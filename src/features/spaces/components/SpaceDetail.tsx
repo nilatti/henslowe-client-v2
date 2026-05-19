@@ -4,6 +4,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { spaceQueryOptions, useDeleteSpace } from '../api/spaces'
 import { SpaceForm } from './SpaceForm'
 import { useIsSuperAdmin, useUserRoleForSpace } from '../../../hooks/useUserRole'
+import { ConflictsManager } from '../../conflicts/components/ConflictsManager'
 import {
   Button,
   Card,
@@ -165,25 +166,10 @@ export function SpaceDetail({ spaceId }: SpaceDetailProps) {
           )}
 
           {activeTab === 'conflicts' && (
-            <Card className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">
-                    {space.conflicts.length} conflict
-                    {space.conflicts.length !== 1 ? 's' : ''}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">
-                    {space.conflict_patterns.length} recurring pattern
-                    {space.conflict_patterns.length !== 1 ? 's' : ''}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-400 italic">
-                  Full conflict management coming soon.
-                </p>
-              </div>
-            </Card>
+            <ConflictsManager
+              spaceId={spaceId}
+              canEdit={isAdmin}
+            />
           )}
         </>
       )}

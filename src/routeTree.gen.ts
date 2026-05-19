@@ -27,6 +27,7 @@ import { Route as SpacesSpaceIdIndexRouteImport } from './routes/spaces/$spaceId
 import { Route as ProductionsProductionIdIndexRouteImport } from './routes/productions/$productionId/index'
 import { Route as PlaysPlayIdIndexRouteImport } from './routes/plays/$playId/index'
 import { Route as AuthorsAuthorIdIndexRouteImport } from './routes/authors/$authorId/index'
+import { Route as ProductionsProductionIdRehearsalsRouteImport } from './routes/productions/$productionId/rehearsals'
 import { Route as PlaysPlayIdScriptRouteImport } from './routes/plays/$playId/script'
 import { Route as PlaysPlayIdCharactersIndexRouteImport } from './routes/plays/$playId/characters/index'
 import { Route as PlaysPlayIdActsActIdIndexRouteImport } from './routes/plays/$playId/acts/$actId/index'
@@ -127,6 +128,12 @@ const AuthorsAuthorIdIndexRoute = AuthorsAuthorIdIndexRouteImport.update({
   path: '/authors/$authorId/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductionsProductionIdRehearsalsRoute =
+  ProductionsProductionIdRehearsalsRouteImport.update({
+    id: '/productions/$productionId/rehearsals',
+    path: '/productions/$productionId/rehearsals',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PlaysPlayIdScriptRoute = PlaysPlayIdScriptRouteImport.update({
   id: '/plays/$playId/script',
   path: '/plays/$playId/script',
@@ -185,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/theaters/': typeof TheatersIndexRoute
   '/users/': typeof UsersIndexRoute
   '/plays/$playId/script': typeof PlaysPlayIdScriptRoute
+  '/productions/$productionId/rehearsals': typeof ProductionsProductionIdRehearsalsRoute
   '/authors/$authorId/': typeof AuthorsAuthorIdIndexRoute
   '/plays/$playId/': typeof PlaysPlayIdIndexRoute
   '/productions/$productionId/': typeof ProductionsProductionIdIndexRoute
@@ -212,6 +220,7 @@ export interface FileRoutesByTo {
   '/theaters': typeof TheatersIndexRoute
   '/users': typeof UsersIndexRoute
   '/plays/$playId/script': typeof PlaysPlayIdScriptRoute
+  '/productions/$productionId/rehearsals': typeof ProductionsProductionIdRehearsalsRoute
   '/authors/$authorId': typeof AuthorsAuthorIdIndexRoute
   '/plays/$playId': typeof PlaysPlayIdIndexRoute
   '/productions/$productionId': typeof ProductionsProductionIdIndexRoute
@@ -240,6 +249,7 @@ export interface FileRoutesById {
   '/theaters/': typeof TheatersIndexRoute
   '/users/': typeof UsersIndexRoute
   '/plays/$playId/script': typeof PlaysPlayIdScriptRoute
+  '/productions/$productionId/rehearsals': typeof ProductionsProductionIdRehearsalsRoute
   '/authors/$authorId/': typeof AuthorsAuthorIdIndexRoute
   '/plays/$playId/': typeof PlaysPlayIdIndexRoute
   '/productions/$productionId/': typeof ProductionsProductionIdIndexRoute
@@ -269,6 +279,7 @@ export interface FileRouteTypes {
     | '/theaters/'
     | '/users/'
     | '/plays/$playId/script'
+    | '/productions/$productionId/rehearsals'
     | '/authors/$authorId/'
     | '/plays/$playId/'
     | '/productions/$productionId/'
@@ -296,6 +307,7 @@ export interface FileRouteTypes {
     | '/theaters'
     | '/users'
     | '/plays/$playId/script'
+    | '/productions/$productionId/rehearsals'
     | '/authors/$authorId'
     | '/plays/$playId'
     | '/productions/$productionId'
@@ -323,6 +335,7 @@ export interface FileRouteTypes {
     | '/theaters/'
     | '/users/'
     | '/plays/$playId/script'
+    | '/productions/$productionId/rehearsals'
     | '/authors/$authorId/'
     | '/plays/$playId/'
     | '/productions/$productionId/'
@@ -351,6 +364,7 @@ export interface RootRouteChildren {
   TheatersIndexRoute: typeof TheatersIndexRoute
   UsersIndexRoute: typeof UsersIndexRoute
   PlaysPlayIdScriptRoute: typeof PlaysPlayIdScriptRoute
+  ProductionsProductionIdRehearsalsRoute: typeof ProductionsProductionIdRehearsalsRoute
   AuthorsAuthorIdIndexRoute: typeof AuthorsAuthorIdIndexRoute
   PlaysPlayIdIndexRoute: typeof PlaysPlayIdIndexRoute
   ProductionsProductionIdIndexRoute: typeof ProductionsProductionIdIndexRoute
@@ -493,6 +507,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthorsAuthorIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/productions/$productionId/rehearsals': {
+      id: '/productions/$productionId/rehearsals'
+      path: '/productions/$productionId/rehearsals'
+      fullPath: '/productions/$productionId/rehearsals'
+      preLoaderRoute: typeof ProductionsProductionIdRehearsalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/plays/$playId/script': {
       id: '/plays/$playId/script'
       path: '/plays/$playId/script'
@@ -559,6 +580,8 @@ const rootRouteChildren: RootRouteChildren = {
   TheatersIndexRoute: TheatersIndexRoute,
   UsersIndexRoute: UsersIndexRoute,
   PlaysPlayIdScriptRoute: PlaysPlayIdScriptRoute,
+  ProductionsProductionIdRehearsalsRoute:
+    ProductionsProductionIdRehearsalsRoute,
   AuthorsAuthorIdIndexRoute: AuthorsAuthorIdIndexRoute,
   PlaysPlayIdIndexRoute: PlaysPlayIdIndexRoute,
   ProductionsProductionIdIndexRoute: ProductionsProductionIdIndexRoute,

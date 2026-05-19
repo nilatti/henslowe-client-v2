@@ -131,11 +131,20 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
           )}
 
           {activeTab === 'rehearsals' && (
-            <Card className="p-4">
-              <p className="text-sm text-gray-400 italic">
-                Rehearsal management coming in a future update.
-              </p>
-            </Card>
+            <div className="space-y-4">
+              <div className="flex justify-end">
+                <Link
+                  to="/productions/$productionId/rehearsals"
+                  params={{ productionId: String(productionId) }}
+                  className="text-sm text-blue-600 hover:text-blue-800"
+                >
+                  View full rehearsal schedule →
+                </Link>
+              </div>
+              <Card className="p-4 text-sm text-gray-500 text-center">
+                Full rehearsal schedule available at the link above.
+              </Card>
+            </div>
           )}
         </>
       )}

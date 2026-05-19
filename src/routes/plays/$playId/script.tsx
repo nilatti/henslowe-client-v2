@@ -1,4 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { playScriptQueryOptions } from '../../../features/script/api/script'
+import { ScriptPage } from '../../../features/script/components/ScriptPage'
 import { type RouterContext } from '../../../types/router'
 
 export const Route = createFileRoute('/plays/$playId/script')({
@@ -7,12 +9,10 @@ export const Route = createFileRoute('/plays/$playId/script')({
       throw redirect({ to: '/login' })
     }
   },
-  component: function ScriptPlaceholder() {
-    return (
-      <div className="p-8 text-center text-gray-500">
-        <p className="text-lg font-medium mb-2">Script viewer</p>
-        <p className="text-sm">Coming in a future update.</p>
-      </div>
-    )
+  loader: ({ params, context: { queryClient } }) =>
+    queryClient.ensureQueryData(playScriptQueryOptions(Number(params.playId))),
+  component: function ScriptRoute() {
+    const { playId } = Route.useParams()
+    return <ScriptPage playId={Number(playId)} />
   },
 })

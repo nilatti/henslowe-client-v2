@@ -6,6 +6,7 @@ import { UserForm } from './UserForm'
 import { useAuth } from '../../../hooks/useAuth'
 import { useIsSuperAdmin } from '../../../hooks/useUserRole'
 import { buildUserName } from '../../../utils/actorUtils'
+import { ConflictsManager } from '../../conflicts/components/ConflictsManager'
 import {
   Button,
   Card,
@@ -248,24 +249,11 @@ export function UserDetail({ userId }: UserDetailProps) {
             </Card>
           )}
 
-          {activeTab === 'conflicts' && user.conflicts && (
-            <Card className="p-6">
-              <div className="space-y-2">
-                <p className="text-sm text-gray-700">
-                  {user.conflicts.length} conflict
-                  {user.conflicts.length !== 1 ? 's' : ''}
-                </p>
-                {user.conflict_patterns && (
-                  <p className="text-sm text-gray-700">
-                    {user.conflict_patterns.length} recurring pattern
-                    {user.conflict_patterns.length !== 1 ? 's' : ''}
-                  </p>
-                )}
-                <p className="text-xs text-gray-400 italic">
-                  Full conflict management coming soon.
-                </p>
-              </div>
-            </Card>
+          {activeTab === 'conflicts' && (
+            <ConflictsManager
+              userId={userId}
+              canEdit={canEdit}
+            />
           )}
         </>
       )}
