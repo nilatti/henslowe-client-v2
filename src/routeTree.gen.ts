@@ -10,7 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as HelpRouteImport } from './routes/help'
+import { Route as GettingStartedRouteImport } from './routes/getting-started'
 import { Route as FreeRouteImport } from './routes/free'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as UsersIndexRouteImport } from './routes/users/index'
 import { Route as TheatersIndexRouteImport } from './routes/theaters/index'
@@ -49,9 +53,29 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GettingStartedRoute = GettingStartedRouteImport.update({
+  id: '/getting-started',
+  path: '/getting-started',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FreeRoute = FreeRouteImport.update({
   id: '/free',
   path: '/free',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -227,7 +251,11 @@ const PlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
+  '/about': typeof AboutRoute
+  '/faq': typeof FaqRoute
   '/free': typeof FreeRouteWithChildren
+  '/getting-started': typeof GettingStartedRoute
+  '/help': typeof HelpRoute
   '/login': typeof LoginRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/free/casting': typeof FreeCastingRoute
@@ -261,6 +289,10 @@ export interface FileRoutesByFullPath {
   '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/': typeof PlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute
 }
 export interface FileRoutesByTo {
+  '/about': typeof AboutRoute
+  '/faq': typeof FaqRoute
+  '/getting-started': typeof GettingStartedRoute
+  '/help': typeof HelpRoute
   '/login': typeof LoginRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/free/casting': typeof FreeCastingRoute
@@ -297,7 +329,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/about': typeof AboutRoute
+  '/faq': typeof FaqRoute
   '/free': typeof FreeRouteWithChildren
+  '/getting-started': typeof GettingStartedRoute
+  '/help': typeof HelpRoute
   '/login': typeof LoginRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/free/casting': typeof FreeCastingRoute
@@ -335,7 +371,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/faq'
     | '/free'
+    | '/getting-started'
+    | '/help'
     | '/login'
     | '/auth/callback'
     | '/free/casting'
@@ -369,6 +409,10 @@ export interface FileRouteTypes {
     | '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/about'
+    | '/faq'
+    | '/getting-started'
+    | '/help'
     | '/login'
     | '/auth/callback'
     | '/free/casting'
@@ -404,7 +448,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_authenticated'
+    | '/about'
+    | '/faq'
     | '/free'
+    | '/getting-started'
+    | '/help'
     | '/login'
     | '/auth/callback'
     | '/free/casting'
@@ -441,7 +489,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AboutRoute: typeof AboutRoute
+  FaqRoute: typeof FaqRoute
   FreeRoute: typeof FreeRouteWithChildren
+  GettingStartedRoute: typeof GettingStartedRoute
+  HelpRoute: typeof HelpRoute
   LoginRoute: typeof LoginRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   SpecializationsSpecializationIdRoute: typeof SpecializationsSpecializationIdRoute
@@ -478,11 +530,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/getting-started': {
+      id: '/getting-started'
+      path: '/getting-started'
+      fullPath: '/getting-started'
+      preLoaderRoute: typeof GettingStartedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/free': {
       id: '/free'
       path: '/free'
       fullPath: '/free'
       preLoaderRoute: typeof FreeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -746,7 +826,11 @@ const FreeRouteWithChildren = FreeRoute._addFileChildren(FreeRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AboutRoute: AboutRoute,
+  FaqRoute: FaqRoute,
   FreeRoute: FreeRouteWithChildren,
+  GettingStartedRoute: GettingStartedRoute,
+  HelpRoute: HelpRoute,
   LoginRoute: LoginRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   SpecializationsSpecializationIdRoute: SpecializationsSpecializationIdRoute,
