@@ -69,6 +69,49 @@ export interface PlaySkeleton {
   acts: ActSkeleton[]
 }
 
+// Lines returned by the play show action (characters with their lines aggregated)
+export interface CharacterBreakdownLine {
+  id: number
+  number: string
+  kind: string | null
+  original_content: string
+  new_content: string | null
+  character_id: number | null
+  character_group_id: number | null
+  french_scene_id: number
+  xml_id: string | null
+}
+
+export interface CharacterWithLines {
+  id: number
+  name: string
+  xml_id?: string | null
+  age: string | null
+  gender: string | null
+  description: string | null
+  play_id: number
+  lines: CharacterBreakdownLine[]
+}
+
+export interface CharacterGroupWithLines {
+  id: number
+  name: string
+  xml_id?: string | null
+  play_id: number
+  lines: CharacterBreakdownLine[]
+}
+
+// Returned by GET /api/v1/plays/:id (the full show action)
+export interface PlayWithCharacters {
+  id: number
+  title: string
+  canonical: boolean
+  author: PlayAuthor
+  characters: CharacterWithLines[]
+  character_groups: CharacterGroupWithLines[]
+  acts: ActSkeleton[]
+}
+
 // Selector helpers — derive flat arrays from skeleton
 export function getScenes(skeleton: PlaySkeleton): SceneSkeleton[] {
   return skeleton.acts.flatMap(act => act.scenes)

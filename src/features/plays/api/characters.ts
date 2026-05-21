@@ -13,12 +13,17 @@ export const characterQueryOptions = (id: number) =>
       api.get(`/api/v1/characters/${id}`).then(r => r.data),
   })
 
+function invalidatePlay(qc: ReturnType<typeof useQueryClient>, playId: number) {
+  qc.invalidateQueries({ queryKey: ['plays', playId, 'skeleton'] })
+  qc.invalidateQueries({ queryKey: ['plays', playId], exact: true })
+}
+
 export function useCreateCharacter(playId: number) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: Omit<Character, 'id'>) =>
       api.post(`/api/v1/plays/${playId}/characters`, { character: data }).then(r => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['plays', playId, 'skeleton'] }),
+    onSuccess: () => invalidatePlay(qc, playId),
   })
 }
 
@@ -27,7 +32,7 @@ export function useUpdateCharacter(playId: number) {
   return useMutation({
     mutationFn: updateMutationFn<Character>('characters'),
     onSuccess: (_, vars) => {
-      qc.invalidateQueries({ queryKey: ['plays', playId, 'skeleton'] })
+      invalidatePlay(qc, playId)
       qc.invalidateQueries({ queryKey: ['characters', vars.id] })
     },
   })
@@ -37,7 +42,7 @@ export function useDeleteCharacter(playId: number) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: deleteMutationFn('characters'),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['plays', playId, 'skeleton'] }),
+    onSuccess: () => invalidatePlay(qc, playId),
   })
 }
 
@@ -48,7 +53,7 @@ export function useCreateCharacterGroup(playId: number) {
       api
         .post(`/api/v1/plays/${playId}/character_groups`, { character_group: { ...data, play_id: playId } })
         .then(r => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['plays', playId, 'skeleton'] }),
+    onSuccess: () => invalidatePlay(qc, playId),
   })
 }
 
@@ -56,7 +61,7 @@ export function useUpdateCharacterGroup(playId: number) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: updateMutationFn<PlayCharacterGroup>('character_groups'),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['plays', playId, 'skeleton'] }),
+    onSuccess: () => invalidatePlay(qc, playId),
   })
 }
 
@@ -64,6 +69,6 @@ export function useDeleteCharacterGroup(playId: number) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: deleteMutationFn('character_groups'),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['plays', playId, 'skeleton'] }),
+    onSuccess: () => invalidatePlay(qc, playId),
   })
 }

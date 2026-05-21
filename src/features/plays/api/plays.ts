@@ -6,7 +6,7 @@ import {
   deleteMutationFn,
 } from '../../../api/queryFactory'
 import api from '../../../api/client'
-import { type PlayListItem, type PlaySkeleton } from '../types/play'
+import { type PlayListItem, type PlaySkeleton, type PlayWithCharacters } from '../types/play'
 
 // List — uses play_titles endpoint for minimal payload
 export const playsQueryOptions = () =>
@@ -14,6 +14,14 @@ export const playsQueryOptions = () =>
     queryKey: ['plays'],
     queryFn: (): Promise<PlayListItem[]> =>
       api.get('/api/v1/plays/play_titles').then(r => r.data),
+  })
+
+// Full show — characters with aggregated lines, used for character breakdown
+export const playQueryOptions = (id: number) =>
+  queryOptions({
+    queryKey: ['plays', id],
+    queryFn: (): Promise<PlayWithCharacters> =>
+      api.get(`/api/v1/plays/${id}`).then(r => r.data),
   })
 
 // Skeleton — full hierarchy for detail page
