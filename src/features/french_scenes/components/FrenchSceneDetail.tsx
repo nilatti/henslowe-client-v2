@@ -5,6 +5,7 @@ import { frenchSceneQueryOptions, useDeleteFrenchScene } from '../api/frenchScen
 import { playSkeletonQueryOptions } from '../../plays/api/plays'
 import { FrenchSceneForm } from './FrenchSceneForm'
 import { OnStagesManager } from './OnStagesManager'
+import { EntranceExitsList } from '../../productions/components/EntranceExits/EntranceExitsList'
 import { useIsSuperAdmin } from '../../../hooks/useUserRole'
 import {
   Button,
@@ -145,6 +146,16 @@ export function FrenchSceneDetail({
             frenchScene={frenchScene}
             playSkeleton={playSkeleton}
           />
+
+          {playSkeleton.production_id != null && (
+            <Card className="p-4">
+              <EntranceExitsList
+                frenchSceneId={frenchSceneId}
+                productionId={playSkeleton.production_id}
+                characters={playSkeleton.characters}
+              />
+            </Card>
+          )}
 
           <Card className="p-4">
             <p className="text-sm text-gray-400 italic">

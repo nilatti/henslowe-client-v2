@@ -4,6 +4,7 @@ import { Link } from '@tanstack/react-router'
 import { playScriptQueryOptions, useBulkUpdateLines } from '../api/script'
 import { TextSelector, type SelectionKey } from './TextSelector'
 import { ScriptViewer } from './ScriptViewer'
+import { ExportButtons } from './ExportButtons'
 import { Button } from '../../../components/ui'
 import {
   useUserRoleForProduction,
@@ -14,7 +15,7 @@ import {
   getFrenchScenesFromAct,
   getFrenchScenesFromPlay,
 } from '../utils/scriptUtils'
-import type { MergedText } from '../types/script'
+import type { MergedText, ScriptAct } from '../types/script'
 
 interface ScriptPageProps {
   playId: number
@@ -66,6 +67,12 @@ export function ScriptPage({ playId }: ScriptPageProps) {
     }
 
     return null
+  }, [selectedKey, script])
+
+  const selectedAct = useMemo((): ScriptAct | null => {
+    if (!selectedKey?.startsWith('act-')) return null
+    const actId = Number(selectedKey.split('-')[1])
+    return script.acts.find(a => a.id === actId) ?? null
   }, [selectedKey, script])
 
   const selectedLabel = useMemo(() => {
@@ -182,9 +189,14 @@ export function ScriptPage({ playId }: ScriptPageProps) {
             </div>
           ) : (
             <>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                {selectedLabel}
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {selectedLabel}
+                </h2>
+                {selectedAct && (
+                  <ExportButtons act={selectedAct} playTitle={script.title} />
+                )}
+              </div>
               {selectedText && (
                 <ScriptViewer
                   text={selectedText}

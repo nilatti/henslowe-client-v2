@@ -48,6 +48,8 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
     { id: 'info', label: 'Info' },
     { id: 'people', label: 'People' },
     { id: 'rehearsals', label: 'Rehearsals' },
+    { id: 'doubling-charts', label: 'Doubling Charts' },
+    { id: 'set-design', label: 'Set Design' },
   ]
 
   return (
@@ -143,6 +145,40 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
               </div>
               <Card className="p-4 text-sm text-gray-500 text-center">
                 Full rehearsal schedule available at the link above.
+              </Card>
+            </div>
+          )}
+
+          {activeTab === 'doubling-charts' && (
+            <div className="space-y-4">
+              <div className="flex justify-end">
+                <Link
+                  to="/productions/$productionId/doubling-charts"
+                  params={{ productionId: String(productionId) }}
+                  className="text-sm text-blue-600 hover:text-blue-800"
+                >
+                  View doubling charts →
+                </Link>
+              </div>
+              <Card className="p-4 text-sm text-gray-500 text-center">
+                Full doubling charts available at the link above.
+              </Card>
+            </div>
+          )}
+
+          {activeTab === 'set-design' && (
+            <div className="space-y-4">
+              <div className="flex justify-end">
+                <Link
+                  to="/productions/$productionId/set-design"
+                  params={{ productionId: String(productionId) }}
+                  className="text-sm text-blue-600 hover:text-blue-800"
+                >
+                  View set design →
+                </Link>
+              </div>
+              <Card className="p-4 text-sm text-gray-500 text-center">
+                Full set design dashboard available at the link above.
               </Card>
             </div>
           )}

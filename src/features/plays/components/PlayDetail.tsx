@@ -105,13 +105,27 @@ export function PlayDetail({ playId }: PlayDetailProps) {
                     {play.canonical ? 'Canonical' : 'Production copy'}
                   </dd>
                 </div>
-                <div className="pt-2 flex gap-3">
+                <div className="pt-2 flex gap-3 flex-wrap">
                   <Link
                     to="/plays/$playId/script"
                     params={{ playId: String(playId) }}
                     className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                   >
                     View script →
+                  </Link>
+                  <Link
+                    to="/plays/$playId/part-scripts"
+                    params={{ playId: String(playId) }}
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    Part scripts →
+                  </Link>
+                  <Link
+                    to="/plays/$playId/word-clouds"
+                    params={{ playId: String(playId) }}
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    Word clouds →
                   </Link>
                 </div>
               </dl>

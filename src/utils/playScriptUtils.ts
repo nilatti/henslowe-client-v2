@@ -328,8 +328,6 @@ function sortLines(arrayOfLines: Line[]): Line[] {
 }
 
 // suppress unused function warnings for non-exported helpers
-void filterEmptyActs;
-void filterEmptyScenes;
 void letterValue;
 
 export {
@@ -337,7 +335,9 @@ export {
   calculateLineCount,
   calculateRunTime,
   determineTypeOfLine,
+  filterEmptyActs,
   filterEmptyContent,
+  filterEmptyScenes,
   getFrenchScenesFromAct,
   getFrenchScenesFromPlay,
   getLinesForCharacter,

@@ -14,6 +14,7 @@ import { Route as HelpRouteImport } from './routes/help'
 import { Route as GettingStartedRouteImport } from './routes/getting-started'
 import { Route as FreeRouteImport } from './routes/free'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as UsersIndexRouteImport } from './routes/users/index'
@@ -39,8 +40,12 @@ import { Route as SpacesSpaceIdIndexRouteImport } from './routes/spaces/$spaceId
 import { Route as ProductionsProductionIdIndexRouteImport } from './routes/productions/$productionId/index'
 import { Route as PlaysPlayIdIndexRouteImport } from './routes/plays/$playId/index'
 import { Route as AuthorsAuthorIdIndexRouteImport } from './routes/authors/$authorId/index'
+import { Route as ProductionsProductionIdSetDesignRouteImport } from './routes/productions/$productionId/set-design'
 import { Route as ProductionsProductionIdRehearsalsRouteImport } from './routes/productions/$productionId/rehearsals'
+import { Route as ProductionsProductionIdDoublingChartsRouteImport } from './routes/productions/$productionId/doubling-charts'
+import { Route as PlaysPlayIdWordCloudsRouteImport } from './routes/plays/$playId/word-clouds'
 import { Route as PlaysPlayIdScriptRouteImport } from './routes/plays/$playId/script'
+import { Route as PlaysPlayIdPartScriptsRouteImport } from './routes/plays/$playId/part-scripts'
 import { Route as PlaysPlayIdCharactersIndexRouteImport } from './routes/plays/$playId/characters/index'
 import { Route as PlaysPlayIdActsActIdIndexRouteImport } from './routes/plays/$playId/acts/$actId/index'
 import { Route as PlaysPlayIdActsActIdScenesNewRouteImport } from './routes/plays/$playId/acts/$actId/scenes/new'
@@ -71,6 +76,11 @@ const FreeRoute = FreeRouteImport.update({
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -199,15 +209,37 @@ const AuthorsAuthorIdIndexRoute = AuthorsAuthorIdIndexRouteImport.update({
   path: '/authors/$authorId/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductionsProductionIdSetDesignRoute =
+  ProductionsProductionIdSetDesignRouteImport.update({
+    id: '/productions/$productionId/set-design',
+    path: '/productions/$productionId/set-design',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ProductionsProductionIdRehearsalsRoute =
   ProductionsProductionIdRehearsalsRouteImport.update({
     id: '/productions/$productionId/rehearsals',
     path: '/productions/$productionId/rehearsals',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ProductionsProductionIdDoublingChartsRoute =
+  ProductionsProductionIdDoublingChartsRouteImport.update({
+    id: '/productions/$productionId/doubling-charts',
+    path: '/productions/$productionId/doubling-charts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PlaysPlayIdWordCloudsRoute = PlaysPlayIdWordCloudsRouteImport.update({
+  id: '/plays/$playId/word-clouds',
+  path: '/plays/$playId/word-clouds',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlaysPlayIdScriptRoute = PlaysPlayIdScriptRouteImport.update({
   id: '/plays/$playId/script',
   path: '/plays/$playId/script',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaysPlayIdPartScriptsRoute = PlaysPlayIdPartScriptsRouteImport.update({
+  id: '/plays/$playId/part-scripts',
+  path: '/plays/$playId/part-scripts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlaysPlayIdCharactersIndexRoute =
@@ -252,6 +284,7 @@ const PlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
   '/faq': typeof FaqRoute
   '/free': typeof FreeRouteWithChildren
   '/getting-started': typeof GettingStartedRoute
@@ -273,8 +306,12 @@ export interface FileRoutesByFullPath {
   '/specializations/': typeof SpecializationsIndexRoute
   '/theaters/': typeof TheatersIndexRoute
   '/users/': typeof UsersIndexRoute
+  '/plays/$playId/part-scripts': typeof PlaysPlayIdPartScriptsRoute
   '/plays/$playId/script': typeof PlaysPlayIdScriptRoute
+  '/plays/$playId/word-clouds': typeof PlaysPlayIdWordCloudsRoute
+  '/productions/$productionId/doubling-charts': typeof ProductionsProductionIdDoublingChartsRoute
   '/productions/$productionId/rehearsals': typeof ProductionsProductionIdRehearsalsRoute
+  '/productions/$productionId/set-design': typeof ProductionsProductionIdSetDesignRoute
   '/authors/$authorId/': typeof AuthorsAuthorIdIndexRoute
   '/plays/$playId/': typeof PlaysPlayIdIndexRoute
   '/productions/$productionId/': typeof ProductionsProductionIdIndexRoute
@@ -290,6 +327,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
   '/faq': typeof FaqRoute
   '/getting-started': typeof GettingStartedRoute
   '/help': typeof HelpRoute
@@ -311,8 +349,12 @@ export interface FileRoutesByTo {
   '/specializations': typeof SpecializationsIndexRoute
   '/theaters': typeof TheatersIndexRoute
   '/users': typeof UsersIndexRoute
+  '/plays/$playId/part-scripts': typeof PlaysPlayIdPartScriptsRoute
   '/plays/$playId/script': typeof PlaysPlayIdScriptRoute
+  '/plays/$playId/word-clouds': typeof PlaysPlayIdWordCloudsRoute
+  '/productions/$productionId/doubling-charts': typeof ProductionsProductionIdDoublingChartsRoute
   '/productions/$productionId/rehearsals': typeof ProductionsProductionIdRehearsalsRoute
+  '/productions/$productionId/set-design': typeof ProductionsProductionIdSetDesignRoute
   '/authors/$authorId': typeof AuthorsAuthorIdIndexRoute
   '/plays/$playId': typeof PlaysPlayIdIndexRoute
   '/productions/$productionId': typeof ProductionsProductionIdIndexRoute
@@ -330,6 +372,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
   '/faq': typeof FaqRoute
   '/free': typeof FreeRouteWithChildren
   '/getting-started': typeof GettingStartedRoute
@@ -352,8 +395,12 @@ export interface FileRoutesById {
   '/specializations/': typeof SpecializationsIndexRoute
   '/theaters/': typeof TheatersIndexRoute
   '/users/': typeof UsersIndexRoute
+  '/plays/$playId/part-scripts': typeof PlaysPlayIdPartScriptsRoute
   '/plays/$playId/script': typeof PlaysPlayIdScriptRoute
+  '/plays/$playId/word-clouds': typeof PlaysPlayIdWordCloudsRoute
+  '/productions/$productionId/doubling-charts': typeof ProductionsProductionIdDoublingChartsRoute
   '/productions/$productionId/rehearsals': typeof ProductionsProductionIdRehearsalsRoute
+  '/productions/$productionId/set-design': typeof ProductionsProductionIdSetDesignRoute
   '/authors/$authorId/': typeof AuthorsAuthorIdIndexRoute
   '/plays/$playId/': typeof PlaysPlayIdIndexRoute
   '/productions/$productionId/': typeof ProductionsProductionIdIndexRoute
@@ -372,6 +419,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/account'
     | '/faq'
     | '/free'
     | '/getting-started'
@@ -393,8 +441,12 @@ export interface FileRouteTypes {
     | '/specializations/'
     | '/theaters/'
     | '/users/'
+    | '/plays/$playId/part-scripts'
     | '/plays/$playId/script'
+    | '/plays/$playId/word-clouds'
+    | '/productions/$productionId/doubling-charts'
     | '/productions/$productionId/rehearsals'
+    | '/productions/$productionId/set-design'
     | '/authors/$authorId/'
     | '/plays/$playId/'
     | '/productions/$productionId/'
@@ -410,6 +462,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/about'
+    | '/account'
     | '/faq'
     | '/getting-started'
     | '/help'
@@ -431,8 +484,12 @@ export interface FileRouteTypes {
     | '/specializations'
     | '/theaters'
     | '/users'
+    | '/plays/$playId/part-scripts'
     | '/plays/$playId/script'
+    | '/plays/$playId/word-clouds'
+    | '/productions/$productionId/doubling-charts'
     | '/productions/$productionId/rehearsals'
+    | '/productions/$productionId/set-design'
     | '/authors/$authorId'
     | '/plays/$playId'
     | '/productions/$productionId'
@@ -449,6 +506,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/about'
+    | '/account'
     | '/faq'
     | '/free'
     | '/getting-started'
@@ -471,8 +529,12 @@ export interface FileRouteTypes {
     | '/specializations/'
     | '/theaters/'
     | '/users/'
+    | '/plays/$playId/part-scripts'
     | '/plays/$playId/script'
+    | '/plays/$playId/word-clouds'
+    | '/productions/$productionId/doubling-charts'
     | '/productions/$productionId/rehearsals'
+    | '/productions/$productionId/set-design'
     | '/authors/$authorId/'
     | '/plays/$playId/'
     | '/productions/$productionId/'
@@ -490,6 +552,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
+  AccountRoute: typeof AccountRoute
   FaqRoute: typeof FaqRoute
   FreeRoute: typeof FreeRouteWithChildren
   GettingStartedRoute: typeof GettingStartedRoute
@@ -505,8 +568,12 @@ export interface RootRouteChildren {
   SpecializationsIndexRoute: typeof SpecializationsIndexRoute
   TheatersIndexRoute: typeof TheatersIndexRoute
   UsersIndexRoute: typeof UsersIndexRoute
+  PlaysPlayIdPartScriptsRoute: typeof PlaysPlayIdPartScriptsRoute
   PlaysPlayIdScriptRoute: typeof PlaysPlayIdScriptRoute
+  PlaysPlayIdWordCloudsRoute: typeof PlaysPlayIdWordCloudsRoute
+  ProductionsProductionIdDoublingChartsRoute: typeof ProductionsProductionIdDoublingChartsRoute
   ProductionsProductionIdRehearsalsRoute: typeof ProductionsProductionIdRehearsalsRoute
+  ProductionsProductionIdSetDesignRoute: typeof ProductionsProductionIdSetDesignRoute
   AuthorsAuthorIdIndexRoute: typeof AuthorsAuthorIdIndexRoute
   PlaysPlayIdIndexRoute: typeof PlaysPlayIdIndexRoute
   ProductionsProductionIdIndexRoute: typeof ProductionsProductionIdIndexRoute
@@ -556,6 +623,13 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -733,6 +807,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthorsAuthorIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/productions/$productionId/set-design': {
+      id: '/productions/$productionId/set-design'
+      path: '/productions/$productionId/set-design'
+      fullPath: '/productions/$productionId/set-design'
+      preLoaderRoute: typeof ProductionsProductionIdSetDesignRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/productions/$productionId/rehearsals': {
       id: '/productions/$productionId/rehearsals'
       path: '/productions/$productionId/rehearsals'
@@ -740,11 +821,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductionsProductionIdRehearsalsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/productions/$productionId/doubling-charts': {
+      id: '/productions/$productionId/doubling-charts'
+      path: '/productions/$productionId/doubling-charts'
+      fullPath: '/productions/$productionId/doubling-charts'
+      preLoaderRoute: typeof ProductionsProductionIdDoublingChartsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plays/$playId/word-clouds': {
+      id: '/plays/$playId/word-clouds'
+      path: '/plays/$playId/word-clouds'
+      fullPath: '/plays/$playId/word-clouds'
+      preLoaderRoute: typeof PlaysPlayIdWordCloudsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/plays/$playId/script': {
       id: '/plays/$playId/script'
       path: '/plays/$playId/script'
       fullPath: '/plays/$playId/script'
       preLoaderRoute: typeof PlaysPlayIdScriptRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plays/$playId/part-scripts': {
+      id: '/plays/$playId/part-scripts'
+      path: '/plays/$playId/part-scripts'
+      fullPath: '/plays/$playId/part-scripts'
+      preLoaderRoute: typeof PlaysPlayIdPartScriptsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/plays/$playId/characters/': {
@@ -827,6 +929,7 @@ const FreeRouteWithChildren = FreeRoute._addFileChildren(FreeRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
+  AccountRoute: AccountRoute,
   FaqRoute: FaqRoute,
   FreeRoute: FreeRouteWithChildren,
   GettingStartedRoute: GettingStartedRoute,
@@ -842,9 +945,14 @@ const rootRouteChildren: RootRouteChildren = {
   SpecializationsIndexRoute: SpecializationsIndexRoute,
   TheatersIndexRoute: TheatersIndexRoute,
   UsersIndexRoute: UsersIndexRoute,
+  PlaysPlayIdPartScriptsRoute: PlaysPlayIdPartScriptsRoute,
   PlaysPlayIdScriptRoute: PlaysPlayIdScriptRoute,
+  PlaysPlayIdWordCloudsRoute: PlaysPlayIdWordCloudsRoute,
+  ProductionsProductionIdDoublingChartsRoute:
+    ProductionsProductionIdDoublingChartsRoute,
   ProductionsProductionIdRehearsalsRoute:
     ProductionsProductionIdRehearsalsRoute,
+  ProductionsProductionIdSetDesignRoute: ProductionsProductionIdSetDesignRoute,
   AuthorsAuthorIdIndexRoute: AuthorsAuthorIdIndexRoute,
   PlaysPlayIdIndexRoute: PlaysPlayIdIndexRoute,
   ProductionsProductionIdIndexRoute: ProductionsProductionIdIndexRoute,
