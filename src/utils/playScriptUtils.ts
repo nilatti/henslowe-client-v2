@@ -1,6 +1,5 @@
 import _ from "lodash";
-// @ts-expect-error - install syllable: npm install syllable @types/syllable
-import Syllable from "syllable";
+import { syllable as Syllable } from "syllable";
 
 interface Line {
   new_content?: string;

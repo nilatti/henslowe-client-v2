@@ -17,9 +17,15 @@ import { Route as SpecializationsIndexRouteImport } from './routes/specializatio
 import { Route as SpacesIndexRouteImport } from './routes/spaces/index'
 import { Route as ProductionsIndexRouteImport } from './routes/productions/index'
 import { Route as PlaysIndexRouteImport } from './routes/plays/index'
+import { Route as FreeIndexRouteImport } from './routes/free/index'
 import { Route as AuthorsIndexRouteImport } from './routes/authors/index'
 import { Route as SpecializationsNewRouteImport } from './routes/specializations/new'
 import { Route as SpecializationsSpecializationIdRouteImport } from './routes/specializations/$specializationId'
+import { Route as FreeWordCloudRouteImport } from './routes/free/word-cloud'
+import { Route as FreePartScriptsRouteImport } from './routes/free/part-scripts'
+import { Route as FreeDoublingRouteImport } from './routes/free/doubling'
+import { Route as FreeCutRouteImport } from './routes/free/cut'
+import { Route as FreeCastingRouteImport } from './routes/free/casting'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as UsersUserIdIndexRouteImport } from './routes/users/$userId/index'
 import { Route as TheatersTheaterIdIndexRouteImport } from './routes/theaters/$theaterId/index'
@@ -76,6 +82,11 @@ const PlaysIndexRoute = PlaysIndexRouteImport.update({
   path: '/plays/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FreeIndexRoute = FreeIndexRouteImport.update({
+  id: '/free/',
+  path: '/free/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthorsIndexRoute = AuthorsIndexRouteImport.update({
   id: '/authors/',
   path: '/authors/',
@@ -92,6 +103,31 @@ const SpecializationsSpecializationIdRoute =
     path: '/specializations/$specializationId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const FreeWordCloudRoute = FreeWordCloudRouteImport.update({
+  id: '/free/word-cloud',
+  path: '/free/word-cloud',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreePartScriptsRoute = FreePartScriptsRouteImport.update({
+  id: '/free/part-scripts',
+  path: '/free/part-scripts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreeDoublingRoute = FreeDoublingRouteImport.update({
+  id: '/free/doubling',
+  path: '/free/doubling',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreeCutRoute = FreeCutRouteImport.update({
+  id: '/free/cut',
+  path: '/free/cut',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreeCastingRoute = FreeCastingRouteImport.update({
+  id: '/free/casting',
+  path: '/free/casting',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -182,9 +218,15 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/free/casting': typeof FreeCastingRoute
+  '/free/cut': typeof FreeCutRoute
+  '/free/doubling': typeof FreeDoublingRoute
+  '/free/part-scripts': typeof FreePartScriptsRoute
+  '/free/word-cloud': typeof FreeWordCloudRoute
   '/specializations/$specializationId': typeof SpecializationsSpecializationIdRoute
   '/specializations/new': typeof SpecializationsNewRoute
   '/authors/': typeof AuthorsIndexRoute
+  '/free/': typeof FreeIndexRoute
   '/plays/': typeof PlaysIndexRoute
   '/productions/': typeof ProductionsIndexRoute
   '/spaces/': typeof SpacesIndexRoute
@@ -210,9 +252,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/free/casting': typeof FreeCastingRoute
+  '/free/cut': typeof FreeCutRoute
+  '/free/doubling': typeof FreeDoublingRoute
+  '/free/part-scripts': typeof FreePartScriptsRoute
+  '/free/word-cloud': typeof FreeWordCloudRoute
   '/specializations/$specializationId': typeof SpecializationsSpecializationIdRoute
   '/specializations/new': typeof SpecializationsNewRoute
   '/authors': typeof AuthorsIndexRoute
+  '/free': typeof FreeIndexRoute
   '/plays': typeof PlaysIndexRoute
   '/productions': typeof ProductionsIndexRoute
   '/spaces': typeof SpacesIndexRoute
@@ -239,9 +287,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/free/casting': typeof FreeCastingRoute
+  '/free/cut': typeof FreeCutRoute
+  '/free/doubling': typeof FreeDoublingRoute
+  '/free/part-scripts': typeof FreePartScriptsRoute
+  '/free/word-cloud': typeof FreeWordCloudRoute
   '/specializations/$specializationId': typeof SpecializationsSpecializationIdRoute
   '/specializations/new': typeof SpecializationsNewRoute
   '/authors/': typeof AuthorsIndexRoute
+  '/free/': typeof FreeIndexRoute
   '/plays/': typeof PlaysIndexRoute
   '/productions/': typeof ProductionsIndexRoute
   '/spaces/': typeof SpacesIndexRoute
@@ -269,9 +323,15 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/auth/callback'
+    | '/free/casting'
+    | '/free/cut'
+    | '/free/doubling'
+    | '/free/part-scripts'
+    | '/free/word-cloud'
     | '/specializations/$specializationId'
     | '/specializations/new'
     | '/authors/'
+    | '/free/'
     | '/plays/'
     | '/productions/'
     | '/spaces/'
@@ -297,9 +357,15 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/auth/callback'
+    | '/free/casting'
+    | '/free/cut'
+    | '/free/doubling'
+    | '/free/part-scripts'
+    | '/free/word-cloud'
     | '/specializations/$specializationId'
     | '/specializations/new'
     | '/authors'
+    | '/free'
     | '/plays'
     | '/productions'
     | '/spaces'
@@ -325,9 +391,15 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/auth/callback'
+    | '/free/casting'
+    | '/free/cut'
+    | '/free/doubling'
+    | '/free/part-scripts'
+    | '/free/word-cloud'
     | '/specializations/$specializationId'
     | '/specializations/new'
     | '/authors/'
+    | '/free/'
     | '/plays/'
     | '/productions/'
     | '/spaces/'
@@ -354,9 +426,15 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  FreeCastingRoute: typeof FreeCastingRoute
+  FreeCutRoute: typeof FreeCutRoute
+  FreeDoublingRoute: typeof FreeDoublingRoute
+  FreePartScriptsRoute: typeof FreePartScriptsRoute
+  FreeWordCloudRoute: typeof FreeWordCloudRoute
   SpecializationsSpecializationIdRoute: typeof SpecializationsSpecializationIdRoute
   SpecializationsNewRoute: typeof SpecializationsNewRoute
   AuthorsIndexRoute: typeof AuthorsIndexRoute
+  FreeIndexRoute: typeof FreeIndexRoute
   PlaysIndexRoute: typeof PlaysIndexRoute
   ProductionsIndexRoute: typeof ProductionsIndexRoute
   SpacesIndexRoute: typeof SpacesIndexRoute
@@ -437,6 +515,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlaysIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/free/': {
+      id: '/free/'
+      path: '/free'
+      fullPath: '/free/'
+      preLoaderRoute: typeof FreeIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/authors/': {
       id: '/authors/'
       path: '/authors'
@@ -456,6 +541,41 @@ declare module '@tanstack/react-router' {
       path: '/specializations/$specializationId'
       fullPath: '/specializations/$specializationId'
       preLoaderRoute: typeof SpecializationsSpecializationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/free/word-cloud': {
+      id: '/free/word-cloud'
+      path: '/free/word-cloud'
+      fullPath: '/free/word-cloud'
+      preLoaderRoute: typeof FreeWordCloudRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/free/part-scripts': {
+      id: '/free/part-scripts'
+      path: '/free/part-scripts'
+      fullPath: '/free/part-scripts'
+      preLoaderRoute: typeof FreePartScriptsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/free/doubling': {
+      id: '/free/doubling'
+      path: '/free/doubling'
+      fullPath: '/free/doubling'
+      preLoaderRoute: typeof FreeDoublingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/free/cut': {
+      id: '/free/cut'
+      path: '/free/cut'
+      fullPath: '/free/cut'
+      preLoaderRoute: typeof FreeCutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/free/casting': {
+      id: '/free/casting'
+      path: '/free/casting'
+      fullPath: '/free/casting'
+      preLoaderRoute: typeof FreeCastingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/callback': {
@@ -570,9 +690,15 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  FreeCastingRoute: FreeCastingRoute,
+  FreeCutRoute: FreeCutRoute,
+  FreeDoublingRoute: FreeDoublingRoute,
+  FreePartScriptsRoute: FreePartScriptsRoute,
+  FreeWordCloudRoute: FreeWordCloudRoute,
   SpecializationsSpecializationIdRoute: SpecializationsSpecializationIdRoute,
   SpecializationsNewRoute: SpecializationsNewRoute,
   AuthorsIndexRoute: AuthorsIndexRoute,
+  FreeIndexRoute: FreeIndexRoute,
   PlaysIndexRoute: PlaysIndexRoute,
   ProductionsIndexRoute: ProductionsIndexRoute,
   SpacesIndexRoute: SpacesIndexRoute,
