@@ -8,7 +8,7 @@ import {
   type SortingState,
 } from '@tanstack/react-table'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { usersQueryOptions, useDeleteUser } from '../api/users'
 import type { UserSummary } from '../types/user'
 import { buildUserName } from '../../../utils/actorUtils'
@@ -19,6 +19,7 @@ export function UsersList() {
   const { data: users } = useSuspenseQuery(usersQueryOptions())
   const deleteUser = useDeleteUser()
   const isSuperAdmin = useIsSuperAdmin()
+  const navigate = useNavigate()
 
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'last_name', desc: false },
@@ -83,7 +84,14 @@ export function UsersList() {
 
   return (
     <div>
-      <PageHeader title="Users" />
+      <PageHeader
+        title="Users"
+        action={isSuperAdmin ? (
+          <Button onClick={() => navigate({ to: '/users/new' })}>
+            Add person
+          </Button>
+        ) : undefined}
+      />
       <Card>
         <table className="w-full text-sm">
           <thead className="border-b border-gray-200">

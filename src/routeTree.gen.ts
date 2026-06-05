@@ -9,78 +9,53 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as HelpRouteImport } from './routes/help'
-import { Route as GettingStartedRouteImport } from './routes/getting-started'
 import { Route as FreeRouteImport } from './routes/free'
-import { Route as FaqRouteImport } from './routes/faq'
-import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as PublicRouteImport } from './routes/_public'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as UsersIndexRouteImport } from './routes/users/index'
-import { Route as TheatersIndexRouteImport } from './routes/theaters/index'
-import { Route as SpecializationsIndexRouteImport } from './routes/specializations/index'
-import { Route as SpacesIndexRouteImport } from './routes/spaces/index'
-import { Route as ProductionsIndexRouteImport } from './routes/productions/index'
-import { Route as PlaysIndexRouteImport } from './routes/plays/index'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as FreeIndexRouteImport } from './routes/free/index'
-import { Route as AuthorsIndexRouteImport } from './routes/authors/index'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as SpecializationsNewRouteImport } from './routes/specializations/new'
-import { Route as SpecializationsSpecializationIdRouteImport } from './routes/specializations/$specializationId'
 import { Route as FreeWordCloudRouteImport } from './routes/free/word-cloud'
 import { Route as FreePartScriptsRouteImport } from './routes/free/part-scripts'
 import { Route as FreeDoublingRouteImport } from './routes/free/doubling'
 import { Route as FreeCutRouteImport } from './routes/free/cut'
 import { Route as FreeCastingRouteImport } from './routes/free/casting'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
-import { Route as UsersUserIdIndexRouteImport } from './routes/users/$userId/index'
-import { Route as TheatersTheaterIdIndexRouteImport } from './routes/theaters/$theaterId/index'
-import { Route as SpacesSpaceIdIndexRouteImport } from './routes/spaces/$spaceId/index'
-import { Route as ProductionsProductionIdIndexRouteImport } from './routes/productions/$productionId/index'
-import { Route as PlaysPlayIdIndexRouteImport } from './routes/plays/$playId/index'
-import { Route as AuthorsAuthorIdIndexRouteImport } from './routes/authors/$authorId/index'
-import { Route as ProductionsProductionIdSetDesignRouteImport } from './routes/productions/$productionId/set-design'
-import { Route as ProductionsProductionIdRehearsalsRouteImport } from './routes/productions/$productionId/rehearsals'
-import { Route as ProductionsProductionIdDoublingChartsRouteImport } from './routes/productions/$productionId/doubling-charts'
-import { Route as PlaysPlayIdWordCloudsRouteImport } from './routes/plays/$playId/word-clouds'
-import { Route as PlaysPlayIdScriptRouteImport } from './routes/plays/$playId/script'
-import { Route as PlaysPlayIdPartScriptsRouteImport } from './routes/plays/$playId/part-scripts'
-import { Route as PlaysPlayIdCharactersIndexRouteImport } from './routes/plays/$playId/characters/index'
-import { Route as PlaysPlayIdActsActIdIndexRouteImport } from './routes/plays/$playId/acts/$actId/index'
-import { Route as PlaysPlayIdActsActIdScenesNewRouteImport } from './routes/plays/$playId/acts/$actId/scenes/new'
-import { Route as PlaysPlayIdActsActIdScenesSceneIdIndexRouteImport } from './routes/plays/$playId/acts/$actId/scenes/$sceneId/index'
-import { Route as PlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRouteImport } from './routes/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new'
-import { Route as PlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRouteImport } from './routes/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/index'
+import { Route as PublicHelpRouteImport } from './routes/_public/help'
+import { Route as PublicGettingStartedRouteImport } from './routes/_public/getting-started'
+import { Route as PublicFaqRouteImport } from './routes/_public/faq'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
+import { Route as AuthenticatedTheatersIndexRouteImport } from './routes/_authenticated/theaters/index'
+import { Route as AuthenticatedSpecializationsIndexRouteImport } from './routes/_authenticated/specializations/index'
+import { Route as AuthenticatedSpacesIndexRouteImport } from './routes/_authenticated/spaces/index'
+import { Route as AuthenticatedProductionsIndexRouteImport } from './routes/_authenticated/productions/index'
+import { Route as AuthenticatedPlaysIndexRouteImport } from './routes/_authenticated/plays/index'
+import { Route as AuthenticatedAuthorsIndexRouteImport } from './routes/_authenticated/authors/index'
+import { Route as AuthenticatedTheatersNewRouteImport } from './routes/_authenticated/theaters/new'
+import { Route as AuthenticatedSpecializationsNewRouteImport } from './routes/_authenticated/specializations/new'
+import { Route as AuthenticatedSpecializationsSpecializationIdRouteImport } from './routes/_authenticated/specializations/$specializationId'
+import { Route as AuthenticatedUsersUserIdIndexRouteImport } from './routes/_authenticated/users/$userId/index'
+import { Route as AuthenticatedTheatersTheaterIdIndexRouteImport } from './routes/_authenticated/theaters/$theaterId/index'
+import { Route as AuthenticatedSpacesSpaceIdIndexRouteImport } from './routes/_authenticated/spaces/$spaceId/index'
+import { Route as AuthenticatedProductionsProductionIdIndexRouteImport } from './routes/_authenticated/productions/$productionId/index'
+import { Route as AuthenticatedPlaysPlayIdIndexRouteImport } from './routes/_authenticated/plays/$playId/index'
+import { Route as AuthenticatedAuthorsAuthorIdIndexRouteImport } from './routes/_authenticated/authors/$authorId/index'
+import { Route as AuthenticatedProductionsProductionIdSetDesignRouteImport } from './routes/_authenticated/productions/$productionId/set-design'
+import { Route as AuthenticatedProductionsProductionIdRehearsalsRouteImport } from './routes/_authenticated/productions/$productionId/rehearsals'
+import { Route as AuthenticatedProductionsProductionIdDoublingChartsRouteImport } from './routes/_authenticated/productions/$productionId/doubling-charts'
+import { Route as AuthenticatedPlaysPlayIdWordCloudsRouteImport } from './routes/_authenticated/plays/$playId/word-clouds'
+import { Route as AuthenticatedPlaysPlayIdScriptRouteImport } from './routes/_authenticated/plays/$playId/script'
+import { Route as AuthenticatedPlaysPlayIdPartScriptsRouteImport } from './routes/_authenticated/plays/$playId/part-scripts'
+import { Route as AuthenticatedPlaysPlayIdActsActIdIndexRouteImport } from './routes/_authenticated/plays/$playId/acts/$actId/index'
+import { Route as AuthenticatedPlaysPlayIdActsActIdScenesNewRouteImport } from './routes/_authenticated/plays/$playId/acts/$actId/scenes/new'
+import { Route as AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRouteImport } from './routes/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/index'
+import { Route as AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRouteImport } from './routes/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new'
+import { Route as AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRouteImport } from './routes/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/index'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HelpRoute = HelpRouteImport.update({
-  id: '/help',
-  path: '/help',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GettingStartedRoute = GettingStartedRouteImport.update({
-  id: '/getting-started',
-  path: '/getting-started',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const FreeRoute = FreeRouteImport.update({
   id: '/free',
   path: '/free',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FaqRoute = FaqRouteImport.update({
-  id: '/faq',
-  path: '/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountRoute = AccountRouteImport.update({
-  id: '/account',
-  path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -88,38 +63,17 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicRoute = PublicRouteImport.update({
+  id: '/_public',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const UsersIndexRoute = UsersIndexRouteImport.update({
-  id: '/users/',
-  path: '/users/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TheatersIndexRoute = TheatersIndexRouteImport.update({
-  id: '/theaters/',
-  path: '/theaters/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SpecializationsIndexRoute = SpecializationsIndexRouteImport.update({
-  id: '/specializations/',
-  path: '/specializations/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SpacesIndexRoute = SpacesIndexRouteImport.update({
-  id: '/spaces/',
-  path: '/spaces/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductionsIndexRoute = ProductionsIndexRouteImport.update({
-  id: '/productions/',
-  path: '/productions/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlaysIndexRoute = PlaysIndexRouteImport.update({
-  id: '/plays/',
-  path: '/plays/',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FreeIndexRoute = FreeIndexRouteImport.update({
@@ -127,27 +81,6 @@ const FreeIndexRoute = FreeIndexRouteImport.update({
   path: '/',
   getParentRoute: () => FreeRoute,
 } as any)
-const AuthorsIndexRoute = AuthorsIndexRouteImport.update({
-  id: '/authors/',
-  path: '/authors/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const SpecializationsNewRoute = SpecializationsNewRouteImport.update({
-  id: '/specializations/new',
-  path: '/specializations/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SpecializationsSpecializationIdRoute =
-  SpecializationsSpecializationIdRouteImport.update({
-    id: '/specializations/$specializationId',
-    path: '/specializations/$specializationId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const FreeWordCloudRoute = FreeWordCloudRouteImport.update({
   id: '/word-cloud',
   path: '/word-cloud',
@@ -178,263 +111,343 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const UsersUserIdIndexRoute = UsersUserIdIndexRouteImport.update({
-  id: '/users/$userId/',
-  path: '/users/$userId/',
-  getParentRoute: () => rootRouteImport,
+const PublicHelpRoute = PublicHelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => PublicRoute,
 } as any)
-const TheatersTheaterIdIndexRoute = TheatersTheaterIdIndexRouteImport.update({
-  id: '/theaters/$theaterId/',
-  path: '/theaters/$theaterId/',
-  getParentRoute: () => rootRouteImport,
+const PublicGettingStartedRoute = PublicGettingStartedRouteImport.update({
+  id: '/getting-started',
+  path: '/getting-started',
+  getParentRoute: () => PublicRoute,
 } as any)
-const SpacesSpaceIdIndexRoute = SpacesSpaceIdIndexRouteImport.update({
-  id: '/spaces/$spaceId/',
-  path: '/spaces/$spaceId/',
-  getParentRoute: () => rootRouteImport,
+const PublicFaqRoute = PublicFaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => PublicRoute,
 } as any)
-const ProductionsProductionIdIndexRoute =
-  ProductionsProductionIdIndexRouteImport.update({
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexRouteImport.update({
+  id: '/users/',
+  path: '/users/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTheatersIndexRoute =
+  AuthenticatedTheatersIndexRouteImport.update({
+    id: '/theaters/',
+    path: '/theaters/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSpecializationsIndexRoute =
+  AuthenticatedSpecializationsIndexRouteImport.update({
+    id: '/specializations/',
+    path: '/specializations/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSpacesIndexRoute =
+  AuthenticatedSpacesIndexRouteImport.update({
+    id: '/spaces/',
+    path: '/spaces/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedProductionsIndexRoute =
+  AuthenticatedProductionsIndexRouteImport.update({
+    id: '/productions/',
+    path: '/productions/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPlaysIndexRoute = AuthenticatedPlaysIndexRouteImport.update({
+  id: '/plays/',
+  path: '/plays/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAuthorsIndexRoute =
+  AuthenticatedAuthorsIndexRouteImport.update({
+    id: '/authors/',
+    path: '/authors/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTheatersNewRoute =
+  AuthenticatedTheatersNewRouteImport.update({
+    id: '/theaters/new',
+    path: '/theaters/new',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSpecializationsNewRoute =
+  AuthenticatedSpecializationsNewRouteImport.update({
+    id: '/specializations/new',
+    path: '/specializations/new',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSpecializationsSpecializationIdRoute =
+  AuthenticatedSpecializationsSpecializationIdRouteImport.update({
+    id: '/specializations/$specializationId',
+    path: '/specializations/$specializationId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedUsersUserIdIndexRoute =
+  AuthenticatedUsersUserIdIndexRouteImport.update({
+    id: '/users/$userId/',
+    path: '/users/$userId/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTheatersTheaterIdIndexRoute =
+  AuthenticatedTheatersTheaterIdIndexRouteImport.update({
+    id: '/theaters/$theaterId/',
+    path: '/theaters/$theaterId/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSpacesSpaceIdIndexRoute =
+  AuthenticatedSpacesSpaceIdIndexRouteImport.update({
+    id: '/spaces/$spaceId/',
+    path: '/spaces/$spaceId/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedProductionsProductionIdIndexRoute =
+  AuthenticatedProductionsProductionIdIndexRouteImport.update({
     id: '/productions/$productionId/',
     path: '/productions/$productionId/',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const PlaysPlayIdIndexRoute = PlaysPlayIdIndexRouteImport.update({
-  id: '/plays/$playId/',
-  path: '/plays/$playId/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthorsAuthorIdIndexRoute = AuthorsAuthorIdIndexRouteImport.update({
-  id: '/authors/$authorId/',
-  path: '/authors/$authorId/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductionsProductionIdSetDesignRoute =
-  ProductionsProductionIdSetDesignRouteImport.update({
+const AuthenticatedPlaysPlayIdIndexRoute =
+  AuthenticatedPlaysPlayIdIndexRouteImport.update({
+    id: '/plays/$playId/',
+    path: '/plays/$playId/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAuthorsAuthorIdIndexRoute =
+  AuthenticatedAuthorsAuthorIdIndexRouteImport.update({
+    id: '/authors/$authorId/',
+    path: '/authors/$authorId/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedProductionsProductionIdSetDesignRoute =
+  AuthenticatedProductionsProductionIdSetDesignRouteImport.update({
     id: '/productions/$productionId/set-design',
     path: '/productions/$productionId/set-design',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const ProductionsProductionIdRehearsalsRoute =
-  ProductionsProductionIdRehearsalsRouteImport.update({
+const AuthenticatedProductionsProductionIdRehearsalsRoute =
+  AuthenticatedProductionsProductionIdRehearsalsRouteImport.update({
     id: '/productions/$productionId/rehearsals',
     path: '/productions/$productionId/rehearsals',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const ProductionsProductionIdDoublingChartsRoute =
-  ProductionsProductionIdDoublingChartsRouteImport.update({
+const AuthenticatedProductionsProductionIdDoublingChartsRoute =
+  AuthenticatedProductionsProductionIdDoublingChartsRouteImport.update({
     id: '/productions/$productionId/doubling-charts',
     path: '/productions/$productionId/doubling-charts',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const PlaysPlayIdWordCloudsRoute = PlaysPlayIdWordCloudsRouteImport.update({
-  id: '/plays/$playId/word-clouds',
-  path: '/plays/$playId/word-clouds',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlaysPlayIdScriptRoute = PlaysPlayIdScriptRouteImport.update({
-  id: '/plays/$playId/script',
-  path: '/plays/$playId/script',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlaysPlayIdPartScriptsRoute = PlaysPlayIdPartScriptsRouteImport.update({
-  id: '/plays/$playId/part-scripts',
-  path: '/plays/$playId/part-scripts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlaysPlayIdCharactersIndexRoute =
-  PlaysPlayIdCharactersIndexRouteImport.update({
-    id: '/plays/$playId/characters/',
-    path: '/plays/$playId/characters/',
-    getParentRoute: () => rootRouteImport,
+const AuthenticatedPlaysPlayIdWordCloudsRoute =
+  AuthenticatedPlaysPlayIdWordCloudsRouteImport.update({
+    id: '/plays/$playId/word-clouds',
+    path: '/plays/$playId/word-clouds',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const PlaysPlayIdActsActIdIndexRoute =
-  PlaysPlayIdActsActIdIndexRouteImport.update({
+const AuthenticatedPlaysPlayIdScriptRoute =
+  AuthenticatedPlaysPlayIdScriptRouteImport.update({
+    id: '/plays/$playId/script',
+    path: '/plays/$playId/script',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPlaysPlayIdPartScriptsRoute =
+  AuthenticatedPlaysPlayIdPartScriptsRouteImport.update({
+    id: '/plays/$playId/part-scripts',
+    path: '/plays/$playId/part-scripts',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPlaysPlayIdActsActIdIndexRoute =
+  AuthenticatedPlaysPlayIdActsActIdIndexRouteImport.update({
     id: '/plays/$playId/acts/$actId/',
     path: '/plays/$playId/acts/$actId/',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const PlaysPlayIdActsActIdScenesNewRoute =
-  PlaysPlayIdActsActIdScenesNewRouteImport.update({
+const AuthenticatedPlaysPlayIdActsActIdScenesNewRoute =
+  AuthenticatedPlaysPlayIdActsActIdScenesNewRouteImport.update({
     id: '/plays/$playId/acts/$actId/scenes/new',
     path: '/plays/$playId/acts/$actId/scenes/new',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const PlaysPlayIdActsActIdScenesSceneIdIndexRoute =
-  PlaysPlayIdActsActIdScenesSceneIdIndexRouteImport.update({
+const AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRoute =
+  AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRouteImport.update({
     id: '/plays/$playId/acts/$actId/scenes/$sceneId/',
     path: '/plays/$playId/acts/$actId/scenes/$sceneId/',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const PlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute =
-  PlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRouteImport.update({
-    id: '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new',
-    path: '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const PlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute =
-  PlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRouteImport.update(
+const AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute =
+  AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRouteImport.update(
+    {
+      id: '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new',
+      path: '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new',
+      getParentRoute: () => AuthenticatedRoute,
+    } as any,
+  )
+const AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute =
+  AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRouteImport.update(
     {
       id: '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/',
       path: '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/',
-      getParentRoute: () => rootRouteImport,
+      getParentRoute: () => AuthenticatedRoute,
     } as any,
   )
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
+  '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
-  '/faq': typeof FaqRoute
   '/free': typeof FreeRouteWithChildren
-  '/getting-started': typeof GettingStartedRoute
-  '/help': typeof HelpRoute
-  '/login': typeof LoginRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/faq': typeof PublicFaqRoute
+  '/getting-started': typeof PublicGettingStartedRoute
+  '/help': typeof PublicHelpRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/free/casting': typeof FreeCastingRoute
   '/free/cut': typeof FreeCutRoute
   '/free/doubling': typeof FreeDoublingRoute
   '/free/part-scripts': typeof FreePartScriptsRoute
   '/free/word-cloud': typeof FreeWordCloudRoute
-  '/specializations/$specializationId': typeof SpecializationsSpecializationIdRoute
-  '/specializations/new': typeof SpecializationsNewRoute
-  '/authors/': typeof AuthorsIndexRoute
   '/free/': typeof FreeIndexRoute
-  '/plays/': typeof PlaysIndexRoute
-  '/productions/': typeof ProductionsIndexRoute
-  '/spaces/': typeof SpacesIndexRoute
-  '/specializations/': typeof SpecializationsIndexRoute
-  '/theaters/': typeof TheatersIndexRoute
-  '/users/': typeof UsersIndexRoute
-  '/plays/$playId/part-scripts': typeof PlaysPlayIdPartScriptsRoute
-  '/plays/$playId/script': typeof PlaysPlayIdScriptRoute
-  '/plays/$playId/word-clouds': typeof PlaysPlayIdWordCloudsRoute
-  '/productions/$productionId/doubling-charts': typeof ProductionsProductionIdDoublingChartsRoute
-  '/productions/$productionId/rehearsals': typeof ProductionsProductionIdRehearsalsRoute
-  '/productions/$productionId/set-design': typeof ProductionsProductionIdSetDesignRoute
-  '/authors/$authorId/': typeof AuthorsAuthorIdIndexRoute
-  '/plays/$playId/': typeof PlaysPlayIdIndexRoute
-  '/productions/$productionId/': typeof ProductionsProductionIdIndexRoute
-  '/spaces/$spaceId/': typeof SpacesSpaceIdIndexRoute
-  '/theaters/$theaterId/': typeof TheatersTheaterIdIndexRoute
-  '/users/$userId/': typeof UsersUserIdIndexRoute
-  '/plays/$playId/characters/': typeof PlaysPlayIdCharactersIndexRoute
-  '/plays/$playId/acts/$actId/': typeof PlaysPlayIdActsActIdIndexRoute
-  '/plays/$playId/acts/$actId/scenes/new': typeof PlaysPlayIdActsActIdScenesNewRoute
-  '/plays/$playId/acts/$actId/scenes/$sceneId/': typeof PlaysPlayIdActsActIdScenesSceneIdIndexRoute
-  '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new': typeof PlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute
-  '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/': typeof PlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute
+  '/specializations/$specializationId': typeof AuthenticatedSpecializationsSpecializationIdRoute
+  '/specializations/new': typeof AuthenticatedSpecializationsNewRoute
+  '/theaters/new': typeof AuthenticatedTheatersNewRoute
+  '/authors/': typeof AuthenticatedAuthorsIndexRoute
+  '/plays/': typeof AuthenticatedPlaysIndexRoute
+  '/productions/': typeof AuthenticatedProductionsIndexRoute
+  '/spaces/': typeof AuthenticatedSpacesIndexRoute
+  '/specializations/': typeof AuthenticatedSpecializationsIndexRoute
+  '/theaters/': typeof AuthenticatedTheatersIndexRoute
+  '/users/': typeof AuthenticatedUsersIndexRoute
+  '/plays/$playId/part-scripts': typeof AuthenticatedPlaysPlayIdPartScriptsRoute
+  '/plays/$playId/script': typeof AuthenticatedPlaysPlayIdScriptRoute
+  '/plays/$playId/word-clouds': typeof AuthenticatedPlaysPlayIdWordCloudsRoute
+  '/productions/$productionId/doubling-charts': typeof AuthenticatedProductionsProductionIdDoublingChartsRoute
+  '/productions/$productionId/rehearsals': typeof AuthenticatedProductionsProductionIdRehearsalsRoute
+  '/productions/$productionId/set-design': typeof AuthenticatedProductionsProductionIdSetDesignRoute
+  '/authors/$authorId/': typeof AuthenticatedAuthorsAuthorIdIndexRoute
+  '/plays/$playId/': typeof AuthenticatedPlaysPlayIdIndexRoute
+  '/productions/$productionId/': typeof AuthenticatedProductionsProductionIdIndexRoute
+  '/spaces/$spaceId/': typeof AuthenticatedSpacesSpaceIdIndexRoute
+  '/theaters/$theaterId/': typeof AuthenticatedTheatersTheaterIdIndexRoute
+  '/users/$userId/': typeof AuthenticatedUsersUserIdIndexRoute
+  '/plays/$playId/acts/$actId/': typeof AuthenticatedPlaysPlayIdActsActIdIndexRoute
+  '/plays/$playId/acts/$actId/scenes/new': typeof AuthenticatedPlaysPlayIdActsActIdScenesNewRoute
+  '/plays/$playId/acts/$actId/scenes/$sceneId/': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRoute
+  '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute
+  '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
-  '/faq': typeof FaqRoute
-  '/getting-started': typeof GettingStartedRoute
-  '/help': typeof HelpRoute
-  '/login': typeof LoginRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/faq': typeof PublicFaqRoute
+  '/getting-started': typeof PublicGettingStartedRoute
+  '/help': typeof PublicHelpRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/free/casting': typeof FreeCastingRoute
   '/free/cut': typeof FreeCutRoute
   '/free/doubling': typeof FreeDoublingRoute
   '/free/part-scripts': typeof FreePartScriptsRoute
   '/free/word-cloud': typeof FreeWordCloudRoute
-  '/specializations/$specializationId': typeof SpecializationsSpecializationIdRoute
-  '/specializations/new': typeof SpecializationsNewRoute
-  '/': typeof AuthenticatedIndexRoute
-  '/authors': typeof AuthorsIndexRoute
   '/free': typeof FreeIndexRoute
-  '/plays': typeof PlaysIndexRoute
-  '/productions': typeof ProductionsIndexRoute
-  '/spaces': typeof SpacesIndexRoute
-  '/specializations': typeof SpecializationsIndexRoute
-  '/theaters': typeof TheatersIndexRoute
-  '/users': typeof UsersIndexRoute
-  '/plays/$playId/part-scripts': typeof PlaysPlayIdPartScriptsRoute
-  '/plays/$playId/script': typeof PlaysPlayIdScriptRoute
-  '/plays/$playId/word-clouds': typeof PlaysPlayIdWordCloudsRoute
-  '/productions/$productionId/doubling-charts': typeof ProductionsProductionIdDoublingChartsRoute
-  '/productions/$productionId/rehearsals': typeof ProductionsProductionIdRehearsalsRoute
-  '/productions/$productionId/set-design': typeof ProductionsProductionIdSetDesignRoute
-  '/authors/$authorId': typeof AuthorsAuthorIdIndexRoute
-  '/plays/$playId': typeof PlaysPlayIdIndexRoute
-  '/productions/$productionId': typeof ProductionsProductionIdIndexRoute
-  '/spaces/$spaceId': typeof SpacesSpaceIdIndexRoute
-  '/theaters/$theaterId': typeof TheatersTheaterIdIndexRoute
-  '/users/$userId': typeof UsersUserIdIndexRoute
-  '/plays/$playId/characters': typeof PlaysPlayIdCharactersIndexRoute
-  '/plays/$playId/acts/$actId': typeof PlaysPlayIdActsActIdIndexRoute
-  '/plays/$playId/acts/$actId/scenes/new': typeof PlaysPlayIdActsActIdScenesNewRoute
-  '/plays/$playId/acts/$actId/scenes/$sceneId': typeof PlaysPlayIdActsActIdScenesSceneIdIndexRoute
-  '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new': typeof PlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute
-  '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId': typeof PlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute
+  '/specializations/$specializationId': typeof AuthenticatedSpecializationsSpecializationIdRoute
+  '/specializations/new': typeof AuthenticatedSpecializationsNewRoute
+  '/theaters/new': typeof AuthenticatedTheatersNewRoute
+  '/authors': typeof AuthenticatedAuthorsIndexRoute
+  '/plays': typeof AuthenticatedPlaysIndexRoute
+  '/productions': typeof AuthenticatedProductionsIndexRoute
+  '/spaces': typeof AuthenticatedSpacesIndexRoute
+  '/specializations': typeof AuthenticatedSpecializationsIndexRoute
+  '/theaters': typeof AuthenticatedTheatersIndexRoute
+  '/users': typeof AuthenticatedUsersIndexRoute
+  '/plays/$playId/part-scripts': typeof AuthenticatedPlaysPlayIdPartScriptsRoute
+  '/plays/$playId/script': typeof AuthenticatedPlaysPlayIdScriptRoute
+  '/plays/$playId/word-clouds': typeof AuthenticatedPlaysPlayIdWordCloudsRoute
+  '/productions/$productionId/doubling-charts': typeof AuthenticatedProductionsProductionIdDoublingChartsRoute
+  '/productions/$productionId/rehearsals': typeof AuthenticatedProductionsProductionIdRehearsalsRoute
+  '/productions/$productionId/set-design': typeof AuthenticatedProductionsProductionIdSetDesignRoute
+  '/authors/$authorId': typeof AuthenticatedAuthorsAuthorIdIndexRoute
+  '/plays/$playId': typeof AuthenticatedPlaysPlayIdIndexRoute
+  '/productions/$productionId': typeof AuthenticatedProductionsProductionIdIndexRoute
+  '/spaces/$spaceId': typeof AuthenticatedSpacesSpaceIdIndexRoute
+  '/theaters/$theaterId': typeof AuthenticatedTheatersTheaterIdIndexRoute
+  '/users/$userId': typeof AuthenticatedUsersUserIdIndexRoute
+  '/plays/$playId/acts/$actId': typeof AuthenticatedPlaysPlayIdActsActIdIndexRoute
+  '/plays/$playId/acts/$actId/scenes/new': typeof AuthenticatedPlaysPlayIdActsActIdScenesNewRoute
+  '/plays/$playId/acts/$actId/scenes/$sceneId': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRoute
+  '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute
+  '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_public': typeof PublicRouteWithChildren
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
-  '/faq': typeof FaqRoute
   '/free': typeof FreeRouteWithChildren
-  '/getting-started': typeof GettingStartedRoute
-  '/help': typeof HelpRoute
-  '/login': typeof LoginRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/_public/faq': typeof PublicFaqRoute
+  '/_public/getting-started': typeof PublicGettingStartedRoute
+  '/_public/help': typeof PublicHelpRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/free/casting': typeof FreeCastingRoute
   '/free/cut': typeof FreeCutRoute
   '/free/doubling': typeof FreeDoublingRoute
   '/free/part-scripts': typeof FreePartScriptsRoute
   '/free/word-cloud': typeof FreeWordCloudRoute
-  '/specializations/$specializationId': typeof SpecializationsSpecializationIdRoute
-  '/specializations/new': typeof SpecializationsNewRoute
-  '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/authors/': typeof AuthorsIndexRoute
   '/free/': typeof FreeIndexRoute
-  '/plays/': typeof PlaysIndexRoute
-  '/productions/': typeof ProductionsIndexRoute
-  '/spaces/': typeof SpacesIndexRoute
-  '/specializations/': typeof SpecializationsIndexRoute
-  '/theaters/': typeof TheatersIndexRoute
-  '/users/': typeof UsersIndexRoute
-  '/plays/$playId/part-scripts': typeof PlaysPlayIdPartScriptsRoute
-  '/plays/$playId/script': typeof PlaysPlayIdScriptRoute
-  '/plays/$playId/word-clouds': typeof PlaysPlayIdWordCloudsRoute
-  '/productions/$productionId/doubling-charts': typeof ProductionsProductionIdDoublingChartsRoute
-  '/productions/$productionId/rehearsals': typeof ProductionsProductionIdRehearsalsRoute
-  '/productions/$productionId/set-design': typeof ProductionsProductionIdSetDesignRoute
-  '/authors/$authorId/': typeof AuthorsAuthorIdIndexRoute
-  '/plays/$playId/': typeof PlaysPlayIdIndexRoute
-  '/productions/$productionId/': typeof ProductionsProductionIdIndexRoute
-  '/spaces/$spaceId/': typeof SpacesSpaceIdIndexRoute
-  '/theaters/$theaterId/': typeof TheatersTheaterIdIndexRoute
-  '/users/$userId/': typeof UsersUserIdIndexRoute
-  '/plays/$playId/characters/': typeof PlaysPlayIdCharactersIndexRoute
-  '/plays/$playId/acts/$actId/': typeof PlaysPlayIdActsActIdIndexRoute
-  '/plays/$playId/acts/$actId/scenes/new': typeof PlaysPlayIdActsActIdScenesNewRoute
-  '/plays/$playId/acts/$actId/scenes/$sceneId/': typeof PlaysPlayIdActsActIdScenesSceneIdIndexRoute
-  '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new': typeof PlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute
-  '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/': typeof PlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute
+  '/_authenticated/specializations/$specializationId': typeof AuthenticatedSpecializationsSpecializationIdRoute
+  '/_authenticated/specializations/new': typeof AuthenticatedSpecializationsNewRoute
+  '/_authenticated/theaters/new': typeof AuthenticatedTheatersNewRoute
+  '/_authenticated/authors/': typeof AuthenticatedAuthorsIndexRoute
+  '/_authenticated/plays/': typeof AuthenticatedPlaysIndexRoute
+  '/_authenticated/productions/': typeof AuthenticatedProductionsIndexRoute
+  '/_authenticated/spaces/': typeof AuthenticatedSpacesIndexRoute
+  '/_authenticated/specializations/': typeof AuthenticatedSpecializationsIndexRoute
+  '/_authenticated/theaters/': typeof AuthenticatedTheatersIndexRoute
+  '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/plays/$playId/part-scripts': typeof AuthenticatedPlaysPlayIdPartScriptsRoute
+  '/_authenticated/plays/$playId/script': typeof AuthenticatedPlaysPlayIdScriptRoute
+  '/_authenticated/plays/$playId/word-clouds': typeof AuthenticatedPlaysPlayIdWordCloudsRoute
+  '/_authenticated/productions/$productionId/doubling-charts': typeof AuthenticatedProductionsProductionIdDoublingChartsRoute
+  '/_authenticated/productions/$productionId/rehearsals': typeof AuthenticatedProductionsProductionIdRehearsalsRoute
+  '/_authenticated/productions/$productionId/set-design': typeof AuthenticatedProductionsProductionIdSetDesignRoute
+  '/_authenticated/authors/$authorId/': typeof AuthenticatedAuthorsAuthorIdIndexRoute
+  '/_authenticated/plays/$playId/': typeof AuthenticatedPlaysPlayIdIndexRoute
+  '/_authenticated/productions/$productionId/': typeof AuthenticatedProductionsProductionIdIndexRoute
+  '/_authenticated/spaces/$spaceId/': typeof AuthenticatedSpacesSpaceIdIndexRoute
+  '/_authenticated/theaters/$theaterId/': typeof AuthenticatedTheatersTheaterIdIndexRoute
+  '/_authenticated/users/$userId/': typeof AuthenticatedUsersUserIdIndexRoute
+  '/_authenticated/plays/$playId/acts/$actId/': typeof AuthenticatedPlaysPlayIdActsActIdIndexRoute
+  '/_authenticated/plays/$playId/acts/$actId/scenes/new': typeof AuthenticatedPlaysPlayIdActsActIdScenesNewRoute
+  '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRoute
+  '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute
+  '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/free'
     | '/account'
     | '/faq'
-    | '/free'
     | '/getting-started'
     | '/help'
-    | '/login'
     | '/auth/callback'
     | '/free/casting'
     | '/free/cut'
     | '/free/doubling'
     | '/free/part-scripts'
     | '/free/word-cloud'
+    | '/free/'
     | '/specializations/$specializationId'
     | '/specializations/new'
+    | '/theaters/new'
     | '/authors/'
-    | '/free/'
     | '/plays/'
     | '/productions/'
     | '/spaces/'
@@ -453,7 +466,6 @@ export interface FileRouteTypes {
     | '/spaces/$spaceId/'
     | '/theaters/$theaterId/'
     | '/users/$userId/'
-    | '/plays/$playId/characters/'
     | '/plays/$playId/acts/$actId/'
     | '/plays/$playId/acts/$actId/scenes/new'
     | '/plays/$playId/acts/$actId/scenes/$sceneId/'
@@ -461,23 +473,23 @@ export interface FileRouteTypes {
     | '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/about'
     | '/account'
     | '/faq'
     | '/getting-started'
     | '/help'
-    | '/login'
     | '/auth/callback'
     | '/free/casting'
     | '/free/cut'
     | '/free/doubling'
     | '/free/part-scripts'
     | '/free/word-cloud'
+    | '/free'
     | '/specializations/$specializationId'
     | '/specializations/new'
-    | '/'
+    | '/theaters/new'
     | '/authors'
-    | '/free'
     | '/plays'
     | '/productions'
     | '/spaces'
@@ -496,7 +508,6 @@ export interface FileRouteTypes {
     | '/spaces/$spaceId'
     | '/theaters/$theaterId'
     | '/users/$userId'
-    | '/plays/$playId/characters'
     | '/plays/$playId/acts/$actId'
     | '/plays/$playId/acts/$actId/scenes/new'
     | '/plays/$playId/acts/$actId/scenes/$sceneId'
@@ -504,132 +515,67 @@ export interface FileRouteTypes {
     | '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId'
   id:
     | '__root__'
+    | '/'
     | '/_authenticated'
+    | '/_public'
     | '/about'
-    | '/account'
-    | '/faq'
     | '/free'
-    | '/getting-started'
-    | '/help'
-    | '/login'
+    | '/_authenticated/account'
+    | '/_public/faq'
+    | '/_public/getting-started'
+    | '/_public/help'
     | '/auth/callback'
     | '/free/casting'
     | '/free/cut'
     | '/free/doubling'
     | '/free/part-scripts'
     | '/free/word-cloud'
-    | '/specializations/$specializationId'
-    | '/specializations/new'
-    | '/_authenticated/'
-    | '/authors/'
     | '/free/'
-    | '/plays/'
-    | '/productions/'
-    | '/spaces/'
-    | '/specializations/'
-    | '/theaters/'
-    | '/users/'
-    | '/plays/$playId/part-scripts'
-    | '/plays/$playId/script'
-    | '/plays/$playId/word-clouds'
-    | '/productions/$productionId/doubling-charts'
-    | '/productions/$productionId/rehearsals'
-    | '/productions/$productionId/set-design'
-    | '/authors/$authorId/'
-    | '/plays/$playId/'
-    | '/productions/$productionId/'
-    | '/spaces/$spaceId/'
-    | '/theaters/$theaterId/'
-    | '/users/$userId/'
-    | '/plays/$playId/characters/'
-    | '/plays/$playId/acts/$actId/'
-    | '/plays/$playId/acts/$actId/scenes/new'
-    | '/plays/$playId/acts/$actId/scenes/$sceneId/'
-    | '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new'
-    | '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/'
+    | '/_authenticated/specializations/$specializationId'
+    | '/_authenticated/specializations/new'
+    | '/_authenticated/theaters/new'
+    | '/_authenticated/authors/'
+    | '/_authenticated/plays/'
+    | '/_authenticated/productions/'
+    | '/_authenticated/spaces/'
+    | '/_authenticated/specializations/'
+    | '/_authenticated/theaters/'
+    | '/_authenticated/users/'
+    | '/_authenticated/plays/$playId/part-scripts'
+    | '/_authenticated/plays/$playId/script'
+    | '/_authenticated/plays/$playId/word-clouds'
+    | '/_authenticated/productions/$productionId/doubling-charts'
+    | '/_authenticated/productions/$productionId/rehearsals'
+    | '/_authenticated/productions/$productionId/set-design'
+    | '/_authenticated/authors/$authorId/'
+    | '/_authenticated/plays/$playId/'
+    | '/_authenticated/productions/$productionId/'
+    | '/_authenticated/spaces/$spaceId/'
+    | '/_authenticated/theaters/$theaterId/'
+    | '/_authenticated/users/$userId/'
+    | '/_authenticated/plays/$playId/acts/$actId/'
+    | '/_authenticated/plays/$playId/acts/$actId/scenes/new'
+    | '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/'
+    | '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new'
+    | '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  PublicRoute: typeof PublicRouteWithChildren
   AboutRoute: typeof AboutRoute
-  AccountRoute: typeof AccountRoute
-  FaqRoute: typeof FaqRoute
   FreeRoute: typeof FreeRouteWithChildren
-  GettingStartedRoute: typeof GettingStartedRoute
-  HelpRoute: typeof HelpRoute
-  LoginRoute: typeof LoginRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
-  SpecializationsSpecializationIdRoute: typeof SpecializationsSpecializationIdRoute
-  SpecializationsNewRoute: typeof SpecializationsNewRoute
-  AuthorsIndexRoute: typeof AuthorsIndexRoute
-  PlaysIndexRoute: typeof PlaysIndexRoute
-  ProductionsIndexRoute: typeof ProductionsIndexRoute
-  SpacesIndexRoute: typeof SpacesIndexRoute
-  SpecializationsIndexRoute: typeof SpecializationsIndexRoute
-  TheatersIndexRoute: typeof TheatersIndexRoute
-  UsersIndexRoute: typeof UsersIndexRoute
-  PlaysPlayIdPartScriptsRoute: typeof PlaysPlayIdPartScriptsRoute
-  PlaysPlayIdScriptRoute: typeof PlaysPlayIdScriptRoute
-  PlaysPlayIdWordCloudsRoute: typeof PlaysPlayIdWordCloudsRoute
-  ProductionsProductionIdDoublingChartsRoute: typeof ProductionsProductionIdDoublingChartsRoute
-  ProductionsProductionIdRehearsalsRoute: typeof ProductionsProductionIdRehearsalsRoute
-  ProductionsProductionIdSetDesignRoute: typeof ProductionsProductionIdSetDesignRoute
-  AuthorsAuthorIdIndexRoute: typeof AuthorsAuthorIdIndexRoute
-  PlaysPlayIdIndexRoute: typeof PlaysPlayIdIndexRoute
-  ProductionsProductionIdIndexRoute: typeof ProductionsProductionIdIndexRoute
-  SpacesSpaceIdIndexRoute: typeof SpacesSpaceIdIndexRoute
-  TheatersTheaterIdIndexRoute: typeof TheatersTheaterIdIndexRoute
-  UsersUserIdIndexRoute: typeof UsersUserIdIndexRoute
-  PlaysPlayIdCharactersIndexRoute: typeof PlaysPlayIdCharactersIndexRoute
-  PlaysPlayIdActsActIdIndexRoute: typeof PlaysPlayIdActsActIdIndexRoute
-  PlaysPlayIdActsActIdScenesNewRoute: typeof PlaysPlayIdActsActIdScenesNewRoute
-  PlaysPlayIdActsActIdScenesSceneIdIndexRoute: typeof PlaysPlayIdActsActIdScenesSceneIdIndexRoute
-  PlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute: typeof PlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute
-  PlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute: typeof PlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/help': {
-      id: '/help'
-      path: '/help'
-      fullPath: '/help'
-      preLoaderRoute: typeof HelpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/getting-started': {
-      id: '/getting-started'
-      path: '/getting-started'
-      fullPath: '/getting-started'
-      preLoaderRoute: typeof GettingStartedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/free': {
       id: '/free'
       path: '/free'
       fullPath: '/free'
       preLoaderRoute: typeof FreeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/faq': {
-      id: '/faq'
-      path: '/faq'
-      fullPath: '/faq'
-      preLoaderRoute: typeof FaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/account': {
-      id: '/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -639,6 +585,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_public': {
+      id: '/_public'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof PublicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -646,46 +599,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/users/': {
-      id: '/users/'
-      path: '/users'
-      fullPath: '/users/'
-      preLoaderRoute: typeof UsersIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/theaters/': {
-      id: '/theaters/'
-      path: '/theaters'
-      fullPath: '/theaters/'
-      preLoaderRoute: typeof TheatersIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/specializations/': {
-      id: '/specializations/'
-      path: '/specializations'
-      fullPath: '/specializations/'
-      preLoaderRoute: typeof SpecializationsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/spaces/': {
-      id: '/spaces/'
-      path: '/spaces'
-      fullPath: '/spaces/'
-      preLoaderRoute: typeof SpacesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/productions/': {
-      id: '/productions/'
-      path: '/productions'
-      fullPath: '/productions/'
-      preLoaderRoute: typeof ProductionsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/plays/': {
-      id: '/plays/'
-      path: '/plays'
-      fullPath: '/plays/'
-      preLoaderRoute: typeof PlaysIndexRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/free/': {
@@ -694,34 +612,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/free/'
       preLoaderRoute: typeof FreeIndexRouteImport
       parentRoute: typeof FreeRoute
-    }
-    '/authors/': {
-      id: '/authors/'
-      path: '/authors'
-      fullPath: '/authors/'
-      preLoaderRoute: typeof AuthorsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/': {
-      id: '/_authenticated/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/specializations/new': {
-      id: '/specializations/new'
-      path: '/specializations/new'
-      fullPath: '/specializations/new'
-      preLoaderRoute: typeof SpecializationsNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/specializations/$specializationId': {
-      id: '/specializations/$specializationId'
-      path: '/specializations/$specializationId'
-      fullPath: '/specializations/$specializationId'
-      preLoaderRoute: typeof SpecializationsSpecializationIdRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/free/word-cloud': {
       id: '/free/word-cloud'
@@ -765,146 +655,321 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/users/$userId/': {
-      id: '/users/$userId/'
+    '/_public/help': {
+      id: '/_public/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof PublicHelpRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/getting-started': {
+      id: '/_public/getting-started'
+      path: '/getting-started'
+      fullPath: '/getting-started'
+      preLoaderRoute: typeof PublicGettingStartedRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/faq': {
+      id: '/_public/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof PublicFaqRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/users/': {
+      id: '/_authenticated/users/'
+      path: '/users'
+      fullPath: '/users/'
+      preLoaderRoute: typeof AuthenticatedUsersIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/theaters/': {
+      id: '/_authenticated/theaters/'
+      path: '/theaters'
+      fullPath: '/theaters/'
+      preLoaderRoute: typeof AuthenticatedTheatersIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/specializations/': {
+      id: '/_authenticated/specializations/'
+      path: '/specializations'
+      fullPath: '/specializations/'
+      preLoaderRoute: typeof AuthenticatedSpecializationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/spaces/': {
+      id: '/_authenticated/spaces/'
+      path: '/spaces'
+      fullPath: '/spaces/'
+      preLoaderRoute: typeof AuthenticatedSpacesIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/productions/': {
+      id: '/_authenticated/productions/'
+      path: '/productions'
+      fullPath: '/productions/'
+      preLoaderRoute: typeof AuthenticatedProductionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/plays/': {
+      id: '/_authenticated/plays/'
+      path: '/plays'
+      fullPath: '/plays/'
+      preLoaderRoute: typeof AuthenticatedPlaysIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/authors/': {
+      id: '/_authenticated/authors/'
+      path: '/authors'
+      fullPath: '/authors/'
+      preLoaderRoute: typeof AuthenticatedAuthorsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/theaters/new': {
+      id: '/_authenticated/theaters/new'
+      path: '/theaters/new'
+      fullPath: '/theaters/new'
+      preLoaderRoute: typeof AuthenticatedTheatersNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/specializations/new': {
+      id: '/_authenticated/specializations/new'
+      path: '/specializations/new'
+      fullPath: '/specializations/new'
+      preLoaderRoute: typeof AuthenticatedSpecializationsNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/specializations/$specializationId': {
+      id: '/_authenticated/specializations/$specializationId'
+      path: '/specializations/$specializationId'
+      fullPath: '/specializations/$specializationId'
+      preLoaderRoute: typeof AuthenticatedSpecializationsSpecializationIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/users/$userId/': {
+      id: '/_authenticated/users/$userId/'
       path: '/users/$userId'
       fullPath: '/users/$userId/'
-      preLoaderRoute: typeof UsersUserIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedUsersUserIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/theaters/$theaterId/': {
-      id: '/theaters/$theaterId/'
+    '/_authenticated/theaters/$theaterId/': {
+      id: '/_authenticated/theaters/$theaterId/'
       path: '/theaters/$theaterId'
       fullPath: '/theaters/$theaterId/'
-      preLoaderRoute: typeof TheatersTheaterIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedTheatersTheaterIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/spaces/$spaceId/': {
-      id: '/spaces/$spaceId/'
+    '/_authenticated/spaces/$spaceId/': {
+      id: '/_authenticated/spaces/$spaceId/'
       path: '/spaces/$spaceId'
       fullPath: '/spaces/$spaceId/'
-      preLoaderRoute: typeof SpacesSpaceIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedSpacesSpaceIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/productions/$productionId/': {
-      id: '/productions/$productionId/'
+    '/_authenticated/productions/$productionId/': {
+      id: '/_authenticated/productions/$productionId/'
       path: '/productions/$productionId'
       fullPath: '/productions/$productionId/'
-      preLoaderRoute: typeof ProductionsProductionIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedProductionsProductionIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/plays/$playId/': {
-      id: '/plays/$playId/'
+    '/_authenticated/plays/$playId/': {
+      id: '/_authenticated/plays/$playId/'
       path: '/plays/$playId'
       fullPath: '/plays/$playId/'
-      preLoaderRoute: typeof PlaysPlayIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPlaysPlayIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/authors/$authorId/': {
-      id: '/authors/$authorId/'
+    '/_authenticated/authors/$authorId/': {
+      id: '/_authenticated/authors/$authorId/'
       path: '/authors/$authorId'
       fullPath: '/authors/$authorId/'
-      preLoaderRoute: typeof AuthorsAuthorIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedAuthorsAuthorIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/productions/$productionId/set-design': {
-      id: '/productions/$productionId/set-design'
+    '/_authenticated/productions/$productionId/set-design': {
+      id: '/_authenticated/productions/$productionId/set-design'
       path: '/productions/$productionId/set-design'
       fullPath: '/productions/$productionId/set-design'
-      preLoaderRoute: typeof ProductionsProductionIdSetDesignRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedProductionsProductionIdSetDesignRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/productions/$productionId/rehearsals': {
-      id: '/productions/$productionId/rehearsals'
+    '/_authenticated/productions/$productionId/rehearsals': {
+      id: '/_authenticated/productions/$productionId/rehearsals'
       path: '/productions/$productionId/rehearsals'
       fullPath: '/productions/$productionId/rehearsals'
-      preLoaderRoute: typeof ProductionsProductionIdRehearsalsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedProductionsProductionIdRehearsalsRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/productions/$productionId/doubling-charts': {
-      id: '/productions/$productionId/doubling-charts'
+    '/_authenticated/productions/$productionId/doubling-charts': {
+      id: '/_authenticated/productions/$productionId/doubling-charts'
       path: '/productions/$productionId/doubling-charts'
       fullPath: '/productions/$productionId/doubling-charts'
-      preLoaderRoute: typeof ProductionsProductionIdDoublingChartsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedProductionsProductionIdDoublingChartsRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/plays/$playId/word-clouds': {
-      id: '/plays/$playId/word-clouds'
+    '/_authenticated/plays/$playId/word-clouds': {
+      id: '/_authenticated/plays/$playId/word-clouds'
       path: '/plays/$playId/word-clouds'
       fullPath: '/plays/$playId/word-clouds'
-      preLoaderRoute: typeof PlaysPlayIdWordCloudsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPlaysPlayIdWordCloudsRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/plays/$playId/script': {
-      id: '/plays/$playId/script'
+    '/_authenticated/plays/$playId/script': {
+      id: '/_authenticated/plays/$playId/script'
       path: '/plays/$playId/script'
       fullPath: '/plays/$playId/script'
-      preLoaderRoute: typeof PlaysPlayIdScriptRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPlaysPlayIdScriptRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/plays/$playId/part-scripts': {
-      id: '/plays/$playId/part-scripts'
+    '/_authenticated/plays/$playId/part-scripts': {
+      id: '/_authenticated/plays/$playId/part-scripts'
       path: '/plays/$playId/part-scripts'
       fullPath: '/plays/$playId/part-scripts'
-      preLoaderRoute: typeof PlaysPlayIdPartScriptsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPlaysPlayIdPartScriptsRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/plays/$playId/characters/': {
-      id: '/plays/$playId/characters/'
-      path: '/plays/$playId/characters'
-      fullPath: '/plays/$playId/characters/'
-      preLoaderRoute: typeof PlaysPlayIdCharactersIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/plays/$playId/acts/$actId/': {
-      id: '/plays/$playId/acts/$actId/'
+    '/_authenticated/plays/$playId/acts/$actId/': {
+      id: '/_authenticated/plays/$playId/acts/$actId/'
       path: '/plays/$playId/acts/$actId'
       fullPath: '/plays/$playId/acts/$actId/'
-      preLoaderRoute: typeof PlaysPlayIdActsActIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPlaysPlayIdActsActIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/plays/$playId/acts/$actId/scenes/new': {
-      id: '/plays/$playId/acts/$actId/scenes/new'
+    '/_authenticated/plays/$playId/acts/$actId/scenes/new': {
+      id: '/_authenticated/plays/$playId/acts/$actId/scenes/new'
       path: '/plays/$playId/acts/$actId/scenes/new'
       fullPath: '/plays/$playId/acts/$actId/scenes/new'
-      preLoaderRoute: typeof PlaysPlayIdActsActIdScenesNewRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPlaysPlayIdActsActIdScenesNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/plays/$playId/acts/$actId/scenes/$sceneId/': {
-      id: '/plays/$playId/acts/$actId/scenes/$sceneId/'
+    '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/': {
+      id: '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/'
       path: '/plays/$playId/acts/$actId/scenes/$sceneId'
       fullPath: '/plays/$playId/acts/$actId/scenes/$sceneId/'
-      preLoaderRoute: typeof PlaysPlayIdActsActIdScenesSceneIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new': {
-      id: '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new'
+    '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new': {
+      id: '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new'
       path: '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new'
       fullPath: '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new'
-      preLoaderRoute: typeof PlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/': {
-      id: '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/'
+    '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/': {
+      id: '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/'
       path: '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId'
       fullPath: '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId/'
-      preLoaderRoute: typeof PlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedSpecializationsSpecializationIdRoute: typeof AuthenticatedSpecializationsSpecializationIdRoute
+  AuthenticatedSpecializationsNewRoute: typeof AuthenticatedSpecializationsNewRoute
+  AuthenticatedTheatersNewRoute: typeof AuthenticatedTheatersNewRoute
+  AuthenticatedAuthorsIndexRoute: typeof AuthenticatedAuthorsIndexRoute
+  AuthenticatedPlaysIndexRoute: typeof AuthenticatedPlaysIndexRoute
+  AuthenticatedProductionsIndexRoute: typeof AuthenticatedProductionsIndexRoute
+  AuthenticatedSpacesIndexRoute: typeof AuthenticatedSpacesIndexRoute
+  AuthenticatedSpecializationsIndexRoute: typeof AuthenticatedSpecializationsIndexRoute
+  AuthenticatedTheatersIndexRoute: typeof AuthenticatedTheatersIndexRoute
+  AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedPlaysPlayIdPartScriptsRoute: typeof AuthenticatedPlaysPlayIdPartScriptsRoute
+  AuthenticatedPlaysPlayIdScriptRoute: typeof AuthenticatedPlaysPlayIdScriptRoute
+  AuthenticatedPlaysPlayIdWordCloudsRoute: typeof AuthenticatedPlaysPlayIdWordCloudsRoute
+  AuthenticatedProductionsProductionIdDoublingChartsRoute: typeof AuthenticatedProductionsProductionIdDoublingChartsRoute
+  AuthenticatedProductionsProductionIdRehearsalsRoute: typeof AuthenticatedProductionsProductionIdRehearsalsRoute
+  AuthenticatedProductionsProductionIdSetDesignRoute: typeof AuthenticatedProductionsProductionIdSetDesignRoute
+  AuthenticatedAuthorsAuthorIdIndexRoute: typeof AuthenticatedAuthorsAuthorIdIndexRoute
+  AuthenticatedPlaysPlayIdIndexRoute: typeof AuthenticatedPlaysPlayIdIndexRoute
+  AuthenticatedProductionsProductionIdIndexRoute: typeof AuthenticatedProductionsProductionIdIndexRoute
+  AuthenticatedSpacesSpaceIdIndexRoute: typeof AuthenticatedSpacesSpaceIdIndexRoute
+  AuthenticatedTheatersTheaterIdIndexRoute: typeof AuthenticatedTheatersTheaterIdIndexRoute
+  AuthenticatedUsersUserIdIndexRoute: typeof AuthenticatedUsersUserIdIndexRoute
+  AuthenticatedPlaysPlayIdActsActIdIndexRoute: typeof AuthenticatedPlaysPlayIdActsActIdIndexRoute
+  AuthenticatedPlaysPlayIdActsActIdScenesNewRoute: typeof AuthenticatedPlaysPlayIdActsActIdScenesNewRoute
+  AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRoute: typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRoute
+  AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute: typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute
+  AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute: typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedSpecializationsSpecializationIdRoute:
+    AuthenticatedSpecializationsSpecializationIdRoute,
+  AuthenticatedSpecializationsNewRoute: AuthenticatedSpecializationsNewRoute,
+  AuthenticatedTheatersNewRoute: AuthenticatedTheatersNewRoute,
+  AuthenticatedAuthorsIndexRoute: AuthenticatedAuthorsIndexRoute,
+  AuthenticatedPlaysIndexRoute: AuthenticatedPlaysIndexRoute,
+  AuthenticatedProductionsIndexRoute: AuthenticatedProductionsIndexRoute,
+  AuthenticatedSpacesIndexRoute: AuthenticatedSpacesIndexRoute,
+  AuthenticatedSpecializationsIndexRoute:
+    AuthenticatedSpecializationsIndexRoute,
+  AuthenticatedTheatersIndexRoute: AuthenticatedTheatersIndexRoute,
+  AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedPlaysPlayIdPartScriptsRoute:
+    AuthenticatedPlaysPlayIdPartScriptsRoute,
+  AuthenticatedPlaysPlayIdScriptRoute: AuthenticatedPlaysPlayIdScriptRoute,
+  AuthenticatedPlaysPlayIdWordCloudsRoute:
+    AuthenticatedPlaysPlayIdWordCloudsRoute,
+  AuthenticatedProductionsProductionIdDoublingChartsRoute:
+    AuthenticatedProductionsProductionIdDoublingChartsRoute,
+  AuthenticatedProductionsProductionIdRehearsalsRoute:
+    AuthenticatedProductionsProductionIdRehearsalsRoute,
+  AuthenticatedProductionsProductionIdSetDesignRoute:
+    AuthenticatedProductionsProductionIdSetDesignRoute,
+  AuthenticatedAuthorsAuthorIdIndexRoute:
+    AuthenticatedAuthorsAuthorIdIndexRoute,
+  AuthenticatedPlaysPlayIdIndexRoute: AuthenticatedPlaysPlayIdIndexRoute,
+  AuthenticatedProductionsProductionIdIndexRoute:
+    AuthenticatedProductionsProductionIdIndexRoute,
+  AuthenticatedSpacesSpaceIdIndexRoute: AuthenticatedSpacesSpaceIdIndexRoute,
+  AuthenticatedTheatersTheaterIdIndexRoute:
+    AuthenticatedTheatersTheaterIdIndexRoute,
+  AuthenticatedUsersUserIdIndexRoute: AuthenticatedUsersUserIdIndexRoute,
+  AuthenticatedPlaysPlayIdActsActIdIndexRoute:
+    AuthenticatedPlaysPlayIdActsActIdIndexRoute,
+  AuthenticatedPlaysPlayIdActsActIdScenesNewRoute:
+    AuthenticatedPlaysPlayIdActsActIdScenesNewRoute,
+  AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRoute:
+    AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRoute,
+  AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute:
+    AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute,
+  AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute:
+    AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
+
+interface PublicRouteChildren {
+  PublicFaqRoute: typeof PublicFaqRoute
+  PublicGettingStartedRoute: typeof PublicGettingStartedRoute
+  PublicHelpRoute: typeof PublicHelpRoute
+}
+
+const PublicRouteChildren: PublicRouteChildren = {
+  PublicFaqRoute: PublicFaqRoute,
+  PublicGettingStartedRoute: PublicGettingStartedRoute,
+  PublicHelpRoute: PublicHelpRoute,
+}
+
+const PublicRouteWithChildren =
+  PublicRoute._addFileChildren(PublicRouteChildren)
 
 interface FreeRouteChildren {
   FreeCastingRoute: typeof FreeCastingRoute
@@ -927,47 +992,12 @@ const FreeRouteChildren: FreeRouteChildren = {
 const FreeRouteWithChildren = FreeRoute._addFileChildren(FreeRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  PublicRoute: PublicRouteWithChildren,
   AboutRoute: AboutRoute,
-  AccountRoute: AccountRoute,
-  FaqRoute: FaqRoute,
   FreeRoute: FreeRouteWithChildren,
-  GettingStartedRoute: GettingStartedRoute,
-  HelpRoute: HelpRoute,
-  LoginRoute: LoginRoute,
   AuthCallbackRoute: AuthCallbackRoute,
-  SpecializationsSpecializationIdRoute: SpecializationsSpecializationIdRoute,
-  SpecializationsNewRoute: SpecializationsNewRoute,
-  AuthorsIndexRoute: AuthorsIndexRoute,
-  PlaysIndexRoute: PlaysIndexRoute,
-  ProductionsIndexRoute: ProductionsIndexRoute,
-  SpacesIndexRoute: SpacesIndexRoute,
-  SpecializationsIndexRoute: SpecializationsIndexRoute,
-  TheatersIndexRoute: TheatersIndexRoute,
-  UsersIndexRoute: UsersIndexRoute,
-  PlaysPlayIdPartScriptsRoute: PlaysPlayIdPartScriptsRoute,
-  PlaysPlayIdScriptRoute: PlaysPlayIdScriptRoute,
-  PlaysPlayIdWordCloudsRoute: PlaysPlayIdWordCloudsRoute,
-  ProductionsProductionIdDoublingChartsRoute:
-    ProductionsProductionIdDoublingChartsRoute,
-  ProductionsProductionIdRehearsalsRoute:
-    ProductionsProductionIdRehearsalsRoute,
-  ProductionsProductionIdSetDesignRoute: ProductionsProductionIdSetDesignRoute,
-  AuthorsAuthorIdIndexRoute: AuthorsAuthorIdIndexRoute,
-  PlaysPlayIdIndexRoute: PlaysPlayIdIndexRoute,
-  ProductionsProductionIdIndexRoute: ProductionsProductionIdIndexRoute,
-  SpacesSpaceIdIndexRoute: SpacesSpaceIdIndexRoute,
-  TheatersTheaterIdIndexRoute: TheatersTheaterIdIndexRoute,
-  UsersUserIdIndexRoute: UsersUserIdIndexRoute,
-  PlaysPlayIdCharactersIndexRoute: PlaysPlayIdCharactersIndexRoute,
-  PlaysPlayIdActsActIdIndexRoute: PlaysPlayIdActsActIdIndexRoute,
-  PlaysPlayIdActsActIdScenesNewRoute: PlaysPlayIdActsActIdScenesNewRoute,
-  PlaysPlayIdActsActIdScenesSceneIdIndexRoute:
-    PlaysPlayIdActsActIdScenesSceneIdIndexRoute,
-  PlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute:
-    PlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute,
-  PlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute:
-    PlaysPlayIdActsActIdScenesSceneIdFrenchScenesFrenchSceneIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

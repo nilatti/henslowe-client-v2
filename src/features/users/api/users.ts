@@ -1,6 +1,7 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   listQueryOptions,
+  createMutationFn,
   updateMutationFn,
   deleteMutationFn,
 } from '../../../api/queryFactory'
@@ -16,6 +17,14 @@ export const userQueryOptions = (id: number) =>
       import('../../../api/client')
         .then(m => m.default.get(`/api/v1/users/${id}`).then(r => r.data)),
   })
+
+export function useCreateUser() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: createMutationFn<UserEditableFields>('users'),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['users'] }),
+  })
+}
 
 export function useUpdateUser() {
   const qc = useQueryClient()
