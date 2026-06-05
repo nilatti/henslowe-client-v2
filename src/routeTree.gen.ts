@@ -32,6 +32,7 @@ import { Route as AuthenticatedSpacesIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedProductionsIndexRouteImport } from './routes/_authenticated/productions/index'
 import { Route as AuthenticatedPlaysIndexRouteImport } from './routes/_authenticated/plays/index'
 import { Route as AuthenticatedAuthorsIndexRouteImport } from './routes/_authenticated/authors/index'
+import { Route as AuthenticatedUsersNewRouteImport } from './routes/_authenticated/users/new'
 import { Route as AuthenticatedTheatersNewRouteImport } from './routes/_authenticated/theaters/new'
 import { Route as AuthenticatedSpecializationsNewRouteImport } from './routes/_authenticated/specializations/new'
 import { Route as AuthenticatedSpecializationsSpecializationIdRouteImport } from './routes/_authenticated/specializations/$specializationId'
@@ -171,6 +172,11 @@ const AuthenticatedAuthorsIndexRoute =
     path: '/authors/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedUsersNewRoute = AuthenticatedUsersNewRouteImport.update({
+  id: '/users/new',
+  path: '/users/new',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedTheatersNewRoute =
   AuthenticatedTheatersNewRouteImport.update({
     id: '/theaters/new',
@@ -314,6 +320,7 @@ export interface FileRoutesByFullPath {
   '/specializations/$specializationId': typeof AuthenticatedSpecializationsSpecializationIdRoute
   '/specializations/new': typeof AuthenticatedSpecializationsNewRoute
   '/theaters/new': typeof AuthenticatedTheatersNewRoute
+  '/users/new': typeof AuthenticatedUsersNewRoute
   '/authors/': typeof AuthenticatedAuthorsIndexRoute
   '/plays/': typeof AuthenticatedPlaysIndexRoute
   '/productions/': typeof AuthenticatedProductionsIndexRoute
@@ -356,6 +363,7 @@ export interface FileRoutesByTo {
   '/specializations/$specializationId': typeof AuthenticatedSpecializationsSpecializationIdRoute
   '/specializations/new': typeof AuthenticatedSpecializationsNewRoute
   '/theaters/new': typeof AuthenticatedTheatersNewRoute
+  '/users/new': typeof AuthenticatedUsersNewRoute
   '/authors': typeof AuthenticatedAuthorsIndexRoute
   '/plays': typeof AuthenticatedPlaysIndexRoute
   '/productions': typeof AuthenticatedProductionsIndexRoute
@@ -402,6 +410,7 @@ export interface FileRoutesById {
   '/_authenticated/specializations/$specializationId': typeof AuthenticatedSpecializationsSpecializationIdRoute
   '/_authenticated/specializations/new': typeof AuthenticatedSpecializationsNewRoute
   '/_authenticated/theaters/new': typeof AuthenticatedTheatersNewRoute
+  '/_authenticated/users/new': typeof AuthenticatedUsersNewRoute
   '/_authenticated/authors/': typeof AuthenticatedAuthorsIndexRoute
   '/_authenticated/plays/': typeof AuthenticatedPlaysIndexRoute
   '/_authenticated/productions/': typeof AuthenticatedProductionsIndexRoute
@@ -447,6 +456,7 @@ export interface FileRouteTypes {
     | '/specializations/$specializationId'
     | '/specializations/new'
     | '/theaters/new'
+    | '/users/new'
     | '/authors/'
     | '/plays/'
     | '/productions/'
@@ -489,6 +499,7 @@ export interface FileRouteTypes {
     | '/specializations/$specializationId'
     | '/specializations/new'
     | '/theaters/new'
+    | '/users/new'
     | '/authors'
     | '/plays'
     | '/productions'
@@ -534,6 +545,7 @@ export interface FileRouteTypes {
     | '/_authenticated/specializations/$specializationId'
     | '/_authenticated/specializations/new'
     | '/_authenticated/theaters/new'
+    | '/_authenticated/users/new'
     | '/_authenticated/authors/'
     | '/_authenticated/plays/'
     | '/_authenticated/productions/'
@@ -732,6 +744,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuthorsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/users/new': {
+      id: '/_authenticated/users/new'
+      path: '/users/new'
+      fullPath: '/users/new'
+      preLoaderRoute: typeof AuthenticatedUsersNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/theaters/new': {
       id: '/_authenticated/theaters/new'
       path: '/theaters/new'
@@ -880,6 +899,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSpecializationsSpecializationIdRoute: typeof AuthenticatedSpecializationsSpecializationIdRoute
   AuthenticatedSpecializationsNewRoute: typeof AuthenticatedSpecializationsNewRoute
   AuthenticatedTheatersNewRoute: typeof AuthenticatedTheatersNewRoute
+  AuthenticatedUsersNewRoute: typeof AuthenticatedUsersNewRoute
   AuthenticatedAuthorsIndexRoute: typeof AuthenticatedAuthorsIndexRoute
   AuthenticatedPlaysIndexRoute: typeof AuthenticatedPlaysIndexRoute
   AuthenticatedProductionsIndexRoute: typeof AuthenticatedProductionsIndexRoute
@@ -912,6 +932,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedSpecializationsSpecializationIdRoute,
   AuthenticatedSpecializationsNewRoute: AuthenticatedSpecializationsNewRoute,
   AuthenticatedTheatersNewRoute: AuthenticatedTheatersNewRoute,
+  AuthenticatedUsersNewRoute: AuthenticatedUsersNewRoute,
   AuthenticatedAuthorsIndexRoute: AuthenticatedAuthorsIndexRoute,
   AuthenticatedPlaysIndexRoute: AuthenticatedPlaysIndexRoute,
   AuthenticatedProductionsIndexRoute: AuthenticatedProductionsIndexRoute,
