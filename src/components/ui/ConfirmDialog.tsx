@@ -23,7 +23,12 @@ export function ConfirmDialog({
     try {
       await onConfirm()
     } catch (e) {
-      setError((e as Error)?.message || 'Something went wrong')
+      const isTimeout = (e as { code?: string })?.code === 'ECONNABORTED'
+      setError(
+        isTimeout
+          ? 'This is taking longer than expected. The server may still be processing — wait a moment and refresh the page to check.'
+          : (e as Error)?.message || 'Something went wrong'
+      )
       setIsPending(false)
     }
   }
@@ -38,8 +43,7 @@ export function ConfirmDialog({
         <div className="flex gap-3 justify-end">
           <button
             onClick={onCancel}
-            disabled={isPending}
-            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50"
+            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
           >
             Cancel
           </button>

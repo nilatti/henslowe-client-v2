@@ -56,5 +56,5 @@ export function updateMutationFn<T extends { id: number }>(resource: string, sin
 
 export function deleteMutationFn(resource: string) {
   return (id: number) =>
-    api.delete(`/api/v1/${resource}/${id}`).then(r => r.data)
+    api.delete(`/api/v1/${resource}/${id}`, { timeout: 90000 }).then(r => r.data)
 }

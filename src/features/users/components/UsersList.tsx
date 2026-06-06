@@ -145,8 +145,9 @@ export function UsersList() {
           isDestructive
           confirmLabel="Delete"
           onConfirm={async () => {
-            await deleteUser.mutateAsync(confirmDelete.id)
-            setConfirmDelete(null)
+            const id = confirmDelete.id
+            await deleteUser.mutateAsync(id)
+            setConfirmDelete(prev => prev?.id === id ? null : prev)
           }}
           onCancel={() => setConfirmDelete(null)}
         />
