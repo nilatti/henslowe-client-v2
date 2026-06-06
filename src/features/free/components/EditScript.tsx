@@ -7,7 +7,6 @@ import {
   getFrenchScenesFromAct,
   mergeTextFromFrenchScenes,
 } from '../../../utils/playScriptUtils'
-import { determineTypeOfLine } from '../../../utils/playScriptUtils'
 import type { MergedText } from '../../script/types/script'
 
 // Navigation key format used by the old getSelectedText:
@@ -24,8 +23,10 @@ export function EditScript({ linesPerMinute }: EditScriptProps) {
   const { play, getSelectedText, updateLine } = useFreePlayStore()
   const [selectedText, setSelectedText] = useState<object>({})
   const [text, setText] = useState<Partial<MergedText>>({})
+  const [selectedNavKey, setSelectedNavKey] = useState<string | null>(null)
 
   function loadText(textMenuKey: string) {
+    setSelectedNavKey(textMenuKey)
     const slashes = textMenuKey.match(/\//g)?.length ?? 0
     const isPlay = textMenuKey === 'play'
     let textUnit: string
@@ -62,11 +63,14 @@ export function EditScript({ linesPerMinute }: EditScriptProps) {
 
   function handleLineSubmit(line: Parameters<typeof updateLine>[0]) {
     updateLine(line)
-    const type = determineTypeOfLine(line as Parameters<typeof determineTypeOfLine>[0])
-    const fieldKey = `${type}s` as keyof MergedText
-    const oldLines = (text[fieldKey] ?? []) as typeof line[]
-    const newLines = oldLines.map(l => (l.id === line.id ? line : l))
-    setText(prev => ({ ...prev, [fieldKey]: newLines }))
+    const fieldKey: keyof MergedText = (text.stage_directions ?? []).some(l => l.id === line.id)
+      ? 'stage_directions'
+      : (text.sound_cues ?? []).some(l => l.id === line.id)
+      ? 'sound_cues'
+      : 'lines'
+    const oldItems = (text[fieldKey] ?? []) as typeof line[]
+    const newItems = oldItems.map(l => (l.id === line.id ? line : l))
+    setText(prev => ({ ...prev, [fieldKey]: newItems }))
   }
 
   if (!play) return null
@@ -88,7 +92,11 @@ export function EditScript({ linesPerMinute }: EditScriptProps) {
         <nav className="w-48 shrink-0 text-sm overflow-y-auto max-h-screen sticky top-4">
           <button
             onClick={() => loadText('play')}
-            className="w-full text-left px-3 py-1.5 rounded text-sm font-medium mb-1 text-gray-700 hover:bg-gray-100"
+            className={`w-full text-left px-3 py-1.5 rounded text-sm font-medium mb-1 ${
+              selectedNavKey === 'play'
+                ? 'bg-blue-100 text-blue-700'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
           >
             Full play
           </button>
@@ -97,7 +105,11 @@ export function EditScript({ linesPerMinute }: EditScriptProps) {
             <div key={act.id} className="mb-1">
               <button
                 onClick={() => loadText(String(act.id))}
-                className="w-full text-left px-3 py-1.5 rounded text-sm font-medium text-gray-700 hover:bg-gray-100"
+                className={`w-full text-left px-3 py-1.5 rounded text-sm font-medium ${
+                  selectedNavKey === String(act.id)
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
               >
                 Act {act.number}
               </button>
@@ -106,7 +118,11 @@ export function EditScript({ linesPerMinute }: EditScriptProps) {
                 <div key={scene.id} className="ml-3">
                   <button
                     onClick={() => loadText(`${act.id}/${scene.id}`)}
-                    className="w-full text-left px-3 py-1 rounded text-xs text-gray-500 hover:bg-gray-100"
+                    className={`w-full text-left px-3 py-1 rounded text-xs ${
+                      selectedNavKey === `${act.id}/${scene.id}`
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'text-gray-500 hover:bg-gray-100'
+                    }`}
                   >
                     Scene {scene.pretty_name}
                   </button>
@@ -115,7 +131,11 @@ export function EditScript({ linesPerMinute }: EditScriptProps) {
                     <button
                       key={fs.id}
                       onClick={() => loadText(`${act.id}/${scene.id}/${fs.id}`)}
-                      className="w-full text-left px-3 py-0.5 rounded text-xs ml-2 text-gray-400 hover:bg-gray-100"
+                      className={`w-full text-left px-3 py-0.5 rounded text-xs ml-2 ${
+                        selectedNavKey === `${act.id}/${scene.id}/${fs.id}`
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'text-gray-400 hover:bg-gray-100'
+                      }`}
                     >
                       {fs.pretty_name}
                     </button>

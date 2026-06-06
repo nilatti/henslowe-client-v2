@@ -5,6 +5,7 @@ export interface AuthUser {
   last_name: string
   role: string
   subscription_status: string
+  is_superadmin: boolean
 }
 
 export interface AuthState {

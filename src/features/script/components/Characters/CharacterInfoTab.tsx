@@ -71,6 +71,7 @@ export default function CharacterInfoTab({ character, playId }: Props) {
     } else {
       deleteCharacterGroup.mutate(character.id)
     }
+    setConfirmDelete(false)
   }
 
   return (

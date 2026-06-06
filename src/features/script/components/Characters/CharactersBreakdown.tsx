@@ -16,9 +16,10 @@ function tabKey(c: CharacterEntry): string {
 
 interface Props {
   playId: number
+  embedded?: boolean
 }
 
-export default function CharactersBreakdown({ playId }: Props) {
+export default function CharactersBreakdown({ playId, embedded = false }: Props) {
   const { data: play } = useSuspenseQuery(playQueryOptions(playId))
   const [activeKey, setActiveKey] = useState<string | null>(null)
 
@@ -41,27 +42,30 @@ export default function CharactersBreakdown({ playId }: Props) {
 
   return (
     <div>
-      <div className="mb-4">
-        <h2 className="text-2xl font-bold">
-          <Link
-            to="/plays/$playId"
-            params={{ playId: String(playId) }}
-            className="hover:text-blue-600"
-          >
-            {play.title}
-          </Link>
-        </h2>
-        {play.canonical && (
-          <p className="text-sm text-gray-500 italic">Canonical Version</p>
-        )}
-        {play.author && (
-          <p className="text-lg text-gray-700">
-            by {play.author.first_name} {play.author.last_name}
-          </p>
-        )}
-      </div>
-
-      <h2 className="text-xl font-semibold mb-3">Characters</h2>
+      {!embedded && (
+        <>
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold">
+              <Link
+                to="/plays/$playId"
+                params={{ playId: String(playId) }}
+                className="hover:text-blue-600"
+              >
+                {play.title}
+              </Link>
+            </h2>
+            {play.canonical && (
+              <p className="text-sm text-gray-500 italic">Canonical Version</p>
+            )}
+            {play.author && (
+              <p className="text-lg text-gray-700">
+                by {play.author.first_name} {play.author.last_name}
+              </p>
+            )}
+          </div>
+          <h2 className="text-xl font-semibold mb-3">Characters</h2>
+        </>
+      )}
 
       <div className="flex min-h-0">
         {/* Sidebar */}
@@ -87,7 +91,7 @@ export default function CharactersBreakdown({ playId }: Props) {
                 : 'text-gray-500 hover:bg-gray-50'
             }`}
           >
-            + Add New Character
+            Add New Character
           </button>
         </div>
 
@@ -99,7 +103,7 @@ export default function CharactersBreakdown({ playId }: Props) {
               onCreated={(id, type) => setActiveKey(`${type}-${id}`)}
             />
           ) : selectedCharacter ? (
-            <CharacterInfoTab character={selectedCharacter} playId={playId} />
+            <CharacterInfoTab key={selectedKey} character={selectedCharacter} playId={playId} />
           ) : null}
         </div>
       </div>

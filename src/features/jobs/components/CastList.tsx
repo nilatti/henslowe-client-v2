@@ -31,7 +31,7 @@ export function CastList({
   const { data: jobs } = useSuspenseQuery(
     productionJobsQueryOptions(productionId)
   )
-  const role = useUserRoleForProduction(productionId)
+  const role = useUserRoleForProduction(productionId, theaterId)
   const isSuperAdmin = useIsSuperAdmin()
   const isAdmin = role === 'admin' || isSuperAdmin
 

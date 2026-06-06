@@ -7,7 +7,6 @@ import type { Job, JobWithDetails } from '../types/job'
 import { Button } from '../../../components/ui'
 import { buildUserName } from '../../../utils/actorUtils'
 import { useAuth } from '../../../hooks/useAuth'
-import { SUPERUSERS } from '../../../utils/constants'
 import { format } from 'date-fns'
 
 interface JobFormProps {
@@ -32,7 +31,7 @@ export function JobForm({
   const { data: specializations } = useSuspenseQuery(specializationsQueryOptions())
   const { data: users } = useSuspenseQuery(usersQueryOptions())
   const { user: currentUser } = useAuth()
-  const isSuperAdmin = currentUser ? SUPERUSERS.includes(currentUser.email) : false
+  const isSuperAdmin = currentUser?.is_superadmin === true
   const isEditing = !!job
 
   // Filter users — paid users see all, free users see only fake

@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { frenchSceneQueryOptions, useDeleteFrenchScene } from '../api/frenchScenes'
 import { playSkeletonQueryOptions } from '../../plays/api/plays'
+import { productionSkeletonQueryOptions } from '../../productions/api/productions'
 import { FrenchSceneForm } from './FrenchSceneForm'
 import { OnStagesManager } from './OnStagesManager'
 import { EntranceExitsList } from '../../productions/components/EntranceExits/EntranceExitsList'
-import { useIsSuperAdmin } from '../../../hooks/useUserRole'
+import { useIsPlayAdmin } from '../../../hooks/useUserRole'
 import {
   Button,
   Card,
@@ -33,14 +34,22 @@ export function FrenchSceneDetail({
   const { data: playSkeleton } = useSuspenseQuery(
     playSkeletonQueryOptions(playId)
   )
+  const { data: productionSkeleton } = useQuery({
+    ...productionSkeletonQueryOptions(playSkeleton.production_id ?? 0),
+    enabled: playSkeleton.production_id != null,
+  })
   const deleteFrenchScene = useDeleteFrenchScene(playId, sceneId)
-  const isSuperAdmin = useIsSuperAdmin()
+  const isAdmin = useIsPlayAdmin(playId)
   const navigate = useNavigate()
 
   const [isEditing, setIsEditing] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   const prettyName = frenchScene.pretty_name ?? `${frenchScene.number}`
+  const actNumber = playSkeleton.acts.find(a => a.id === actId)?.number
+  const sceneNumber = playSkeleton.acts
+    .flatMap(a => a.scenes)
+    .find(s => s.id === sceneId)?.number
 
   return (
     <div>
@@ -58,7 +67,7 @@ export function FrenchSceneDetail({
           params={{ playId: String(playId), actId: String(actId) }}
           className="text-blue-600 hover:text-blue-800"
         >
-          Act {prettyName.split('.')[0]}
+          Act {actNumber}
         </Link>
         <span className="text-gray-400">→</span>
         <Link
@@ -70,7 +79,7 @@ export function FrenchSceneDetail({
           }}
           className="text-blue-600 hover:text-blue-800"
         >
-          Scene {prettyName.split('.').slice(0, 2).join('.')}
+          Scene {sceneNumber}
         </Link>
         <span className="text-gray-400">→</span>
         <span className="text-gray-600">French Scene {prettyName}</span>
@@ -79,7 +88,7 @@ export function FrenchSceneDetail({
       <PageHeader
         title={`French Scene ${prettyName}`}
         action={
-          isSuperAdmin && (
+          isAdmin ? (
             <div className="flex gap-2">
               <Button variant="secondary" onClick={() => setIsEditing(true)}>
                 Edit
@@ -88,7 +97,7 @@ export function FrenchSceneDetail({
                 Delete
               </Button>
             </div>
-          )
+          ) : undefined
         }
       />
 
@@ -152,6 +161,7 @@ export function FrenchSceneDetail({
               <EntranceExitsList
                 frenchSceneId={frenchSceneId}
                 productionId={playSkeleton.production_id}
+                theaterId={productionSkeleton?.theater.id}
                 characters={playSkeleton.characters}
               />
             </Card>

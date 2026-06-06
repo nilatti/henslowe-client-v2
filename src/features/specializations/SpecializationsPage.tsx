@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { PageHeader } from '../../components/ui'
+import { Button, PageHeader } from '../../components/ui'
 import { useIsSuperAdmin } from '../../hooks/useUserRole'
 import { specializationsQueryOptions } from './queries'
 import type { Specialization } from './types'
@@ -15,11 +15,8 @@ export function SpecializationsPage() {
         title="Specializations"
         action={
           isSuperAdmin ? (
-            <Link
-              to="/specializations/new"
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Add New
+            <Link to="/specializations/new" className="inline-block">
+              <Button>New Specialization</Button>
             </Link>
           ) : undefined
         }

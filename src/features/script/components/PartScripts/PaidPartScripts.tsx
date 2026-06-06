@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { Route } from '../../../../routes/plays/$playId/part-scripts'
+import { Route } from '../../../../routes/_authenticated/plays/$playId/part-scripts'
 import { playScriptQueryOptions } from '../../api/script'
 import { productionJobsQueryOptions } from '../../../jobs/api/jobs'
 import { ACTOR_SPECIALIZATION_ID } from '../../../../utils/constants'

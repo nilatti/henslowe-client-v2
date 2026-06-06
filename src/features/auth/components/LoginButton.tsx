@@ -2,7 +2,7 @@
 export function LoginButton() {
   return (
     <a
-      href="/auth/google_oauth2"
+      href={`${import.meta.env.VITE_API_URL}/auth/google_oauth2`}
       className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
     >
       <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">

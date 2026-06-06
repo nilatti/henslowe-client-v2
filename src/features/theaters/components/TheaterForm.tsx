@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { useCreateTheater, useUpdateTheater } from '../api/theaters'
 import type { Theater } from '../types/theater'
@@ -6,7 +7,7 @@ import { US_STATES_ARRAY } from '../../../utils/constants'
 
 interface TheaterFormProps {
   theater?: Theater
-  onSuccess: () => void
+  onSuccess: (id?: number) => void
   onCancel: () => void
 }
 
@@ -14,6 +15,7 @@ export function TheaterForm({ theater, onSuccess, onCancel }: TheaterFormProps) 
   const create = useCreateTheater()
   const update = useUpdateTheater()
   const isEditing = !!theater
+  const [error, setError] = useState<string | null>(null)
 
   const form = useForm({
     defaultValues: {
@@ -28,12 +30,18 @@ export function TheaterForm({ theater, onSuccess, onCancel }: TheaterFormProps) 
       calendar_url: theater?.calendar_url ?? '',
     },
     onSubmit: async ({ value }) => {
-      if (isEditing) {
-        await update.mutateAsync({ ...theater, ...value })
-      } else {
-        await create.mutateAsync(value)
+      setError(null)
+      try {
+        if (isEditing) {
+          await update.mutateAsync({ ...theater, ...value })
+          onSuccess()
+        } else {
+          const created = await create.mutateAsync(value)
+          onSuccess((created as Theater).id)
+        }
+      } catch {
+        setError('Failed to save. Please try again.')
       }
-      onSuccess()
     },
   })
 
@@ -200,6 +208,10 @@ export function TheaterForm({ theater, onSuccess, onCancel }: TheaterFormProps) 
           </div>
         )}
       </form.Field>
+
+      {error && (
+        <p className="text-sm text-red-600">{error}</p>
+      )}
 
       <div className="flex gap-3 justify-end pt-2">
         <Button variant="secondary" type="button" onClick={onCancel}>

@@ -8,22 +8,22 @@ import {
   type SortingState,
 } from '@tanstack/react-table'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { theatersQueryOptions, useDeleteTheater } from '../api/theaters'
 import type { Theater } from '../types/theater'
-import { TheaterForm } from './TheaterForm'
-import { useIsSuperAdmin } from '../../../hooks/useUserRole'
+import { useIsSuperAdmin, useAdminTheaterIds } from '../../../hooks/useUserRole'
 import { Button, Card, ConfirmDialog, PageHeader } from '../../../components/ui'
 
 export function TheatersList() {
   const { data: theaters } = useSuspenseQuery(theatersQueryOptions())
   const deleteTheater = useDeleteTheater()
+  const navigate = useNavigate()
   const isSuperAdmin = useIsSuperAdmin()
+  const adminTheaterIds = useAdminTheaterIds()
 
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'name', desc: false },
   ])
-  const [showForm, setShowForm] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState<Theater | null>(null)
 
   const columnHelper = createColumnHelper<Theater>()
@@ -31,13 +31,16 @@ export function TheatersList() {
     columnHelper.accessor('name', {
       header: 'Name',
       cell: ({ row }) => (
-        <Link
-          to={'/theaters/$theaterId' as never}
-          params={{ theaterId: String(row.original.id) } as never}
+        <a
+          href={`/theaters/${row.original.id}`}
+          onClick={(e) => {
+            e.preventDefault()
+            void navigate({ to: '/theaters/$theaterId' as never, params: { theaterId: String(row.original.id) } as never })
+          }}
           className="text-blue-600 hover:text-blue-800"
         >
           {row.original.name}
-        </Link>
+        </a>
       ),
     }),
     columnHelper.accessor('city', {
@@ -66,8 +69,12 @@ export function TheatersList() {
     ] : []),
   ]
 
+  const filteredTheaters = theaters.filter(
+    t => !t.fake || adminTheaterIds === null || adminTheaterIds.has(t.id)
+  )
+
   const table = useReactTable({
-    data: theaters.filter(t => !t.fake),
+    data: filteredTheaters,
     columns,
     state: { sorting },
     onSortingChange: setSorting,
@@ -80,21 +87,13 @@ export function TheatersList() {
       <PageHeader
         title="Theaters"
         action={
-          !showForm ? (
-            <Button onClick={() => setShowForm(true)}>New Theater</Button>
+          isSuperAdmin ? (
+            <Link to={'/theaters/new' as never}>
+              <Button>New Theater</Button>
+            </Link>
           ) : undefined
         }
       />
-
-      {showForm && (
-        <Card className="p-6 mb-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">New Theater</h2>
-          <TheaterForm
-            onSuccess={() => setShowForm(false)}
-            onCancel={() => setShowForm(false)}
-          />
-        </Card>
-      )}
 
       <Card>
         <table className="w-full text-sm">
@@ -130,7 +129,7 @@ export function TheatersList() {
             ))}
           </tbody>
         </table>
-        {theaters.filter(t => !t.fake).length === 0 && (
+        {filteredTheaters.length === 0 && (
           <p className="px-4 py-6 text-sm text-gray-500 text-center">No theaters found.</p>
         )}
       </Card>

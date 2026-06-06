@@ -24,7 +24,10 @@ export function useCreateProduction() {
     onSuccess: async (data) => {
       await Promise.all([
         qc.invalidateQueries({ queryKey: ['productions'] }),
-        qc.fetchQuery(productionSkeletonQueryOptions(data.id)),
+        qc.invalidateQueries({ queryKey: ['productions', data.id, 'skeleton'] }),
+        data.theater_id
+          ? qc.invalidateQueries({ queryKey: ['theaters', data.theater_id, 'skeleton'] })
+          : undefined,
       ])
     },
   })

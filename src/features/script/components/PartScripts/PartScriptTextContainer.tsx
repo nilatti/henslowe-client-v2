@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { sortLines } from '../../../../utils/playScriptUtils'
-import { isLineCut } from '../../utils/scriptUtils'
+import { buildDiff, isLineCut } from '../../utils/scriptUtils'
 import type { PartLine, PartText } from './types'
 
 type IndexedLine = PartLine & { _idx: number }
@@ -112,23 +112,44 @@ export default function PartScriptTextContainer({
     if (line.character_id) currentCharId = line.character_id
 
     const isTarget = characterIds.includes(line.character_id ?? -1)
-    const content =
+    const isCut = isLineCut(line as { new_content: string | null })
+    const diffParts =
       showCut && line.new_content?.trim()
-        ? `[${line.original_content} → ${line.new_content}]`
-        : line.new_content?.trim() || line.original_content
+        ? buildDiff(line.original_content, line.new_content!)
+        : null
+    const content = diffParts ? null : line.new_content?.trim() || line.original_content
 
     return (
       <div
         key={index}
-        className={`flex gap-3 py-0.5 text-sm ${isTarget ? '' : 'opacity-50 italic'}`}
+        className={`flex gap-3 text-sm ${
+          !isTarget ? 'opacity-50 italic pt-12' : isCut && showCut ? 'opacity-50 pt-2' : 'pt-2'
+        }`}
       >
-        <span className="text-gray-300 w-10 shrink-0 text-right text-xs pt-0.5">
+        <span className="text-gray-400 w-16 shrink-0 text-right text-xs pt-0.5">
           {line.number}
         </span>
-        <span className="w-28 shrink-0 text-right text-xs font-medium text-gray-600">
+        <span className="w-40 shrink-0 text-left pl-2 text-xs font-bold text-gray-700">
           {showCharacter ? (line.character?.name ?? '') : ''}
         </span>
-        <span className="flex-1">{content}</span>
+        <span className="flex-1">
+          {diffParts
+            ? diffParts.map((part, i) => (
+                <span
+                  key={i}
+                  className={
+                    part.type === 'removed'
+                      ? 'line-through text-red-400'
+                      : part.type === 'added'
+                      ? 'text-green-600 font-medium'
+                      : ''
+                  }
+                >
+                  {part.value}
+                </span>
+              ))
+            : content}
+        </span>
       </div>
     )
   })

@@ -63,12 +63,12 @@ export function AuditionersList({
         >
           {hideCast ? 'Show cast' : 'Hide cast'}
         </Button>
-        {isAdmin && (
-          <Button onClick={() => setShowForm(true)}>
-            + Add auditioner
-          </Button>
-        )}
       </div>
+      {isAdmin && !showForm && (
+        <Button className="mb-3" onClick={() => setShowForm(true)}>
+          Add Auditioner
+        </Button>
+      )}
 
       <p className="text-xs text-amber-600 mb-3">
         Add auditioners before casting — you need a record of who auditioned.

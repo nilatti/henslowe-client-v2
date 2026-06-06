@@ -35,7 +35,7 @@ export function TextEdit({ handleLineSubmit, linesPerMinute, selectedText, text 
       : null
 
   return (
-    <div className="flex-1 min-w-0">
+    <div className="flex-1 min-w-0 border-l border-gray-200 pl-8">
       <h3 className="text-base font-semibold text-gray-800 mb-2">
         {(selectedText as { heading?: string; pretty_name?: string }).heading ??
           (selectedText as { heading?: string; pretty_name?: string }).pretty_name}

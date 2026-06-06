@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useUpdateRehearsal } from '../../api/rehearsals'
 import {
@@ -13,7 +13,6 @@ import { PlayContentCheckboxes } from './PlayContentCheckboxes'
 import { ExtraUsersPanel } from './ExtraUsersPanel'
 import { Button, Card } from '../../../../components/ui'
 import {
-  markContentScheduled,
   markContentRecommended,
   buildCallList,
   getCalledActors,
@@ -68,38 +67,36 @@ export function RehearsalContentManager({
       ? scenesQuery.isLoading
       : frenchScenesQuery.isLoading
 
-  const [playContent, setPlayContent] = useState<TextUnitWithOnStages[]>([])
+  const [selectedIds, setSelectedIds] = useState<number[]>(() => {
+    const textUnit = (rehearsal.text_unit ?? 'acts') as keyof RehearsalWithDetails
+    const content = rehearsal[textUnit] as { id: number }[] | undefined
+    return content?.map(item => item.id) ?? []
+  })
   const [extraUsers, setExtraUsers] = useState<RehearsalUser[]>([])
   const [showExtraUsers, setShowExtraUsers] = useState(false)
 
   const unavailableActors = unavailableUsers(actors, rehearsal as never) as RehearsalUser[]
 
-  useEffect(() => {
-    if (!rawPlayContent) return
-
-    const rehearsalContentIds: number[] =
-      ((rehearsal as any)[rehearsal.text_unit ?? 'acts'] as { id: number }[] | undefined)
-        ?.map(item => item.id) ?? []
+  const playContent = useMemo(() => {
+    if (!rawPlayContent) return []
 
     let processed: TextUnitWithOnStages[] = rawPlayContent.map(item => ({
       ...item,
       heading: item.pretty_name ?? `Act ${item.number}`,
     }))
-    processed = markContentScheduled(processed, rehearsalContentIds)
     processed = markContentRecommended(processed, unavailableActors)
     processed = processed.map(item => ({
       ...item,
       furtherInfo: buildCallList(item, actors),
+      isScheduled: selectedIds.includes(item.id),
     }))
 
-    setPlayContent(processed)
-  }, [rawPlayContent, rehearsal.id])
+    return processed
+  }, [rawPlayContent, unavailableActors, actors, selectedIds])
 
   const handleToggle = (id: number) => {
-    setPlayContent(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, isScheduled: !item.isScheduled } : item
-      )
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     )
   }
 
@@ -129,13 +126,14 @@ export function RehearsalContentManager({
       ? `${rehearsal.text_unit.slice(0, -1)}_ids`
       : 'act_ids'
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await updateRehearsal.mutateAsync({
+    const payload: Record<string, unknown> = {
       id: rehearsal.id,
       text_unit: rehearsal.text_unit,
       user_ids: userIds,
       [singularKey]: selected.map(item => item.id),
-    } as any)
+    }
+
+    await updateRehearsal.mutateAsync(payload as Parameters<typeof updateRehearsal.mutateAsync>[0])
     onClose()
   }
 

@@ -4,7 +4,7 @@ import { OnStageItem } from './OnStageItem'
 import type { FrenchSceneDetail } from '../types/frenchScene'
 import type { PlaySkeleton } from '../../plays/types/play'
 import { Button, Card } from '../../../components/ui'
-import { useIsSuperAdmin } from '../../../hooks/useUserRole'
+import { useIsPlayAdmin } from '../../../hooks/useUserRole'
 
 interface OnStagesManagerProps {
   frenchScene: FrenchSceneDetail
@@ -16,7 +16,7 @@ export function OnStagesManager({
   playSkeleton,
 }: OnStagesManagerProps) {
   const createOnStage = useCreateOnStage(frenchScene.id)
-  const isSuperAdmin = useIsSuperAdmin()
+  const isAdmin = useIsPlayAdmin(playSkeleton.id)
 
   const [showForm, setShowForm] = useState(false)
   const [selectedType, setSelectedType] = useState<'character' | 'character_group'>('character')
@@ -62,16 +62,14 @@ export function OnStagesManager({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-900">
-          On Stage ({frenchScene.on_stages.length})
-        </h3>
-        {isSuperAdmin && !showForm && (
-          <Button onClick={() => setShowForm(true)}>
-            + Add
-          </Button>
-        )}
-      </div>
+      <h3 className="text-sm font-semibold text-gray-900 mb-3">
+        On Stage ({frenchScene.on_stages.length})
+      </h3>
+      {isAdmin && !showForm && (
+        <Button className="mb-3" onClick={() => setShowForm(true)}>
+          Add Character
+        </Button>
+      )}
 
       {showForm && (
         <Card className="p-4 mb-3">
@@ -166,7 +164,7 @@ export function OnStagesManager({
                 key={os.id}
                 onStage={os}
                 frenchSceneId={frenchScene.id}
-                isAdmin={isSuperAdmin}
+                isAdmin={isAdmin}
               />
             ))}
           </ul>

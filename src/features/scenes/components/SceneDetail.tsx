@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { sceneQueryOptions, useDeleteScene } from '../api/scenes'
+import { actQueryOptions } from '../../acts/api/acts'
 import { SceneForm } from './SceneForm'
 import { FrenchSceneForm } from '../../french_scenes/components/FrenchSceneForm'
-import { useIsSuperAdmin } from '../../../hooks/useUserRole'
+import { useIsPlayAdmin } from '../../../hooks/useUserRole'
 import {
   Button,
   Card,
@@ -20,17 +21,20 @@ interface SceneDetailProps {
 
 export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
   const { data: scene } = useSuspenseQuery(sceneQueryOptions(sceneId))
+  const { data: act } = useSuspenseQuery(actQueryOptions(actId))
   const deleteScene = useDeleteScene(playId, actId)
-  const isSuperAdmin = useIsSuperAdmin()
+  const isAdmin = useIsPlayAdmin(playId)
   const navigate = useNavigate()
 
   const [isEditing, setIsEditing] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [showForm, setShowForm] = useState(false)
 
+  const prettyName = `${act.number}.${scene.number}`
+
   const title = scene.heading
-    ? `Scene ${scene.pretty_name}: ${scene.heading}`
-    : `Scene ${scene.pretty_name}`
+    ? `Scene ${prettyName}: ${scene.heading}`
+    : `Scene ${prettyName}`
 
   const lastFrenchScene = scene.french_scenes[scene.french_scenes.length - 1]
   const nextFrenchSceneNumber = lastFrenchScene
@@ -53,16 +57,16 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
           params={{ playId: String(playId), actId: String(actId) }}
           className="text-blue-600 hover:text-blue-800"
         >
-          Act {scene.pretty_name.split('.')[0]}
+          Act {act.number}
         </Link>
         <span className="text-gray-400">→</span>
-        <span className="text-gray-600">Scene {scene.pretty_name}</span>
+        <span className="text-gray-600">Scene {prettyName}</span>
       </div>
 
       <PageHeader
         title={title}
         action={
-          isSuperAdmin && (
+          isAdmin && (
             <div className="flex gap-2">
               <Button variant="secondary" onClick={() => setIsEditing(true)}>
                 Edit
@@ -126,16 +130,14 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
           )}
 
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-medium text-gray-900">
-                French Scenes
-              </h2>
-              {isSuperAdmin && !showForm && (
-                <Button onClick={() => setShowForm(true)}>
-                  + Add French Scene
-                </Button>
-              )}
-            </div>
+            <h2 className="text-lg font-medium text-gray-900 mb-3">
+              French Scenes
+            </h2>
+            {isAdmin && !showForm && (
+              <Button className="mb-3" onClick={() => setShowForm(true)}>
+                Add French Scene
+              </Button>
+            )}
 
             {showForm && (
               <Card className="p-6 mb-4">
@@ -169,7 +171,7 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
                         className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
                       >
                         <span className="text-gray-900">
-                          French Scene {scene.pretty_name}.{fs.number}
+                          French Scene {prettyName}.{fs.number}
                         </span>
                         <span className="text-gray-400 text-xs">
                           {fs.on_stages.length} on stage
@@ -187,7 +189,7 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
 
       {confirmDelete && (
         <ConfirmDialog
-          message={`Delete Scene ${scene.pretty_name}? This will delete all french scenes within it.`}
+          message={`Delete Scene ${prettyName}? This will delete all french scenes within it.`}
           isDestructive
           confirmLabel="Delete"
           onConfirm={async () => {

@@ -2,12 +2,12 @@ import _ from "lodash";
 import { syllable as Syllable } from "syllable";
 
 interface Line {
-  new_content?: string;
+  new_content?: string | null;
   original_content: string;
   count?: number;
   number?: string;
-  character_id?: number;
-  kind?: string;
+  character_id?: number | null;
+  kind?: string | null;
 }
 
 interface OnStage {
@@ -241,13 +241,10 @@ function mergeTextFromFrenchScenes(frenchScenes: FrenchScene[]): TextCollection 
     const gatheredLines = frenchScene.lines;
     const compactLines = _.compact(gatheredLines);
     allText.lines = allText.lines.concat(compactLines);
-    allText.lines = _.uniqBy(allText.lines, "line_number");
     const compactStageDirections = _.compact(frenchScene.stage_directions);
     allText.stage_directions = allText.stage_directions.concat(compactStageDirections);
-    allText.stage_directions = _.uniqBy(allText.stage_directions, "line_number");
     const compactSoundCues = _.compact(frenchScene.sound_cues);
     allText.sound_cues = allText.sound_cues.concat(compactSoundCues);
-    allText.sound_cues = _.uniqBy(allText.sound_cues, "line_number");
   });
 
   return allText;
@@ -329,6 +326,14 @@ function sortLines(arrayOfLines: Line[]): Line[] {
 
 // suppress unused function warnings for non-exported helpers
 void letterValue;
+
+// Cut-convention helpers.
+// Cuts are stored as new_content === '' (empty string).
+// null means the line has never been edited (unedited/original).
+export const isCut = (line: Line): boolean => line.new_content === '';
+export const isEdited = (line: Line): boolean =>
+  line.new_content !== null && line.new_content !== '';
+export const isUnedited = (line: Line): boolean => line.new_content === null;
 
 export {
   calculateChange,

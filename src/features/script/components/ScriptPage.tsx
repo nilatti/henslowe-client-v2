@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { playScriptQueryOptions, useBulkUpdateLines } from '../api/script'
+import { productionSkeletonQueryOptions } from '../../productions/api/productions'
 import { TextSelector, type SelectionKey } from './TextSelector'
 import { ScriptViewer } from './ScriptViewer'
 import { ExportButtons } from './ExportButtons'
@@ -30,7 +31,11 @@ export function ScriptPage({ playId }: ScriptPageProps) {
   const linesPerMinute = script.production?.lines_per_minute ?? null
 
   const isProductionCopy = !script.canonical && !!script.production_id
-  const role = useUserRoleForProduction(script.production_id ?? 0)
+  const { data: productionSkeleton } = useQuery({
+    ...productionSkeletonQueryOptions(script.production_id ?? 0),
+    enabled: isProductionCopy,
+  })
+  const role = useUserRoleForProduction(script.production_id ?? 0, productionSkeleton?.theater.id)
   const isSuperAdmin = useIsSuperAdmin()
   const isEditable = isProductionCopy && (role === 'admin' || isSuperAdmin)
 
@@ -116,13 +121,13 @@ export function ScriptPage({ playId }: ScriptPageProps) {
   const handleCutAll = () => {
     const ids = getBulkIds()
     if (!ids) return
-    bulkUpdate.mutate({ ...ids, newContent: ' ' })
+    bulkUpdate.mutate({ ...ids, newContent: '' })
   }
 
   const handleUncutAll = () => {
     const ids = getBulkIds()
     if (!ids) return
-    bulkUpdate.mutate({ ...ids, newContent: '' })
+    bulkUpdate.mutate({ ...ids, newContent: null })
   }
 
   return (
@@ -174,7 +179,7 @@ export function ScriptPage({ playId }: ScriptPageProps) {
           onSelect={setSelectedKey}
         />
 
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 border-l border-gray-200 pl-8">
           {isEditable && (
             <div className="text-xs text-blue-600 mb-2 italic">
               Edit mode: double-click any line to edit, or use Cut / Restore

@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { Route } from '../../../../routes/plays/$playId/word-clouds'
+import { Route } from '../../../../routes/_authenticated/plays/$playId/word-clouds'
 import { playScriptQueryOptions } from '../../api/script'
 import WordCloudContainer from './WordCloudContainer'
 

@@ -8,7 +8,7 @@ import {
 } from '../api/productions'
 import { ProductionForm } from './ProductionForm'
 import { CastList } from '../../jobs/components/CastList'
-import { useIsSuperAdmin } from '../../../hooks/useUserRole'
+import { useIsSuperAdmin, useUserRoleForProduction, useUserRoleForTheater } from '../../../hooks/useUserRole'
 import {
   Button,
   Card,
@@ -36,13 +36,17 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
   )
   const deleteProduction = useDeleteProduction()
   const isSuperAdmin = useIsSuperAdmin()
+  const productionRole = useUserRoleForProduction(productionId, production.theater?.id ?? 0)
+  const theaterRole = useUserRoleForTheater(production.theater?.id ?? 0)
+  const isAdmin = productionRole === 'admin' || isSuperAdmin
+  const canDelete = theaterRole === 'admin' || isSuperAdmin
   const navigate = useNavigate()
 
   const [activeTab, setActiveTab] = useState('info')
   const [isEditing, setIsEditing] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
-  const title = production.play.title
+  const title = production.play?.title ?? ''
 
   const tabs = [
     { id: 'info', label: 'Info' },
@@ -50,6 +54,7 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
     { id: 'rehearsals', label: 'Rehearsals' },
     { id: 'doubling-charts', label: 'Doubling Charts' },
     { id: 'set-design', label: 'Set Design' },
+    { id: 'script', label: 'Script' },
   ]
 
   return (
@@ -68,16 +73,18 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
       <PageHeader
         title={title}
         action={
-          isSuperAdmin && (
+          isAdmin ? (
             <div className="flex gap-2">
               <Button variant="secondary" onClick={() => setIsEditing(true)}>
                 Edit
               </Button>
-              <Button variant="danger" onClick={() => setConfirmDelete(true)}>
-                Delete
-              </Button>
+              {canDelete && (
+                <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+                  Delete
+                </Button>
+              )}
             </div>
-          )
+          ) : undefined
         }
       />
 
@@ -98,11 +105,11 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
               <dl className="space-y-3 text-sm">
                 <div>
                   <dt className="font-medium text-gray-700">Theater</dt>
-                  <dd className="text-gray-600 mt-1">{production.theater.name}</dd>
+                  <dd className="text-gray-600 mt-1">{production.theater?.name}</dd>
                 </div>
                 <div>
                   <dt className="font-medium text-gray-700">Play</dt>
-                  <dd className="text-gray-600 mt-1">{production.play.title}</dd>
+                  <dd className="text-gray-600 mt-1">{production.play?.title}</dd>
                 </div>
                 {(production.start_date || production.end_date) && (
                   <div>
@@ -126,7 +133,7 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
           {activeTab === 'people' && (
             <CastList
               productionId={productionId}
-              theaterId={production.theater.id}
+              theaterId={production.theater?.id ?? 0}
               productionStartDate={production.start_date}
               productionEndDate={production.end_date}
             />
@@ -162,6 +169,30 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
               </div>
               <Card className="p-4 text-sm text-gray-500 text-center">
                 Full doubling charts available at the link above.
+              </Card>
+            </div>
+          )}
+
+          {activeTab === 'script' && (
+            <div className="space-y-4">
+              <div className="flex justify-end gap-4">
+                <Link
+                  to="/plays/$playId"
+                  params={{ playId: String(production.play?.id ?? 0) }}
+                  className="text-sm text-blue-600 hover:text-blue-800"
+                >
+                  View play →
+                </Link>
+                <Link
+                  to="/plays/$playId/script"
+                  params={{ playId: String(production.play?.id ?? 0) }}
+                  className="text-sm text-blue-600 hover:text-blue-800"
+                >
+                  View script →
+                </Link>
+              </div>
+              <Card className="p-4 text-sm text-gray-500 text-center">
+                Full script available at the link above.
               </Card>
             </div>
           )}

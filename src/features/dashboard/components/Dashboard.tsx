@@ -60,15 +60,15 @@ export function Dashboard() {
                       </Link>{' '}
                     </span>
                   )}
-                  {job.theater && (
+                  {job.theater_id !== null && (
                     <span>
                       at{' '}
                       <Link
                         to="/theaters/$theaterId"
-                        params={{ theaterId: String(job.theater.id) }}
+                        params={{ theaterId: String(job.theater_id) }}
                         className="text-blue-600 hover:underline"
                       >
-                        {job.theater.name}
+                        {job.theater?.name ?? 'Theater'}
                       </Link>
                     </span>
                   )}

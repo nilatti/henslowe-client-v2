@@ -60,7 +60,7 @@ export function useCreateOnStage(frenchSceneId: number) {
       nonspeaking: boolean
       description?: string | null
     }) =>
-      api.post('/api/v1/on_stages', { on_stage: data }).then(r => r.data),
+      api.post(`/api/v1/french_scenes/${frenchSceneId}/on_stages`, { on_stage: data }).then(r => r.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['french_scenes', frenchSceneId] })
     },

@@ -3,6 +3,7 @@ export interface PlayListItem {
   title: string
   author_id: number
   canonical?: boolean
+  author?: { last_name: string }
 }
 
 export interface PlayAuthor {

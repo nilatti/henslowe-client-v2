@@ -25,15 +25,15 @@ export function LineRead({ line, showCharacter, showCut }: LineReadProps) {
         isCut && showCut ? 'opacity-50' : ''
       } ${isStageDirection ? 'italic text-gray-500' : ''}`}
     >
-      <span className="text-gray-300 w-10 shrink-0 text-right text-xs pt-0.5">
+      <span className="text-gray-400 w-16 shrink-0 text-right text-xs pt-0.5">
         {line.number}
       </span>
       {showCharacter && line.character ? (
-        <span className="font-semibold text-gray-700 w-24 shrink-0 text-right pr-2">
+        <span className="font-bold text-gray-700 w-40 shrink-0 pl-2">
           {line.character.name}
         </span>
       ) : (
-        <span className="w-24 shrink-0" />
+        <span className="w-40 shrink-0" />
       )}
       <span className="flex-1 leading-relaxed">
         {diffContent ? (

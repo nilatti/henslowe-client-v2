@@ -3,10 +3,10 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { playSkeletonQueryOptions, useDeletePlay } from '../api/plays'
 import { PlayForm } from './PlayForm'
-import { CharactersTab } from './CharactersTab'
+import CharactersBreakdown from '../../script/components/Characters/CharactersBreakdown'
 import { ActsTab } from '../../acts/components/ActsTab'
 import { getScenes, getAllCharacters } from '../types/play'
-import { useIsSuperAdmin } from '../../../hooks/useUserRole'
+import { useIsPlayAdmin } from '../../../hooks/useUserRole'
 import {
   Button,
   Card,
@@ -22,7 +22,7 @@ interface PlayDetailProps {
 export function PlayDetail({ playId }: PlayDetailProps) {
   const { data: play } = useSuspenseQuery(playSkeletonQueryOptions(playId))
   const deletePlay = useDeletePlay()
-  const isSuperAdmin = useIsSuperAdmin()
+  const isAdmin = useIsPlayAdmin(playId)
   const navigate = useNavigate()
 
   const [activeTab, setActiveTab] = useState('info')
@@ -43,7 +43,7 @@ export function PlayDetail({ playId }: PlayDetailProps) {
       <PageHeader
         title={play.title}
         action={
-          isSuperAdmin && (
+          isAdmin && (
             <div className="flex gap-2">
               <Button variant="secondary" onClick={() => setIsEditing(true)}>
                 Edit
@@ -137,7 +137,7 @@ export function PlayDetail({ playId }: PlayDetailProps) {
           )}
 
           {activeTab === 'characters' && (
-            <CharactersTab play={play} playId={playId} isSuperAdmin={isSuperAdmin} />
+            <CharactersBreakdown playId={playId} embedded />
           )}
         </>
       )}

@@ -50,8 +50,8 @@ export function buildDiff(
   }))
 }
 
-export function isLineCut(line: { new_content: string | null }): boolean {
-  return !!line.new_content && line.new_content.trim() === ''
+export function isLineCut(line: { new_content: string | null | undefined }): boolean {
+  return line.new_content != null && line.new_content.trim() === ''
 }
 
 export function isLineEdited(line: { new_content: string | null }): boolean {

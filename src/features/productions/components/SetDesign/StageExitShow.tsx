@@ -39,7 +39,7 @@ export function StageExitShow({
   }
 
   return (
-    <li className="group flex items-center justify-between py-2 px-1 rounded hover:bg-gray-50">
+    <li className="flex items-center justify-between py-2 px-1 rounded hover:bg-gray-50">
       <span
         className={`text-sm ${isAdmin ? 'cursor-pointer hover:text-blue-600' : ''} ${isDeleting ? 'opacity-50' : ''}`}
         onClick={() => isAdmin && setEditing(true)}
@@ -50,7 +50,7 @@ export function StageExitShow({
         <button
           onClick={() => onDelete(stageExit.id)}
           disabled={isDeleting}
-          className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-600 transition-opacity disabled:opacity-50 p-1"
+          className="text-gray-400 hover:text-red-600 disabled:opacity-50 p-1"
           aria-label="Delete stage exit"
         >
           <Trash2 size={14} />

@@ -11,7 +11,7 @@ export function AuthCallbackPage() {
     const error = params.get('error')
 
     if (error || !token) {
-      navigate({ to: '/login', search: { error: error ?? 'unknown' } })
+      navigate({ to: '/' })
       return
     }
 
@@ -22,10 +22,11 @@ export function AuthCallbackPage() {
       last_name: params.get('last_name') ?? '',
       role: params.get('role') ?? 'regular',
       subscription_status: params.get('subscription_status') ?? 'never subscribed',
+      is_superadmin: params.get('is_superadmin') === 'true',
     }
 
     if (!user.id || !user.email) {
-      navigate({ to: '/login', search: { error: 'invalid_user' } })
+      navigate({ to: '/' })
       return
     }
 
@@ -35,7 +36,7 @@ export function AuthCallbackPage() {
     // Full reload so AuthProvider re-initializes from the freshly stored token.
     // Client-side navigate() won't work here because the storage event only
     // fires cross-tab, so AuthProvider's in-memory state is still null.
-    window.location.href = '/plays'
+    window.location.href = '/'
   }, [navigate])
 
   return (

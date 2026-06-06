@@ -41,35 +41,16 @@ function updateItemInScript(
 export function useUpdateLine(playId: number) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (line: Partial<ScriptLine> & { id: number }) => {
-      const type = line.number?.match(/^SD/)
-        ? 'stage_directions'
-        : line.number?.match(/^SC/)
-        ? 'sound_cues'
-        : 'lines'
-      const singular =
-        type === 'stage_directions'
-          ? 'stage_direction'
-          : type === 'sound_cues'
-          ? 'sound_cue'
-          : 'line'
-      return api
-        .put(`/api/v1/${type}/${line.id}`, { [singular]: line })
-        .then(r => r.data)
-    },
+    mutationFn: (line: Partial<ScriptLine> & { id: number }) =>
+      api.put(`/api/v1/lines/${line.id}`, { line }).then(r => r.data),
     onMutate: async updated => {
       await qc.cancelQueries({ queryKey: ['plays', playId, 'script'] })
       const previous = qc.getQueryData(['plays', playId, 'script'])
-      const field = updated.number?.match(/^SD/)
-        ? 'stage_directions'
-        : updated.number?.match(/^SC/)
-        ? 'sound_cues'
-        : 'lines'
       qc.setQueryData(
         ['plays', playId, 'script'],
         (old: PlayScript | undefined) => {
           if (!old) return old
-          return updateItemInScript(old, updated, field as 'lines' | 'stage_directions' | 'sound_cues')
+          return updateItemInScript(old, updated, 'lines')
         }
       )
       return { previous }
@@ -89,7 +70,7 @@ interface BulkUpdateArgs {
   lineIds: number[]
   sdIds: number[]
   scIds: number[]
-  newContent: string
+  newContent: string | null
 }
 
 // Single optimistic update + parallel server calls — avoids the race conditions

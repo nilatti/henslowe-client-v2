@@ -55,7 +55,7 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
     return <p className="text-sm text-gray-500 py-4">No casting data available yet.</p>
   }
 
-  const tableWidth = level === 'french_scene' ? '1400%' : '250%'
+  const tableWidth = 'max-content'
 
   function getOnStages(): ChartOnStage[][] {
     const blocks: ChartOnStage[][] = []
@@ -88,21 +88,21 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
     const acts = filterEmptyContent(play.acts) as unknown as ChartAct[]
     if (level === 'act') {
       return acts.map(act => (
-        <th key={crypto.randomUUID()} className="border border-gray-400 p-1 text-xs font-medium overflow-hidden">
+        <th key={crypto.randomUUID()} className="border border-gray-400 px-2 py-2 text-sm font-bold text-left bg-white">
           Act {act.number}
         </th>
       ))
     } else if (level === 'scene') {
       const scenes = getScenesFromPlay(play) as unknown as ChartScene[]
       return (filterEmptyContent(scenes) as unknown as ChartScene[]).map(scene => (
-        <th key={crypto.randomUUID()} className="border border-gray-400 p-1 text-xs font-medium overflow-hidden">
+        <th key={crypto.randomUUID()} className="border border-gray-400 px-2 py-2 text-sm font-bold text-left bg-white">
           {scene.pretty_name ?? ''}
         </th>
       ))
     } else {
       const fss = getFrenchScenesFromPlay(play) as unknown as ChartFrenchScene[]
       return fss.map(fs => (
-        <th key={crypto.randomUUID()} className="border border-gray-400 p-1 text-xs font-medium overflow-hidden">
+        <th key={crypto.randomUUID()} className="border border-gray-400 px-2 py-2 text-sm font-bold text-left bg-white" style={{ minWidth: '70px' }}>
           {fs.pretty_name ?? ''}
         </th>
       ))
@@ -132,7 +132,9 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
       return (
         <td
           key={crypto.randomUUID()}
-          className={`border border-gray-400 p-1 text-xs overflow-hidden break-all ${doublingProblem ? 'bg-orange-200' : ''}`}
+          className={`border border-gray-400 px-2 py-1 text-xs break-words ${
+            doublingProblem ? 'bg-orange-400 text-white font-medium' : ''
+          }`}
         >
           {_.join(names, ', ')}
         </td>
@@ -140,8 +142,11 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
     })
 
     return (
-      <tr key={crypto.randomUUID()} className="odd:bg-white even:bg-gray-50 hover:bg-gray-100">
-        <td className="border border-gray-400 p-1 text-xs sticky left-0 bg-inherit z-10">
+      <tr key={crypto.randomUUID()} className="odd:bg-white even:bg-teal-50 hover:bg-blue-50 transition-colors">
+        <td
+          className="border border-gray-400 px-2 py-1 text-sm font-medium sticky left-0 bg-inherit z-10"
+          style={{ width: '220px', minWidth: '220px' }}
+        >
           {buildUserName(actor)}
         </td>
         {rowData}
@@ -167,15 +172,18 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
       const names = _.map(uniqChars, os => os.character?.name ?? '')
 
       return (
-        <td key={crypto.randomUUID()} className="border border-gray-400 p-1 text-xs overflow-hidden break-all">
+        <td key={crypto.randomUUID()} className="border border-gray-400 px-2 py-1 text-xs break-words">
           {_.join(names, ', ')}
         </td>
       )
     })
 
     return (
-      <tr key={crypto.randomUUID()} className="odd:bg-white even:bg-gray-50 hover:bg-gray-100">
-        <td className="border border-gray-400 p-1 text-xs sticky left-0 bg-inherit z-10 font-medium">
+      <tr key={crypto.randomUUID()} className="odd:bg-white even:bg-teal-50 border-t-2 border-gray-400">
+        <td
+          className="border border-gray-400 px-2 py-1 text-sm font-medium italic sticky left-0 bg-inherit z-10"
+          style={{ width: '220px', minWidth: '220px' }}
+        >
           Still to cast
         </td>
         {rowData}
@@ -184,14 +192,20 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="w-full overflow-x-auto">
       <table
-        style={{ width: tableWidth, tableLayout: 'fixed' }}
-        className="border-collapse text-sm"
+        className="border-collapse w-full"
+        style={{
+          width: tableWidth,
+          tableLayout: 'auto',
+        }}
       >
         <thead>
-          <tr className="bg-gray-100">
-            <th className="border border-gray-400 p-1 text-xs font-medium sticky left-0 bg-gray-100 z-10">
+          <tr>
+            <th
+              className="border border-gray-400 px-2 py-2 text-sm font-bold text-left bg-white sticky left-0 z-10"
+              style={{ width: '220px', minWidth: '220px' }}
+            >
               Actor
             </th>
             {generateColumns()}

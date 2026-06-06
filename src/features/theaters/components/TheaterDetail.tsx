@@ -4,6 +4,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { theaterSkeletonQueryOptions, useDeleteTheater } from '../api/theaters'
 import { TheaterForm } from './TheaterForm'
 import { StaffJobsList } from '../../jobs/components/StaffJobsList'
+import { ProductionForm } from '../../productions/components/ProductionForm'
 import { useUserRoleForTheater, useIsSuperAdmin } from '../../../hooks/useUserRole'
 import {
   Button,
@@ -29,6 +30,7 @@ export function TheaterDetail({ theaterId }: TheaterDetailProps) {
   const [activeTab, setActiveTab] = useState('info')
   const [isEditing, setIsEditing] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [showProductionForm, setShowProductionForm] = useState(false)
 
   const tabs = [
     { id: 'info', label: 'Info' },
@@ -113,38 +115,55 @@ export function TheaterDetail({ theaterId }: TheaterDetailProps) {
           )}
 
           {activeTab === 'productions' && (
-            <Card>
-              {theater.productions.length === 0 ? (
-                <p className="px-4 py-3 text-sm text-gray-500">No productions yet.</p>
-              ) : (
-                <ul className="divide-y divide-gray-100">
-                  {theater.productions
-                    .slice()
-                    .sort((a, b) =>
-                      (b.start_date ?? '').localeCompare(a.start_date ?? '')
-                    )
-                    .map(production => (
-                      <li key={production.id}>
-                        <Link
-                          to={'/productions/$productionId' as never}
-                          params={{ productionId: String(production.id) } as never}
-                          className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
-                        >
-                          <span className="text-gray-900">{production.play.title}</span>
-                          <span className="text-gray-400 text-xs">
-                            {production.start_date
-                              ? format(parseISO(production.start_date), 'MMM yyyy')
-                              : '—'}
-                            {production.end_date
-                              ? ` → ${format(parseISO(production.end_date), 'MMM yyyy')}`
-                              : ''}
-                          </span>
-                        </Link>
-                      </li>
-                    ))}
-                </ul>
+            <>
+              {isAdmin && !showProductionForm && (
+                <Button className="mb-3" onClick={() => setShowProductionForm(true)}>New Production</Button>
               )}
-            </Card>
+              {showProductionForm && (
+                <Card className="p-6 mb-4">
+                  <ProductionForm
+                    defaultTheaterId={theaterId}
+                    onSuccess={id => {
+                      setShowProductionForm(false)
+                      if (id) navigate({ to: '/productions/$productionId' as never, params: { productionId: String(id) } as never })
+                    }}
+                    onCancel={() => setShowProductionForm(false)}
+                  />
+                </Card>
+              )}
+              <Card>
+                {theater.productions.length === 0 ? (
+                  <p className="px-4 py-3 text-sm text-gray-500">No productions yet.</p>
+                ) : (
+                  <ul className="divide-y divide-gray-100">
+                    {theater.productions
+                      .slice()
+                      .sort((a, b) =>
+                        (b.start_date ?? '').localeCompare(a.start_date ?? '')
+                      )
+                      .map(production => (
+                        <li key={production.id}>
+                          <Link
+                            to={'/productions/$productionId' as never}
+                            params={{ productionId: String(production.id) } as never}
+                            className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
+                          >
+                            <span className="text-gray-900">{production.play?.title}</span>
+                            <span className="text-gray-400 text-xs">
+                              {production.start_date
+                                ? format(parseISO(production.start_date), 'MMM yyyy')
+                                : '—'}
+                              {production.end_date
+                                ? ` → ${format(parseISO(production.end_date), 'MMM yyyy')}`
+                                : ''}
+                            </span>
+                          </Link>
+                        </li>
+                      ))}
+                  </ul>
+                )}
+              </Card>
+            </>
           )}
 
           {activeTab === 'spaces' && (

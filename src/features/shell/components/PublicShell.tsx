@@ -1,9 +1,11 @@
 import { Outlet } from '@tanstack/react-router'
+import type { ReactNode } from 'react'
 import { Link } from '@tanstack/react-router'
 import { PublicNavigation } from './PublicNavigation'
+import { PaypalButton } from './PaypalButton'
 import { Footer } from '../../free/components/Footer'
 
-export function PublicShell() {
+export function PublicShell({ children }: { children?: ReactNode } = {}) {
   return (
     <div className="min-h-screen flex flex-col">
       <PublicNavigation />
@@ -15,8 +17,11 @@ export function PublicShell() {
             Learn more about signing up for an account.
           </Link>
         </div>
+        <div className="bg-blue-50 border-b border-blue-200 px-4 py-2 flex items-center gap-4 w-full">
+          <PaypalButton />
+        </div>
         <main className="flex-1 p-6">
-          <Outlet />
+          {children ?? <Outlet />}
         </main>
       </div>
       <Footer />

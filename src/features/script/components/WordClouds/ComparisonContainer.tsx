@@ -1,13 +1,12 @@
-// Word cloud rendering uses react-wordcloud (installed with --legacy-peer-deps).
-import { useEffect, useState } from 'react'
-import ReactWordcloud from 'react-wordcloud'
+import { memo, useMemo, useState } from 'react'
+import WordCloud from 'react-d3-cloud'
 import WordCount from './WordCount'
 import type { WordCloudContextItem, WordEntry, WordLines } from './types'
 import type { PlayScript } from '../../types/script'
 
-const wordcloudOptions = {
-  fontSizes: [20, 100] as [number, number],
-}
+const cloudFontSize = (word: { value: number }) => Math.log2(word.value) * 8 + 12
+
+const StableWordCloud = memo(WordCloud)
 
 interface ComparisonContainerProps {
   context: { item: WordCloudContextItem; lines: WordLines }
@@ -16,16 +15,15 @@ interface ComparisonContainerProps {
 
 export default function ComparisonContainer({ context, play }: ComparisonContainerProps) {
   const [words, setWords] = useState<WordLines>(context.lines)
-  const [includedOriginalWords, setIncludedOriginalWords] = useState<WordEntry[]>([])
-  const [includedNewWords, setIncludedNewWords] = useState<WordEntry[]>([])
 
-  useEffect(() => {
-    setIncludedOriginalWords(words.originalContent.filter(w => w.include))
-  }, [JSON.stringify(words.originalContent)])
-
-  useEffect(() => {
-    setIncludedNewWords(words.newContent.filter(w => w.include))
-  }, [JSON.stringify(words.newContent)])
+  const includedOriginalWords = useMemo(
+    () => words.originalContent.filter(w => w.include),
+    [words.originalContent]
+  )
+  const includedNewWords = useMemo(
+    () => words.newContent.filter(w => w.include),
+    [words.newContent]
+  )
 
   function updateWords(newList: WordEntry[], key: 'originalContent' | 'newContent') {
     setWords(prev => ({ ...prev, [key]: newList }))
@@ -55,11 +53,17 @@ export default function ComparisonContainer({ context, play }: ComparisonContain
       <div className="flex flex-row flex-nowrap gap-6">
         <div className="flex flex-col items-center">
           <h3 className="text-base font-semibold mb-2">Original text</h3>
-          <div className="max-h-[700px] w-[500px]">
-            <ReactWordcloud
-              options={wordcloudOptions}
-              words={includedOriginalWords}
-            />
+          <div className="w-[500px] h-[500px]">
+            {includedOriginalWords.length > 0 ? (
+              <StableWordCloud
+                data={includedOriginalWords}
+                width={500}
+                height={500}
+                fontSize={cloudFontSize}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-400 text-sm">No words selected</div>
+            )}
           </div>
           <WordCount
             list="originalContent"
@@ -71,11 +75,17 @@ export default function ComparisonContainer({ context, play }: ComparisonContain
         {!play.canonical && (
           <div className="flex flex-col items-center">
             <h3 className="text-base font-semibold mb-2">Cut text</h3>
-            <div className="max-h-[700px] w-[500px]">
-              <ReactWordcloud
-                options={wordcloudOptions}
-                words={includedNewWords}
-              />
+            <div className="w-[500px] h-[500px]">
+              {includedNewWords.length > 0 ? (
+                <StableWordCloud
+                  data={includedNewWords}
+                  width={500}
+                  height={500}
+                  fontSize={cloudFontSize}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400 text-sm">No words selected</div>
+              )}
             </div>
             <WordCount
               list="newContent"

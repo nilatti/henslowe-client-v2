@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import * as DiffLib from 'diff'
 import { CharacterSelect } from './CharacterSelect'
+import { isCut as isLineCut } from '../../../utils/playScriptUtils'
 import type { ScriptLine } from '../../script/types/script'
 
 interface LineShowEditableProps {
@@ -74,7 +75,7 @@ export function LineShowEditable({
   const [editFormOpen, setEditFormOpen] = useState(false)
   const [selectedCharacter] = useState(tempSelectedCharacter)
 
-  const isCut = line.new_content != null && line.new_content.trim() === ''
+  const isCut = isLineCut(line)
   const isStageDirection = !!line.number?.match(/^SD/)
 
   const diffContent =
@@ -100,11 +101,11 @@ export function LineShowEditable({
     : (line.new_content?.trim() ? line.new_content : line.original_content)
 
   function handleCutWholeLine() {
-    handleLineSubmit({ ...line, new_content: ' ' })
+    handleLineSubmit({ ...line, new_content: '' })
   }
 
   function handleUnCutWholeLine() {
-    handleLineSubmit({ ...line, new_content: '' })
+    handleLineSubmit({ ...line, new_content: null })
   }
 
   function submitCharacterEdit(newCharacter: { id: number; name: string }[]) {
@@ -139,31 +140,39 @@ export function LineShowEditable({
         {line.character.name}
       </span>
     )
-  } else {
+  } else if (line.character_id) {
     characterComponent = (
       <span
         className="text-gray-300 text-xs cursor-pointer hover:text-blue-400 select-none"
         onDoubleClick={() => setCharacterSelectOpen(true)}
+        title="Double-click to reassign"
+      >·</span>
+    )
+  } else {
+    characterComponent = (
+      <span
+        className="text-gray-400 text-xs cursor-pointer hover:text-blue-500 select-none italic"
+        onDoubleClick={() => setCharacterSelectOpen(true)}
         title="Double-click to set character"
       >
-        {line.character_id ? '·' : ''}
+        Set character
       </span>
     )
   }
 
   return (
     <div
-      className={`flex gap-3 py-1 text-sm group ${
+      className={`flex gap-3 py-1 text-sm ${
         isCut && showCut ? 'opacity-40' : ''
       } ${isStageDirection ? 'italic text-gray-500' : ''} ${
         index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
       }`}
     >
-      <span className="text-gray-300 w-10 shrink-0 text-right text-xs pt-0.5">
+      <span className="text-gray-400 w-16 shrink-0 text-right text-xs pt-0.5">
         {line.number}
       </span>
 
-      <div className="relative w-28 shrink-0 text-right pr-2">
+      <div className="relative w-40 shrink-0 text-left pl-2">
         {characterComponent}
       </div>
 
@@ -181,20 +190,20 @@ export function LineShowEditable({
         )}
       </div>
 
-      <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="shrink-0">
         {isCut ? (
           <button
             onClick={handleUnCutWholeLine}
-            className="text-xs px-2 py-0.5 border border-green-400 text-green-600 rounded hover:bg-green-50"
+            className="text-xs px-2 py-0.5 border border-cyan-500 text-cyan-600 rounded hover:bg-cyan-50"
           >
-            Un-Cut
+            Un-Cut Whole Line
           </button>
         ) : (
           <button
             onClick={handleCutWholeLine}
-            className="text-xs px-2 py-0.5 border border-red-300 text-red-500 rounded hover:bg-red-50"
+            className="text-xs px-2 py-0.5 bg-cyan-500 text-white rounded hover:bg-cyan-600"
           >
-            Cut
+            Cut Whole Line
           </button>
         )}
       </div>

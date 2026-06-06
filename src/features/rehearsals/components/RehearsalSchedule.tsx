@@ -44,7 +44,7 @@ export function RehearsalSchedule({
   const { data: jobs } = useSuspenseQuery(
     productionJobsQueryOptions(productionId)
   )
-  const role = useUserRoleForProduction(productionId)
+  const role = useUserRoleForProduction(productionId, theaterId)
   const isSuperAdmin = useIsSuperAdmin()
   const isAdmin = role === 'admin' || isSuperAdmin
 
@@ -119,7 +119,7 @@ export function RehearsalSchedule({
                 Pattern generator
               </Button>
               <Button onClick={() => setShowForm(!showForm)}>
-                + Add rehearsal
+                Add Rehearsal
               </Button>
             </div>
           ) : undefined

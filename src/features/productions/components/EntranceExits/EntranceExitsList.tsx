@@ -17,12 +17,14 @@ import type { PlayCharacter } from '../../../plays/types/play'
 interface EntranceExitsListProps {
   frenchSceneId: number
   productionId: number
+  theaterId?: number
   characters: PlayCharacter[]
 }
 
 function EntranceExitsListInner({
   frenchSceneId,
   productionId,
+  theaterId,
   characters,
 }: EntranceExitsListProps) {
   const { data: entranceExits } = useSuspenseQuery(
@@ -30,7 +32,7 @@ function EntranceExitsListInner({
   )
   const { data: stageExits } = useSuspenseQuery(stageExitsQueryOptions(productionId))
 
-  const role = useUserRoleForProduction(productionId)
+  const role = useUserRoleForProduction(productionId, theaterId)
   const isAdmin = role === 'admin'
 
   const create = useCreateEntranceExit(frenchSceneId)

@@ -1,25 +1,32 @@
-import { useState } from 'react'
-import type { RehearsalUser } from '../../types/rehearsal'
-import { Button, Card } from '../../../../components/ui'
-import { buildUserName } from '../../../../utils/actorUtils'
+import { useState } from "react";
+import type { RehearsalUser } from "../../types/rehearsal";
+import { Button, Card } from "../../../../components/ui";
+import { buildUserName } from "../../../../utils/actorUtils";
 
 interface ExtraUsersPanelProps {
-  extraUsers: RehearsalUser[]
-  onConfirm: (confirmedUsers: RehearsalUser[]) => void
+  extraUsers: RehearsalUser[];
+  onConfirm: (confirmedUsers: RehearsalUser[]) => void;
 }
 
-export function ExtraUsersPanel({ extraUsers, onConfirm }: ExtraUsersPanelProps) {
+export function ExtraUsersPanel({
+  extraUsers,
+  onConfirm,
+}: ExtraUsersPanelProps) {
   const [keepIds, setKeepIds] = useState<Set<number>>(
-    new Set(extraUsers.map(u => u.id))
-  )
+    new Set(extraUsers.map((u) => u.id)),
+  );
 
   const handleToggle = (userId: number) => {
-    setKeepIds(prev => {
-      const next = new Set(prev)
-      next.has(userId) ? next.delete(userId) : next.add(userId)
-      return next
-    })
-  }
+    setKeepIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(userId)) {
+        next.delete(userId);
+      } else {
+        next.add(userId);
+      }
+      return next;
+    });
+  };
 
   return (
     <Card className="p-4 border-amber-200 bg-amber-50">
@@ -31,7 +38,7 @@ export function ExtraUsersPanel({ extraUsers, onConfirm }: ExtraUsersPanelProps)
         Should they still be called? (e.g. designers watching a run)
       </p>
       <div className="space-y-2 mb-4">
-        {extraUsers.map(user => (
+        {extraUsers.map((user) => (
           <label
             key={user.id}
             className="flex items-center gap-2 text-sm text-gray-700"
@@ -46,9 +53,11 @@ export function ExtraUsersPanel({ extraUsers, onConfirm }: ExtraUsersPanelProps)
           </label>
         ))}
       </div>
-      <Button onClick={() => onConfirm(extraUsers.filter(u => keepIds.has(u.id)))}>
+      <Button
+        onClick={() => onConfirm(extraUsers.filter((u) => keepIds.has(u.id)))}
+      >
         Confirm call list
       </Button>
     </Card>
-  )
+  );
 }

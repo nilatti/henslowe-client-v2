@@ -1,30 +1,38 @@
 import { useForm } from '@tanstack/react-form'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { playsQueryOptions } from '../../plays/api/plays'
+import { canonicalPlaysQueryOptions } from '../../plays/api/plays'
 import { theatersQueryOptions } from '../../theaters/api/theaters'
 import { useCreateProduction, useUpdateProduction } from '../api/productions'
 import type { Production } from '../types/production'
 import { Button } from '../../../components/ui'
+import { useAdminTheaterIds } from '../../../hooks/useUserRole'
 
 interface ProductionFormProps {
   production?: Production
+  defaultTheaterId?: number
   onSuccess: (id?: number) => void
   onCancel: () => void
 }
 
-export function ProductionForm({ production, onSuccess, onCancel }: ProductionFormProps) {
-  const { data: plays } = useSuspenseQuery(playsQueryOptions())
-  const { data: theaters } = useSuspenseQuery(theatersQueryOptions())
+export function ProductionForm({ production, defaultTheaterId, onSuccess, onCancel }: ProductionFormProps) {
+  const { data: plays } = useSuspenseQuery(canonicalPlaysQueryOptions())
+  const { data: allTheaters } = useSuspenseQuery(theatersQueryOptions())
+  const adminTheaterIds = useAdminTheaterIds()
+  const theaters = adminTheaterIds
+    ? allTheaters.filter(t => adminTheaterIds.has(t.id))
+    : allTheaters
   const create = useCreateProduction()
   const update = useUpdateProduction(production?.id ?? 0)
   const isEditing = !!production
 
-  const canonicalPlays = plays.filter(p => p.canonical)
-
   const form = useForm({
     defaultValues: {
       play_id: production?.play.id ? String(production.play.id) : '',
-      theater_id: production?.theater_id ? String(production.theater_id) : '',
+      theater_id: production?.theater_id
+        ? String(production.theater_id)
+        : defaultTheaterId
+          ? String(defaultTheaterId)
+          : '',
       start_date: production?.start_date ?? '',
       end_date: production?.end_date ?? '',
       lines_per_minute: production?.lines_per_minute
@@ -78,7 +86,7 @@ export function ProductionForm({ production, onSuccess, onCancel }: ProductionFo
                   className={inputClass}
                 >
                   <option value="">Select a play</option>
-                  {canonicalPlays.map(p => (
+                  {plays.map(p => (
                     <option key={p.id} value={p.id}>
                       {p.title}
                     </option>

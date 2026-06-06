@@ -61,8 +61,6 @@ export const SPACE_CONFLICT_REASONS = [
   "rehearsal",
 ];
 export const SPACE_MEMBER: string[] = [];
-export const SHAKESPEARE_ID = 3;
-export const SUPERUSERS = import.meta.env.VITE_SUPERUSERS?.split(',') ?? ['alisha.huber@gmail.com'];
 export const THEATER_ADMIN = [
   "Executive Director",
   "Artistic Director",

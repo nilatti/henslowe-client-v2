@@ -8,11 +8,12 @@ import { Button, ErrorMessage } from '../../../../components/ui'
 
 interface StageExitsListProps {
   productionId: number
+  theaterId?: number
 }
 
-export function StageExitsList({ productionId }: StageExitsListProps) {
+export function StageExitsList({ productionId, theaterId }: StageExitsListProps) {
   const { data: stageExits } = useSuspenseQuery(stageExitsQueryOptions(productionId))
-  const role = useUserRoleForProduction(productionId)
+  const role = useUserRoleForProduction(productionId, theaterId)
   const isAdmin = role === 'admin'
 
   const create = useCreateStageExit(productionId)

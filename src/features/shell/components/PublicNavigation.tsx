@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { LoginButton } from '../../auth/components/LoginButton'
-import { PaypalButton } from './PaypalButton'
 
 const activeClass = 'text-blue-600 font-medium'
 const linkClass = 'text-gray-700 hover:text-gray-900 text-sm transition-colors'
@@ -14,7 +13,7 @@ export function PublicNavigation() {
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
         <Link
           to="/free"
-          className="font-semibold text-gray-900 text-base"
+          className="font-semibold text-gray-900 text-base shrink-0"
           activeProps={{ className: activeClass }}
         >
           Henslowe's Cloud
@@ -37,7 +36,7 @@ export function PublicNavigation() {
         </button>
 
         {/* Desktop nav */}
-        <nav className="hidden lg:flex items-center gap-5 flex-wrap">
+        <nav className="hidden lg:flex items-center gap-4">
           <NavLinks />
         </nav>
       </div>
@@ -58,29 +57,34 @@ function NavLinks() {
       <Link to="/free" className={linkClass} activeProps={{ className: activeClass }}>
         Home
       </Link>
-      <Link to={'/help' as never} className={linkClass} activeProps={{ className: activeClass }}>
-        Help
-      </Link>
       <Link to="/free/casting" className={linkClass} activeProps={{ className: activeClass }}>
-        Cast your play
+        Cast
       </Link>
       <Link to="/free/cut" className={linkClass} activeProps={{ className: activeClass }}>
-        Cut a play
+        Cut
       </Link>
       <Link to="/free/word-cloud" className={linkClass} activeProps={{ className: activeClass }}>
-        Make play wordclouds
+        Word clouds
       </Link>
       <Link to="/free/doubling" className={linkClass} activeProps={{ className: activeClass }}>
-        Make a doubling chart
+        Doubling chart
       </Link>
       <Link to="/free/part-scripts" className={linkClass} activeProps={{ className: activeClass }}>
-        Generate part scripts
+        Part scripts
+      </Link>
+      <Link to="/help" className={linkClass} activeProps={{ className: activeClass }}>
+        Help
+      </Link>
+      <Link to="/faq" className={linkClass} activeProps={{ className: activeClass }}>
+        FAQ
+      </Link>
+      <Link to="/getting-started" className={linkClass} activeProps={{ className: activeClass }}>
+        Getting started
       </Link>
       <Link to={'/subscriptions' as never} className={linkClass} activeProps={{ className: activeClass }}>
-        Subscribe for more features!
+        Subscribe
       </Link>
       <LoginButton />
-      <PaypalButton />
     </>
   )
 }

@@ -68,11 +68,11 @@ export function DoublingChartContainer({ productionId }: DoublingChartContainerP
           </h2>
         )}
 
-        <div className="p-3 mb-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
-          <strong>Orange</strong> indicates one actor playing two characters in the same
-          act/scene/french scene. A character name in <strong>parentheses</strong> indicates
-          the character is onstage but (in your cut) doesn't speak.
-        </div>
+        <p className="text-sm text-gray-600 mb-3">
+          Orange indicates one actor playing two characters in an act/scene/french
+          scene. A character name in parenthesis indicates that the character is
+          onstage but (in your cut) doesn't talk.
+        </p>
 
         <Tabs
           tabs={[...TABS]}

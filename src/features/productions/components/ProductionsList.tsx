@@ -3,12 +3,12 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { productionsQueryOptions } from '../api/productions'
 import { ProductionForm } from './ProductionForm'
-import { useIsSuperAdmin } from '../../../hooks/useUserRole'
+import { useIsAnyAdmin } from '../../../hooks/useUserRole'
 import { Button, Card, PageHeader } from '../../../components/ui'
 
 export function ProductionsList() {
   const { data: productions } = useSuspenseQuery(productionsQueryOptions())
-  const isSuperAdmin = useIsSuperAdmin()
+  const isAdmin = useIsAnyAdmin()
   const navigate = useNavigate()
 
   const [showForm, setShowForm] = useState(false)
@@ -18,8 +18,8 @@ export function ProductionsList() {
       <PageHeader
         title="Productions"
         action={
-          isSuperAdmin && !showForm ? (
-            <Button onClick={() => setShowForm(true)}>+ New Production</Button>
+          isAdmin && !showForm ? (
+            <Button onClick={() => setShowForm(true)}>New Production</Button>
           ) : undefined
         }
       />
@@ -49,8 +49,8 @@ export function ProductionsList() {
                   className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
                 >
                   <div>
-                    <span className="font-medium text-gray-900">{p.play.title}</span>
-                    <span className="text-gray-500 ml-2">· {p.theater.name}</span>
+                    <span className="font-medium text-gray-900">{p.play?.title}</span>
+                    <span className="text-gray-500 ml-2">· {p.theater?.name}</span>
                   </div>
                   <span className="text-gray-400 text-xs">→</span>
                 </Link>

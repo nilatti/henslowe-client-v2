@@ -15,7 +15,7 @@ export function FullAccessNavigation() {
   const userName = user ? buildUserName(user) : ''
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-10 bg-white border-b border-gray-200">
+    <header className="fixed top-0 left-0 right-0 z-10 bg-white border-b border-gray-200 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
         <Link
           to="/"
@@ -42,14 +42,17 @@ export function FullAccessNavigation() {
         </button>
 
         {/* Desktop nav */}
-        <nav className="hidden lg:flex items-center gap-5 flex-wrap">
+        <nav className="hidden lg:flex items-center gap-3 flex-nowrap">
           <NavLinks superAdmin={superAdmin} userName={userName} />
         </nav>
       </div>
 
       {/* Mobile nav */}
       {menuOpen && (
-        <nav className="lg:hidden border-t border-gray-100 bg-white px-4 pb-4 flex flex-col gap-3">
+        <nav
+          className="lg:hidden border-t border-gray-100 bg-white px-4 pb-4 flex flex-col gap-3"
+          onClick={() => setMenuOpen(false)}
+        >
           <NavLinks superAdmin={superAdmin} userName={userName} />
         </nav>
       )}
@@ -63,8 +66,14 @@ function NavLinks({ superAdmin, userName }: { superAdmin: boolean; userName: str
       <Link to="/" className={linkClass} activeProps={{ className: activeClass }}>
         Dashboard
       </Link>
-      <Link to={'/help' as never} className={linkClass} activeProps={{ className: activeClass }}>
+      <Link to="/help" className={linkClass} activeProps={{ className: activeClass }}>
         Help
+      </Link>
+      <Link to="/faq" className={linkClass} activeProps={{ className: activeClass }}>
+        FAQ
+      </Link>
+      <Link to="/getting-started" className={linkClass} activeProps={{ className: activeClass }}>
+        Getting started
       </Link>
       <Link to="/productions" className={linkClass} activeProps={{ className: activeClass }}>
         Productions
@@ -91,7 +100,7 @@ function NavLinks({ superAdmin, userName }: { superAdmin: boolean; userName: str
           </Link>
         </>
       )}
-      <Link to={'/account' as never} className={linkClass} activeProps={{ className: activeClass }}>
+      <Link to="/account" className={linkClass} activeProps={{ className: activeClass }}>
         Your Account
       </Link>
       <span className="text-sm text-gray-600">Hi, {userName}</span>

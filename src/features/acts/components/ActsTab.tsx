@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { useDeleteAct } from '../api/acts'
 import { ActForm } from './ActForm'
 import type { PlaySkeleton } from '../../plays/types/play'
-import { useIsSuperAdmin } from '../../../hooks/useUserRole'
+import { useIsPlayAdmin } from '../../../hooks/useUserRole'
 import { Button, Card, ConfirmDialog } from '../../../components/ui'
 
 interface ActsTabProps {
@@ -13,7 +13,7 @@ interface ActsTabProps {
 
 export function ActsTab({ play, playId }: ActsTabProps) {
   const deleteAct = useDeleteAct(playId)
-  const isSuperAdmin = useIsSuperAdmin()
+  const isAdmin = useIsPlayAdmin(playId)
 
   const [showForm, setShowForm] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null)
@@ -22,7 +22,7 @@ export function ActsTab({ play, playId }: ActsTabProps) {
 
   return (
     <div className="space-y-4">
-      {isSuperAdmin && !showForm && (
+      {isAdmin && !showForm && (
         <Button onClick={() => setShowForm(true)}>Add Act</Button>
       )}
 
@@ -50,7 +50,7 @@ export function ActsTab({ play, playId }: ActsTabProps) {
             >
               Act {act.number}
             </Link>
-            {isSuperAdmin && (
+            {isAdmin && (
               <Button
                 variant="danger"
                 onClick={() => setConfirmDelete(act.id)}

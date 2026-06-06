@@ -1,5 +1,3 @@
-import { Link } from '@tanstack/react-router'
-
 export function Welcome() {
   return (
     <div>
@@ -40,8 +38,8 @@ export function Welcome() {
         <strong>
           With the free version of our service, any changes you make will vanish
           as soon as you close your browser or switch which play you are working
-          on. For more tools and the ability to save your work, please see our{' '}
-          <Link to="/login">premium plans</Link>, coming soon!
+          on. For more tools and the ability to save your work, please see our
+          premium plans, coming soon!
         </strong>
       </div>
     </div>

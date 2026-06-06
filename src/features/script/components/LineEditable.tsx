@@ -37,8 +37,8 @@ export function LineEditable({
       ? buildDiff(line.original_content, line.new_content)
       : null
 
-  const handleCut = () => updateLine.mutate({ ...line, new_content: ' ' })
-  const handleRestore = () => updateLine.mutate({ ...line, new_content: '' })
+  const handleCut = () => updateLine.mutate({ ...line, new_content: '' })
+  const handleRestore = () => updateLine.mutate({ ...line, new_content: null })
 
   const handleLineSubmit = () => {
     if (editValue !== (line.new_content ?? line.original_content)) {
@@ -74,16 +74,16 @@ export function LineEditable({
 
   return (
     <div
-      className={`flex gap-3 py-1 text-sm group ${
+      className={`flex gap-3 py-1 text-sm ${
         isCut && showCut ? 'opacity-40' : ''
       } ${isStageDirection ? 'italic text-gray-500' : ''}`}
     >
-      <span className="text-gray-300 w-10 shrink-0 text-right text-xs pt-0.5">
+      <span className="text-gray-400 w-16 shrink-0 text-right text-xs pt-0.5">
         {line.number}
       </span>
 
       {/* Character name / selector */}
-      <div className="relative w-24 shrink-0 text-right pr-2">
+      <div className="relative w-40 shrink-0 text-left pl-2">
         {charSelectOpen ? (
           <select
             autoFocus
@@ -112,16 +112,25 @@ export function LineEditable({
           >
             {line.character.name}
           </span>
-        ) : (
+        ) : line.character_id ? (
           <span
             className="text-gray-300 text-xs cursor-pointer hover:text-blue-400 select-none"
             onDoubleClick={() => {
               setPendingCharId(line.character_id)
               setCharSelectOpen(true)
             }}
+            title="Double-click to reassign"
+          >·</span>
+        ) : (
+          <span
+            className="text-gray-400 text-xs cursor-pointer hover:text-blue-500 select-none italic"
+            onDoubleClick={() => {
+              setPendingCharId(null)
+              setCharSelectOpen(true)
+            }}
             title="Double-click to set character"
           >
-            {line.character_id ? '·' : ''}
+            Set character
           </span>
         )}
       </div>
@@ -170,21 +179,21 @@ export function LineEditable({
         )}
       </div>
 
-      {/* Cut / Restore — visible on hover */}
-      <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+      {/* Cut / Restore — always visible */}
+      <div className="shrink-0">
         {isCut ? (
           <button
             onClick={handleRestore}
-            className="text-xs px-2 py-0.5 border border-green-400 text-green-600 rounded hover:bg-green-50"
+            className="text-xs px-2 py-0.5 border border-cyan-500 text-cyan-600 rounded hover:bg-cyan-50"
           >
-            Restore
+            Un-Cut Whole Line
           </button>
         ) : (
           <button
             onClick={handleCut}
-            className="text-xs px-2 py-0.5 border border-red-300 text-red-500 rounded hover:bg-red-50"
+            className="text-xs px-2 py-0.5 bg-cyan-500 text-white rounded hover:bg-cyan-600"
           >
-            Cut
+            Cut Whole Line
           </button>
         )}
       </div>

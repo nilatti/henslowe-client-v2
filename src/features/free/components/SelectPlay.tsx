@@ -1,6 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { playsQueryOptions } from '../../plays/api/plays'
-import { SHAKESPEARE_ID } from '../../../utils/constants'
 import { useFreePlayStore } from '../store/freePlayStore'
 import { LoadingSpinner } from '../../../components/ui'
 
@@ -8,7 +7,7 @@ export function SelectPlay() {
   const { data: allPlays } = useSuspenseQuery(playsQueryOptions())
   const { getPlay, loading } = useFreePlayStore()
 
-  const plays = allPlays.filter(p => p.author_id === SHAKESPEARE_ID)
+  const plays = allPlays.filter(p => p.author?.last_name === 'Shakespeare')
 
   if (loading) {
     return <LoadingSpinner message="Loading play… this may take a moment" />

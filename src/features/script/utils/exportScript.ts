@@ -1,6 +1,6 @@
 import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx'
 import type { ScriptAct } from '../types/script'
-import { mergeTextFromFrenchScenes, sortScriptItems } from './scriptUtils'
+import { mergeTextFromFrenchScenes, sortScriptItems, isLineCut } from './scriptUtils'
 
 const PAGE_SIZE = { width: 12240, height: 15840 }
 const MARGIN = { top: 1440, bottom: 1440, left: 1440, right: 1440 }
@@ -56,7 +56,7 @@ export async function generateCutScript(
 
     for (const item of sorted) {
       if (item._type === 'line') {
-        if (item.new_content === ' ') continue
+        if (isLineCut(item)) continue
         const text = item.new_content ?? item.original_content
         children.push(
           new Paragraph({
@@ -69,7 +69,7 @@ export async function generateCutScript(
           })
         )
       } else if (item._type === 'stage_direction') {
-        if (item.new_content === ' ') continue
+        if (isLineCut(item)) continue
         const text = item.new_content ?? item.original_content
         children.push(
           new Paragraph({
@@ -78,7 +78,7 @@ export async function generateCutScript(
           })
         )
       } else {
-        if (item.new_content === ' ') continue
+        if (isLineCut(item)) continue
         const text = (item.new_content ?? item.original_content) ?? ''
         if (!text.trim()) continue
         children.push(
@@ -120,7 +120,7 @@ export async function generateMarkedScript(
             runs.push(new TextRun({ text: '  ' }))
           }
           runs.push(new TextRun({ text: item.original_content, strike: true }))
-          if (item.new_content !== ' ') {
+          if (!isLineCut(item)) {
             runs.push(new TextRun({ text: ` ${item.new_content}`, underline: {} }))
           }
           children.push(new Paragraph({ children: runs }))
@@ -141,7 +141,7 @@ export async function generateMarkedScript(
           const runs: TextRun[] = [
             new TextRun({ text: item.original_content, italics: true, strike: true }),
           ]
-          if (item.new_content !== ' ') {
+          if (!isLineCut(item)) {
             runs.push(
               new TextRun({ text: ` ${item.new_content}`, italics: true, underline: {} })
             )
@@ -166,7 +166,7 @@ export async function generateMarkedScript(
               strike: true,
             }),
           ]
-          if (item.new_content !== ' ') {
+          if (!isLineCut(item)) {
             runs.push(
               new TextRun({
                 text: ` [Sound: ${item.new_content}]`,

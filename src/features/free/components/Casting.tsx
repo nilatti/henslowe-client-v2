@@ -157,6 +157,7 @@ export function Casting() {
     fakeActorsArray,
     setFakeActors,
     play,
+    setPlay,
     updateActorJobs,
     updateCastings,
   } = useFreePlayStore()
@@ -180,6 +181,15 @@ export function Casting() {
 
   return (
     <>
+      <div className="mb-3 text-base text-gray-700">
+        Casting for {play.title}
+      </div>
+      <button
+        onClick={() => setPlay(null)}
+        className="mb-4 px-3 py-1.5 border border-gray-300 text-sm rounded hover:bg-gray-50"
+      >
+        Select a different play
+      </button>
       <FakeActorsPanel actors={fakeActors} onSubmit={setFakeActors} />
       <p className="text-sm text-gray-500 italic mb-3">
         Number beside character name indicates line count in your cut text (or in

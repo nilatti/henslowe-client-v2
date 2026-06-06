@@ -47,16 +47,14 @@ export function ConflictsManager({ userId, spaceId, canEdit }: ConflictsManagerP
     <div className="space-y-6">
       {/* Individual conflicts */}
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-gray-900">
-            Individual Conflicts ({individualConflicts.length})
-          </h3>
-          {canEdit && !showConflictForm && (
-            <Button onClick={() => setShowConflictForm(true)}>
-              + Add conflict
-            </Button>
-          )}
-        </div>
+        <h3 className="text-sm font-semibold text-gray-900 mb-3">
+          Individual Conflicts ({individualConflicts.length})
+        </h3>
+        {canEdit && !showConflictForm && (
+          <Button className="mb-3" onClick={() => setShowConflictForm(true)}>
+            Add Conflict
+          </Button>
+        )}
 
         {showConflictForm && (
           <Card className="p-4 mb-3">
@@ -92,16 +90,14 @@ export function ConflictsManager({ userId, spaceId, canEdit }: ConflictsManagerP
 
       {/* Recurring patterns */}
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-gray-900">
-            Recurring Patterns ({patterns.length})
-          </h3>
-          {canEdit && !showPatternForm && (
-            <Button onClick={() => setShowPatternForm(true)}>
-              + Add pattern
-            </Button>
-          )}
-        </div>
+        <h3 className="text-sm font-semibold text-gray-900 mb-3">
+          Recurring Patterns ({patterns.length})
+        </h3>
+        {canEdit && !showPatternForm && (
+          <Button className="mb-3" onClick={() => setShowPatternForm(true)}>
+            Add Pattern
+          </Button>
+        )}
 
         {showPatternForm && (
           <Card className="p-4 mb-3">

@@ -41,7 +41,7 @@ export function SetDesignDashboard({ productionId }: SetDesignDashboardProps) {
       <div>
         <h3 className="text-lg font-medium text-gray-800 mb-3">Stage Exits</h3>
         <Suspense fallback={<LoadingSpinner />}>
-          <StageExitsList productionId={productionId} />
+          <StageExitsList productionId={productionId} theaterId={production.theater.id} />
         </Suspense>
       </div>
     </div>

@@ -3,7 +3,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { actQueryOptions, useDeleteAct } from '../api/acts'
 import { ActForm } from './ActForm'
-import { useIsSuperAdmin } from '../../../hooks/useUserRole'
+import { useIsPlayAdmin } from '../../../hooks/useUserRole'
 import {
   Button,
   Card,
@@ -19,7 +19,7 @@ interface ActDetailProps {
 export function ActDetail({ playId, actId }: ActDetailProps) {
   const { data: act } = useSuspenseQuery(actQueryOptions(actId))
   const deleteAct = useDeleteAct(playId)
-  const isSuperAdmin = useIsSuperAdmin()
+  const isAdmin = useIsPlayAdmin(playId)
   const navigate = useNavigate()
 
   const [isEditing, setIsEditing] = useState(false)
@@ -44,7 +44,7 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
       <PageHeader
         title={title}
         action={
-          isSuperAdmin && (
+          isAdmin && (
             <div className="flex gap-2">
               <Button variant="secondary" onClick={() => setIsEditing(true)}>
                 Edit
@@ -107,21 +107,19 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
           )}
 
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-medium text-gray-900">Scenes</h2>
-              {isSuperAdmin && (
-                <Link
-                  to="/plays/$playId/acts/$actId/scenes/new"
-                  params={{
-                    playId: String(playId),
-                    actId: String(actId),
-                  }}
-                  className="text-sm text-blue-600 hover:text-blue-800"
-                >
-                  + Add scene
-                </Link>
-              )}
-            </div>
+            <h2 className="text-lg font-medium text-gray-900 mb-3">Scenes</h2>
+            {isAdmin && (
+              <Link
+                to="/plays/$playId/acts/$actId/scenes/new"
+                params={{
+                  playId: String(playId),
+                  actId: String(actId),
+                }}
+                className="inline-block mb-3"
+              >
+                <Button>Add Scene</Button>
+              </Link>
+            )}
             <Card>
               {act.scenes.length === 0 ? (
                 <p className="px-4 py-3 text-sm text-gray-500">
@@ -141,7 +139,7 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
                         className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
                       >
                         <span className="text-gray-900">
-                          Scene {scene.pretty_name}
+                          Scene {scene.number}
                         </span>
                         <span className="text-gray-400 text-xs">
                           {scene.french_scenes?.length ?? 0} french scene
