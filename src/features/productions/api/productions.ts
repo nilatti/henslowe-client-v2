@@ -21,7 +21,12 @@ export function useCreateProduction() {
   return useMutation({
     mutationFn: (data: Record<string, unknown>) =>
       api.post('/api/v1/productions', { production: data }).then(r => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['productions'] }),
+    onSuccess: async (data) => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ['productions'] }),
+        qc.fetchQuery(productionSkeletonQueryOptions(data.id)),
+      ])
+    },
   })
 }
 
@@ -44,6 +49,9 @@ export function useDeleteProduction() {
   return useMutation({
     mutationFn: (id: number) =>
       api.delete(`/api/v1/productions/${id}`).then(r => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['productions'] }),
+    onSuccess: (_, id) => {
+      qc.removeQueries({ queryKey: ['productions', id, 'skeleton'] })
+      qc.invalidateQueries({ queryKey: ['productions'], exact: true })
+    },
   })
 }

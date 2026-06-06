@@ -40,6 +40,11 @@ export function useDeleteTheater() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: deleteMutationFn('theaters'),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['theaters'] }),
+    onSuccess: (_, id) => {
+      // Remove the skeleton immediately so the still-mounted TheaterDetail
+      // doesn't try to re-fetch a deleted resource and crash the render tree.
+      qc.removeQueries({ queryKey: ['theaters', id, 'skeleton'] })
+      qc.invalidateQueries({ queryKey: ['theaters'], exact: true })
+    },
   })
 }

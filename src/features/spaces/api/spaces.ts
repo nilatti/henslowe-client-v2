@@ -37,6 +37,9 @@ export function useDeleteSpace() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: deleteMutationFn('spaces'),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['spaces'] }),
+    onSuccess: (_, id) => {
+      qc.removeQueries({ queryKey: ['spaces', id] })
+      qc.invalidateQueries({ queryKey: ['spaces'], exact: true })
+    },
   })
 }

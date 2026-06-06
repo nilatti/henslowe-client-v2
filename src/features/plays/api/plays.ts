@@ -16,6 +16,14 @@ export const playsQueryOptions = () =>
       api.get('/api/v1/plays/play_titles').then(r => r.data),
   })
 
+// Canonical plays only — for production creation
+export const canonicalPlaysQueryOptions = () =>
+  queryOptions({
+    queryKey: ['plays', { canonical: true }],
+    queryFn: (): Promise<PlayListItem[]> =>
+      api.get('/api/v1/plays/play_titles', { params: { canonical: true } }).then(r => r.data),
+  })
+
 // Full show — characters with aggregated lines, used for character breakdown
 export const playQueryOptions = (id: number) =>
   queryOptions({
@@ -54,6 +62,10 @@ export function useDeletePlay() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: deleteMutationFn('plays'),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['plays'] }),
+    onSuccess: (_, id) => {
+      qc.removeQueries({ queryKey: ['plays', id] })
+      qc.removeQueries({ queryKey: ['plays', id, 'skeleton'] })
+      qc.invalidateQueries({ queryKey: ['plays'], exact: true })
+    },
   })
 }

@@ -49,7 +49,8 @@ export function SpecializationDetailPage({ specializationId }: Props) {
   const deleteMutation = useMutation({
     mutationFn: deleteSpecializationFn,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['specializations'] })
+      queryClient.removeQueries({ queryKey: ['specializations', specializationId] })
+      queryClient.invalidateQueries({ queryKey: ['specializations'], exact: true })
       void navigate({ to: '/specializations' })
     },
   })

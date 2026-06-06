@@ -34,6 +34,9 @@ export function useDeleteAuthor() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: deleteMutationFn('authors'),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['authors'] }),
+    onSuccess: (_, id) => {
+      qc.removeQueries({ queryKey: ['authors', id] })
+      qc.invalidateQueries({ queryKey: ['authors'], exact: true })
+    },
   })
 }

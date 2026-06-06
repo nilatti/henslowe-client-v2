@@ -35,8 +35,8 @@ export function UsersList() {
         header: 'Name',
         cell: ({ row }) => (
           <Link
-            to={'/users/$userId' as never}
-            params={{ userId: String(row.original.id) } as never}
+            to="/users/$userId"
+            params={{ userId: String(row.original.id) }}
             className="text-blue-600 hover:text-blue-800"
           >
             {buildUserName(row.original)}
