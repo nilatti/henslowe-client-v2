@@ -15,14 +15,15 @@ export function AuthCallbackPage() {
       return
     }
 
+    const role = params.get('role') ?? 'regular'
     const user: AuthUser = {
       id: Number(params.get('id')),
       email: params.get('email') ?? '',
       first_name: params.get('first_name') ?? '',
       last_name: params.get('last_name') ?? '',
-      role: params.get('role') ?? 'regular',
+      role,
       subscription_status: params.get('subscription_status') ?? 'never subscribed',
-      is_superadmin: params.get('is_superadmin') === 'true',
+      is_superadmin: role === 'superadmin',
     }
 
     if (!user.id || !user.email) {

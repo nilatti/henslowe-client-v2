@@ -6,7 +6,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(() => {
     try {
       const stored = localStorage.getItem("auth_user");
-      return stored ? JSON.parse(stored) : null;
+      if (!stored) return null;
+      const parsed = JSON.parse(stored);
+      return { ...parsed, is_superadmin: parsed.role === 'superadmin' };
     } catch {
       return null;
     }
@@ -23,7 +25,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const storedUser = localStorage.getItem("auth_user");
       setToken(storedToken);
       try {
-        setUser(storedUser ? JSON.parse(storedUser) : null);
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser);
+          setUser({ ...parsed, is_superadmin: parsed.role === 'superadmin' });
+        } else {
+          setUser(null);
+        }
       } catch {
         setUser(null);
       }
