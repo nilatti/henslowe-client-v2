@@ -7,7 +7,7 @@ export const mockUsers = {
     email: 'superadmin@test.com',
     first_name: 'Super',
     last_name: 'Admin',
-    role: 'regular',
+    role: 'superadmin',
     subscription_status: 'active',
     is_superadmin: true,
   },
