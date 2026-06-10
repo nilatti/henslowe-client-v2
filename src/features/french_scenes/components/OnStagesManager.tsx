@@ -1,64 +1,52 @@
-import { useState } from 'react'
-import { useCreateOnStage } from '../api/frenchScenes'
-import { OnStageItem } from './OnStageItem'
-import type { FrenchSceneDetail } from '../types/frenchScene'
-import type { PlaySkeleton } from '../../plays/types/play'
-import { Button, Card } from '../../../components/ui'
-import { useIsPlayAdmin } from '../../../hooks/useUserRole'
+import { useState } from "react";
+import { useCreateOnStage } from "../api/frenchScenes";
+import { OnStageItem } from "./OnStageItem";
+import { CharacterCombobox } from "./CharacterCombobox";
+import type { FrenchSceneDetail } from "../types/frenchScene";
+import type { PlaySkeleton } from "../../plays/types/play";
+import { Button, Card } from "../../../components/ui";
+import { useIsPlayAdmin } from "../../../hooks/useUserRole";
 
 interface OnStagesManagerProps {
-  frenchScene: FrenchSceneDetail
-  playSkeleton: PlaySkeleton
+  frenchScene: FrenchSceneDetail;
+  playSkeleton: PlaySkeleton;
 }
 
 export function OnStagesManager({
   frenchScene,
   playSkeleton,
 }: OnStagesManagerProps) {
-  const createOnStage = useCreateOnStage(frenchScene.id)
-  const isAdmin = useIsPlayAdmin(playSkeleton.id)
+  const createOnStage = useCreateOnStage(frenchScene.id);
+  const isAdmin = useIsPlayAdmin(playSkeleton.id);
 
-  const [showForm, setShowForm] = useState(false)
-  const [selectedType, setSelectedType] = useState<'character' | 'character_group'>('character')
-  const [selectedId, setSelectedId] = useState<number | ''>('')
-  const [nonspeaking, setNonspeaking] = useState(false)
+  const [showForm, setShowForm] = useState(false);
+  const [nonspeaking, setNonspeaking] = useState(false);
 
   const onStageCharacterIds = new Set(
-    frenchScene.on_stages.map(os => os.character_id).filter(Boolean)
-  )
+    frenchScene.on_stages.map((os) => os.character_id).filter(Boolean),
+  );
   const onStageGroupIds = new Set(
-    frenchScene.on_stages.map(os => os.character_group_id).filter(Boolean)
-  )
+    frenchScene.on_stages.map((os) => os.character_group_id).filter(Boolean),
+  );
 
-  const availableCharacters = playSkeleton.characters.filter(
-    c => !onStageCharacterIds.has(c.id)
-  )
-  const availableGroups = (playSkeleton.character_groups ?? []).filter(
-    cg => !onStageGroupIds.has(cg.id)
-  )
-
-  const availableOptions =
-    selectedType === 'character' ? availableCharacters : availableGroups
-
-  const handleSubmit = async () => {
-    if (!selectedId) return
+  const handleSelect = async (
+    type: "character" | "character_group",
+    id: number,
+  ) => {
     await createOnStage.mutateAsync({
       french_scene_id: frenchScene.id,
-      character_id: selectedType === 'character' ? Number(selectedId) : null,
-      character_group_id:
-        selectedType === 'character_group' ? Number(selectedId) : null,
+      character_id: type === "character" ? id : null,
+      character_group_id: type === "character_group" ? id : null,
       nonspeaking,
-    })
-    setSelectedId('')
-    setNonspeaking(false)
-    setShowForm(false)
-  }
+    });
+    setNonspeaking(false);
+  };
 
   const sortedOnStages = [...frenchScene.on_stages].sort((a, b) => {
-    const nameA = a.character?.name ?? a.character_group?.name ?? ''
-    const nameB = b.character?.name ?? b.character_group?.name ?? ''
-    return nameA.localeCompare(nameB)
-  })
+    const nameA = a.character?.name ?? a.character_group?.name ?? "";
+    const nameB = b.character?.name ?? b.character_group?.name ?? "";
+    return nameA.localeCompare(nameB);
+  });
 
   return (
     <div>
@@ -74,78 +62,32 @@ export function OnStagesManager({
       {showForm && (
         <Card className="p-4 mb-3">
           <div className="space-y-3">
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 text-sm text-gray-700">
-                <input
-                  type="radio"
-                  checked={selectedType === 'character'}
-                  onChange={() => {
-                    setSelectedType('character')
-                    setSelectedId('')
-                  }}
-                />
-                Character
-              </label>
-              <label className="flex items-center gap-2 text-sm text-gray-700">
-                <input
-                  type="radio"
-                  checked={selectedType === 'character_group'}
-                  onChange={() => {
-                    setSelectedType('character_group')
-                    setSelectedId('')
-                  }}
-                />
-                Character Group
-              </label>
-            </div>
-
-            <select
-              value={selectedId}
-              onChange={e => setSelectedId(Number(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">
-                Select {selectedType === 'character' ? 'character' : 'group'}
-              </option>
-              {availableOptions.map(c => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-
-            {availableOptions.length === 0 && (
-              <p className="text-xs text-gray-400 italic">
-                All {selectedType === 'character' ? 'characters' : 'groups'} are
-                already on stage.
-              </p>
-            )}
+            <CharacterCombobox
+              characters={playSkeleton.characters}
+              characterGroups={playSkeleton.character_groups ?? []}
+              excludeCharacterIds={onStageCharacterIds as Set<number>}
+              excludeGroupIds={onStageGroupIds as Set<number>}
+              playId={playSkeleton.id}
+              onSelect={handleSelect}
+              disabled={createOnStage.isPending}
+            />
 
             <label className="flex items-center gap-2 text-sm text-gray-700">
               <input
                 type="checkbox"
                 checked={nonspeaking}
-                onChange={e => setNonspeaking(e.target.checked)}
+                onChange={(e) => setNonspeaking(e.target.checked)}
                 className="rounded border-gray-300"
               />
-              Nonspeaking role
+              Nonspeaking in this French scene
             </label>
 
-            <div className="flex gap-2 justify-end">
+            <div className="flex justify-end">
               <Button
                 variant="secondary"
-                onClick={() => {
-                  setShowForm(false)
-                  setSelectedId('')
-                }}
+                onClick={() => setShowForm(false)}
               >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={!selectedId || createOnStage.isPending}
-              >
-                {createOnStage.isPending ? 'Adding...' : 'Add to scene'}
+                Done
               </Button>
             </div>
           </div>
@@ -159,7 +101,7 @@ export function OnStagesManager({
           </p>
         ) : (
           <ul>
-            {sortedOnStages.map(os => (
+            {sortedOnStages.map((os) => (
               <OnStageItem
                 key={os.id}
                 onStage={os}
@@ -171,5 +113,5 @@ export function OnStagesManager({
         )}
       </Card>
     </div>
-  )
+  );
 }

@@ -3,6 +3,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { authorQueryOptions, useDeleteAuthor } from '../api/authors'
 import { AuthorForm } from './AuthorForm'
+import { PlayForm } from '../../plays/components/PlayForm'
 import { useIsSuperAdmin } from '../../../hooks/useUserRole'
 import { Button, Card, ConfirmDialog, PageHeader } from '../../../components/ui'
 
@@ -17,6 +18,7 @@ export function AuthorDetail({ authorId }: AuthorDetailProps) {
   const isSuperAdmin = useIsSuperAdmin()
 
   const [isEditing, setIsEditing] = useState(false)
+  const [showPlayForm, setShowPlayForm] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   const nameParts = [author.first_name, author.middle_name, author.last_name].filter(Boolean)
@@ -70,11 +72,32 @@ export function AuthorDetail({ authorId }: AuthorDetailProps) {
             )}
           </Card>
 
-          {canonicalPlays.length > 0 && (
-            <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-3">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-medium text-gray-900">
                 Plays by {author.last_name || fullName}
               </h2>
+              {isSuperAdmin && !showPlayForm && (
+                <Button onClick={() => setShowPlayForm(true)}>
+                  Add Play
+                </Button>
+              )}
+            </div>
+
+            {showPlayForm && (
+              <Card className="p-6 mb-4">
+                <PlayForm
+                  authorId={author.id}
+                  onSuccess={id => {
+                    setShowPlayForm(false)
+                    if (id) void navigate({ to: '/plays/$playId', params: { playId: String(id) } })
+                  }}
+                  onCancel={() => setShowPlayForm(false)}
+                />
+              </Card>
+            )}
+
+            {canonicalPlays.length > 0 && (
               <Card>
                 <ul className="divide-y divide-gray-100">
                   {canonicalPlays.map(play => (
@@ -93,8 +116,11 @@ export function AuthorDetail({ authorId }: AuthorDetailProps) {
                   ))}
                 </ul>
               </Card>
-            </div>
-          )}
+            )}
+            {canonicalPlays.length === 0 && !showPlayForm && (
+              <p className="text-sm text-gray-400 italic">No plays yet.</p>
+            )}
+          </div>
         </div>
       )}
 

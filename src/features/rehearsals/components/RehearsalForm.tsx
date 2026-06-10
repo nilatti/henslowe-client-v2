@@ -1,18 +1,18 @@
-import { useForm } from '@tanstack/react-form'
-import { format } from 'date-fns'
-import { useCreateRehearsal, useUpdateRehearsal } from '../api/rehearsals'
-import type { RehearsalWithDetails } from '../types/rehearsal'
-import { Button } from '../../../components/ui'
+import { useForm } from "@tanstack/react-form";
+import { format } from "date-fns";
+import { useCreateRehearsal, useUpdateRehearsal } from "../api/rehearsals";
+import type { RehearsalWithDetails } from "../types/rehearsal";
+import { Button } from "../../../components/ui";
 
 interface RehearsalFormProps {
-  productionId: number
-  rehearsal?: RehearsalWithDetails
-  onSuccess: () => void
-  onCancel: () => void
+  productionId: number;
+  rehearsal?: RehearsalWithDetails;
+  onSuccess: () => void;
+  onCancel: () => void;
 }
 
 function toLocalInput(iso: string) {
-  return format(new Date(iso), "yyyy-MM-dd'T'HH:mm")
+  return format(new Date(iso), "yyyy-MM-dd'T'HH:mm");
 }
 
 export function RehearsalForm({
@@ -21,18 +21,20 @@ export function RehearsalForm({
   onSuccess,
   onCancel,
 }: RehearsalFormProps) {
-  const create = useCreateRehearsal(productionId)
-  const update = useUpdateRehearsal(productionId)
-  const isEditing = !!rehearsal
+  const create = useCreateRehearsal(productionId);
+  const update = useUpdateRehearsal(productionId);
+  const isEditing = !!rehearsal;
 
-  const now = format(new Date(), "yyyy-MM-dd'T'HH:mm")
+  const now = format(new Date(), "yyyy-MM-dd'T'HH:mm");
 
   const form = useForm({
     defaultValues: {
-      start_time: rehearsal?.start_time ? toLocalInput(rehearsal.start_time) : now,
+      start_time: rehearsal?.start_time
+        ? toLocalInput(rehearsal.start_time)
+        : now,
       end_time: rehearsal?.end_time ? toLocalInput(rehearsal.end_time) : now,
-      title: rehearsal?.title ?? '',
-      notes: rehearsal?.notes ?? '',
+      title: rehearsal?.title ?? "",
+      notes: rehearsal?.notes ?? "",
     },
     onSubmit: async ({ value }) => {
       const payload = {
@@ -41,24 +43,27 @@ export function RehearsalForm({
         end_time: new Date(value.end_time).toISOString(),
         title: value.title || null,
         notes: value.notes || null,
-      }
+      };
       if (isEditing) {
-        await update.mutateAsync({ ...payload, id: rehearsal.id })
+        await update.mutateAsync({ ...payload, id: rehearsal.id });
       } else {
-        await create.mutateAsync(payload)
+        await create.mutateAsync(payload);
       }
-      onSuccess()
+      onSuccess();
     },
-  })
+  });
 
   return (
     <form
-      onSubmit={e => { e.preventDefault(); form.handleSubmit() }}
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
       className="space-y-4"
     >
       <div className="grid grid-cols-2 gap-4">
         <form.Field name="start_time">
-          {field => (
+          {(field) => (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Start time *
@@ -66,7 +71,7 @@ export function RehearsalForm({
               <input
                 type="datetime-local"
                 value={field.state.value}
-                onChange={e => field.handleChange(e.target.value)}
+                onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -75,7 +80,7 @@ export function RehearsalForm({
         </form.Field>
 
         <form.Field name="end_time">
-          {field => (
+          {(field) => (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 End time *
@@ -83,7 +88,7 @@ export function RehearsalForm({
               <input
                 type="datetime-local"
                 value={field.state.value}
-                onChange={e => field.handleChange(e.target.value)}
+                onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -93,14 +98,14 @@ export function RehearsalForm({
       </div>
 
       <form.Field name="title">
-        {field => (
+        {(field) => (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Title
             </label>
             <input
               value={field.state.value}
-              onChange={e => field.handleChange(e.target.value)}
+              onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
               placeholder="e.g. Act 1 run"
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -110,14 +115,14 @@ export function RehearsalForm({
       </form.Field>
 
       <form.Field name="notes">
-        {field => (
+        {(field) => (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Notes
             </label>
             <textarea
               value={field.state.value}
-              onChange={e => field.handleChange(e.target.value)}
+              onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -132,10 +137,12 @@ export function RehearsalForm({
         </Button>
         <Button type="submit" disabled={form.state.isSubmitting}>
           {form.state.isSubmitting
-            ? 'Saving...'
-            : isEditing ? 'Save changes' : 'Create rehearsal'}
+            ? "Saving..."
+            : isEditing
+              ? "Save changes"
+              : "Create rehearsal"}
         </Button>
       </div>
     </form>
-  )
+  );
 }

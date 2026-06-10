@@ -27,7 +27,6 @@ export function Dashboard() {
 
   const rehearsals = upcomingRehearsalsList({
     rehearsals: data.rehearsals ?? [],
-    timezone: data.timezone ?? undefined,
   })
 
   return (

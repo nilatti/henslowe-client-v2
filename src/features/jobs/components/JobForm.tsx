@@ -1,6 +1,7 @@
 import { useForm } from '@tanstack/react-form'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { useCreateJob, useUpdateJob } from '../api/jobs'
+import { useStore } from '@tanstack/react-store'
+import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
+import { useCreateJob, useUpdateJob, productionJobsQueryOptions } from '../api/jobs'
 import { specializationsQueryOptions } from '../../specializations/queries'
 import { usersQueryOptions } from '../../users/api/users'
 import type { Job, JobWithDetails } from '../types/job'
@@ -13,6 +14,7 @@ interface JobFormProps {
   job?: JobWithDetails
   productionId?: number
   theaterId?: number
+  specializationId?: number
   invalidateKey: unknown[]
   onSuccess: () => void
   onCancel: () => void
@@ -22,6 +24,7 @@ export function JobForm({
   job,
   productionId,
   theaterId,
+  specializationId,
   invalidateKey,
   onSuccess,
   onCancel,
@@ -30,11 +33,14 @@ export function JobForm({
   const update = useUpdateJob(invalidateKey)
   const { data: specializations } = useSuspenseQuery(specializationsQueryOptions())
   const { data: users } = useSuspenseQuery(usersQueryOptions())
+  const { data: productionJobs } = useQuery({
+    ...productionJobsQueryOptions(productionId ?? 0),
+    enabled: !!productionId,
+  })
   const { user: currentUser } = useAuth()
   const isSuperAdmin = currentUser?.is_superadmin === true
   const isEditing = !!job
 
-  // Filter users — paid users see all, free users see only fake
   const isSubscribed = currentUser?.subscription_status === 'active'
   const availableUsers = isSubscribed || isSuperAdmin
     ? (users as (typeof users[number] & { fake?: boolean })[]).filter(u => !u.fake)
@@ -45,9 +51,9 @@ export function JobForm({
   const form = useForm({
     defaultValues: {
       user_id: job?.user_id ?? 0,
-      specialization_id: job?.specialization_id ?? 0,
+      specialization_id: job?.specialization_id ?? specializationId ?? 0,
       start_date: job?.start_date ?? today,
-      end_date: job?.end_date ?? today,
+      end_date: job?.end_date ?? '',
     },
     onSubmit: async ({ value }) => {
       const payload: Partial<Job> = {
@@ -56,6 +62,7 @@ export function JobForm({
         theater_id: theaterId ?? job?.theater_id ?? null,
         user_id: value.user_id || null,
         specialization_id: value.specialization_id || null,
+        end_date: value.end_date || null,
       }
       if (isEditing) {
         await update.mutateAsync({ ...payload, id: job.id })
@@ -65,6 +72,20 @@ export function JobForm({
       onSuccess()
     },
   })
+
+  const selectedSpecializationId = useStore(form.store, state => state.values.specialization_id)
+
+  const takenUserIds = new Set(
+    (productionJobs ?? [])
+      .filter(j =>
+        j.specialization_id === selectedSpecializationId &&
+        j.user_id != null &&
+        j.user_id !== job?.user_id
+      )
+      .map(j => j.user_id!)
+  )
+
+  const filteredUsers = availableUsers.filter(u => !takenUserIds.has(u.id))
 
   return (
     <form
@@ -84,7 +105,7 @@ export function JobForm({
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value={0}>Select person</option>
-              {availableUsers
+              {filteredUsers
                 .sort((a, b) => a.last_name.localeCompare(b.last_name))
                 .map(u => (
                   <option key={u.id} value={u.id}>
@@ -97,30 +118,32 @@ export function JobForm({
         )}
       </form.Field>
 
-      <form.Field name="specialization_id">
-        {field => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Role *
-            </label>
-            <select
-              value={field.state.value}
-              onChange={e => field.handleChange(Number(e.target.value))}
-              onBlur={field.handleBlur}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value={0}>Select role</option>
-              {specializations
-                .sort((a, b) => a.title.localeCompare(b.title))
-                .map(s => (
-                  <option key={s.id} value={s.id}>
-                    {s.title}
-                  </option>
-                ))}
-            </select>
-          </div>
-        )}
-      </form.Field>
+      {!specializationId && (
+        <form.Field name="specialization_id">
+          {field => (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Role *
+              </label>
+              <select
+                value={field.state.value}
+                onChange={e => field.handleChange(Number(e.target.value))}
+                onBlur={field.handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value={0}>Select role</option>
+                {specializations
+                  .sort((a, b) => a.title.localeCompare(b.title))
+                  .map(s => (
+                    <option key={s.id} value={s.id}>
+                      {s.title}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
+        </form.Field>
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <form.Field name="start_date">

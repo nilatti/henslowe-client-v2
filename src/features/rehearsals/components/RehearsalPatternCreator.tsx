@@ -1,47 +1,51 @@
-import { useState } from 'react'
-import { useBuildRehearsalSchedule } from '../api/rehearsals'
-import { Button, Card } from '../../../components/ui'
-import { DAYS_OF_WEEK } from '../../../utils/constants'
-import { buildUserName } from '../../../utils/actorUtils'
-import type { RehearsalUser } from '../types/rehearsal'
+import { useState } from "react";
+import { useBuildRehearsalSchedule } from "../api/rehearsals";
+import { Button, Card } from "../../../components/ui";
+import { DAYS_OF_WEEK } from "../../../utils/constants";
+import type { RehearsalUser } from "../types/rehearsal";
+import RehearsalCallSelector from "./people/RehearsalCallSelector";
 
 interface RehearsalPatternCreatorProps {
-  productionId: number
-  hiredUsers: RehearsalUser[]
-  onClose: () => void
+  productionId: number;
+  actors: RehearsalUser[];
+  productionStaff: RehearsalUser[];
+  onClose: () => void;
 }
 
 export function RehearsalPatternCreator({
   productionId,
-  hiredUsers,
+  actors,
+  productionStaff,
   onClose,
 }: RehearsalPatternCreatorProps) {
-  const buildSchedule = useBuildRehearsalSchedule(productionId)
-  const [submitted, setSubmitted] = useState(false)
+  const buildSchedule = useBuildRehearsalSchedule(productionId);
+  const [submitted, setSubmitted] = useState(false);
 
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
-  const [startTime, setStartTime] = useState('')
-  const [endTime, setEndTime] = useState('')
-  const [daysOfWeek, setDaysOfWeek] = useState<string[]>([])
-  const [breakLength, setBreakLength] = useState('')
-  const [timeBetweenBreaks, setTimeBetweenBreaks] = useState('')
-  const [defaultUserIds, setDefaultUserIds] = useState<number[]>([])
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
+  const [breakLength, setBreakLength] = useState("");
+  const [timeBetweenBreaks, setTimeBetweenBreaks] = useState("");
+  const [defaultUserIds, setDefaultUserIds] = useState<number[]>([]);
 
   const blockLength =
-    (parseInt(timeBetweenBreaks) || 0) + (parseInt(breakLength) || 0)
+    (parseInt(timeBetweenBreaks) || 0) + (parseInt(breakLength) || 0);
 
   const toggleDay = (day: string) => {
-    setDaysOfWeek(prev =>
-      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-    )
-  }
+    setDaysOfWeek((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
+    );
+  };
 
   const toggleUser = (userId: number) => {
-    setDefaultUserIds(prev =>
-      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
-    )
-  }
+    setDefaultUserIds((prev) =>
+      prev.includes(userId)
+        ? prev.filter((id) => id !== userId)
+        : [...prev, userId],
+    );
+  };
 
   const handleSubmit = async () => {
     await buildSchedule.mutateAsync({
@@ -54,9 +58,9 @@ export function RehearsalPatternCreator({
       break_length: parseInt(breakLength) || 0,
       time_between_breaks: parseInt(timeBetweenBreaks) || 0,
       default_user_ids: defaultUserIds,
-    })
-    setSubmitted(true)
-  }
+    });
+    setSubmitted(true);
+  };
 
   if (submitted) {
     return (
@@ -65,11 +69,12 @@ export function RehearsalPatternCreator({
           Rehearsal schedule is being built. This may take a few minutes.
         </p>
         <p className="text-xs text-gray-500 mb-4">
-          Come back in about 5 minutes and refresh the page to see your rehearsals.
+          Come back in about 5 minutes and refresh the page to see your
+          rehearsals.
         </p>
         <Button onClick={onClose}>Close</Button>
       </Card>
-    )
+    );
   }
 
   return (
@@ -79,8 +84,8 @@ export function RehearsalPatternCreator({
       </h3>
       <p className="text-xs text-gray-500 italic mb-4">
         Generate a block of rehearsals from a repeating pattern. Run this
-        multiple times for different schedule blocks (e.g. regular rehearsals
-        vs tech week).
+        multiple times for different schedule blocks (e.g. regular rehearsals vs
+        tech week).
       </p>
 
       <div className="space-y-4">
@@ -92,7 +97,7 @@ export function RehearsalPatternCreator({
             <input
               type="date"
               value={startDate}
-              onChange={e => setStartDate(e.target.value)}
+              onChange={(e) => setStartDate(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -103,7 +108,7 @@ export function RehearsalPatternCreator({
             <input
               type="date"
               value={endDate}
-              onChange={e => setEndDate(e.target.value)}
+              onChange={(e) => setEndDate(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -117,7 +122,7 @@ export function RehearsalPatternCreator({
             <input
               type="time"
               value={startTime}
-              onChange={e => setStartTime(e.target.value)}
+              onChange={(e) => setStartTime(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -128,7 +133,7 @@ export function RehearsalPatternCreator({
             <input
               type="time"
               value={endTime}
-              onChange={e => setEndTime(e.target.value)}
+              onChange={(e) => setEndTime(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -139,7 +144,7 @@ export function RehearsalPatternCreator({
             Rehearse on these days
           </label>
           <div className="flex flex-wrap gap-3">
-            {DAYS_OF_WEEK.map(day => (
+            {DAYS_OF_WEEK.map((day) => (
               <label
                 key={day}
                 className="flex items-center gap-1 text-sm text-gray-700"
@@ -164,7 +169,7 @@ export function RehearsalPatternCreator({
             <input
               type="number"
               value={timeBetweenBreaks}
-              onChange={e => setTimeBetweenBreaks(e.target.value)}
+              onChange={(e) => setTimeBetweenBreaks(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -175,7 +180,7 @@ export function RehearsalPatternCreator({
             <input
               type="number"
               value={breakLength}
-              onChange={e => setBreakLength(e.target.value)}
+              onChange={(e) => setBreakLength(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -192,29 +197,22 @@ export function RehearsalPatternCreator({
           </div>
         </div>
 
-        {hiredUsers.length > 0 && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Always call these people
-            </label>
-            <div className="space-y-1 max-h-40 overflow-y-auto">
-              {hiredUsers.map(u => (
-                <label
-                  key={u.id}
-                  className="flex items-center gap-2 text-sm text-gray-700"
-                >
-                  <input
-                    type="checkbox"
-                    checked={defaultUserIds.includes(u.id)}
-                    onChange={() => toggleUser(u.id)}
-                    className="rounded border-gray-300"
-                  />
-                  {buildUserName(u)}
-                </label>
-              ))}
+        {actors.length > 0 ||
+          (productionStaff.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Always call these people
+              </label>
+              <div className="space-y-1 max-h-40 overflow-y-auto">
+                <RehearsalCallSelector
+                  actors={actors}
+                  productionStaff={productionStaff}
+                  selectedIds={defaultUserIds}
+                  handleToggle={toggleUser}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          ))}
       </div>
 
       <div className="flex gap-2 mt-6">
@@ -229,12 +227,12 @@ export function RehearsalPatternCreator({
             buildSchedule.isPending
           }
         >
-          {buildSchedule.isPending ? 'Submitting...' : 'Generate rehearsals'}
+          {buildSchedule.isPending ? "Submitting..." : "Generate rehearsals"}
         </Button>
         <Button variant="secondary" onClick={onClose}>
           Cancel
         </Button>
       </div>
     </Card>
-  )
+  );
 }

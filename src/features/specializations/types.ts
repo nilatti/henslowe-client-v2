@@ -2,6 +2,8 @@ export interface Specialization {
   id: number
   title: string
   description?: string | null
+  production_admin: boolean
+  theater_admin: boolean
 }
 
 export interface SpecializationUser {

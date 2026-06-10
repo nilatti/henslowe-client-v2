@@ -48,12 +48,15 @@ export interface SceneSkeleton {
   id: number
   number: number
   pretty_name: string
+  heading: string | null
+  summary: string | null
   french_scenes: FrenchSceneSkeleton[]
 }
 
 export interface ActSkeleton {
   id: number
   number: number
+  summary: string | null
   scenes: SceneSkeleton[]
 }
 

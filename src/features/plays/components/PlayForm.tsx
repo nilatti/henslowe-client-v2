@@ -7,11 +7,12 @@ import { Button } from '../../../components/ui'
 
 interface PlayFormProps {
   play?: PlaySkeleton
+  authorId?: number
   onSuccess: (id?: number) => void
   onCancel: () => void
 }
 
-export function PlayForm({ play, onSuccess, onCancel }: PlayFormProps) {
+export function PlayForm({ play, authorId, onSuccess, onCancel }: PlayFormProps) {
   const create = useCreatePlay()
   const update = useUpdatePlay()
   const { data: authors } = useSuspenseQuery(authorsQueryOptions())
@@ -20,7 +21,7 @@ export function PlayForm({ play, onSuccess, onCancel }: PlayFormProps) {
   const form = useForm({
     defaultValues: {
       title: play?.title ?? '',
-      author_id: play?.author?.id ?? 0,
+      author_id: play?.author?.id ?? authorId ?? 0,
       synopsis: play?.synopsis ?? '',
       text_notes: play?.text_notes ?? '',
       canonical: play?.canonical ?? true,
@@ -57,30 +58,32 @@ export function PlayForm({ play, onSuccess, onCancel }: PlayFormProps) {
         )}
       </form.Field>
 
-      <form.Field name="author_id">
-        {field => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Author *
-            </label>
-            <select
-              value={field.state.value}
-              onChange={e => field.handleChange(Number(e.target.value))}
-              onBlur={field.handleBlur}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value={0}>Select an author</option>
-              {authors
-                .sort((a, b) => a.last_name.localeCompare(b.last_name))
-                .map(author => (
-                  <option key={author.id} value={author.id}>
-                    {author.last_name}{author.first_name ? `, ${author.first_name}` : ''}
-                  </option>
-                ))}
-            </select>
-          </div>
-        )}
-      </form.Field>
+      {!authorId && (
+        <form.Field name="author_id">
+          {field => (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Author *
+              </label>
+              <select
+                value={field.state.value}
+                onChange={e => field.handleChange(Number(e.target.value))}
+                onBlur={field.handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value={0}>Select an author</option>
+                {authors
+                  .sort((a, b) => a.last_name.localeCompare(b.last_name))
+                  .map(author => (
+                    <option key={author.id} value={author.id}>
+                      {author.last_name}{author.first_name ? `, ${author.first_name}` : ''}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
+        </form.Field>
+      )}
 
       {isEditing && (
         <>

@@ -1,45 +1,45 @@
-import { useState } from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { sceneQueryOptions, useDeleteScene } from '../api/scenes'
-import { actQueryOptions } from '../../acts/api/acts'
-import { SceneForm } from './SceneForm'
-import { FrenchSceneForm } from '../../french_scenes/components/FrenchSceneForm'
-import { useIsPlayAdmin } from '../../../hooks/useUserRole'
+import { useState } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { sceneQueryOptions, useDeleteScene } from "../api/scenes";
+import { actQueryOptions } from "../../acts/api/acts";
+import { SceneForm } from "./SceneForm";
+import { FrenchSceneForm } from "../../french_scenes/components/FrenchSceneForm";
+import { useIsPlayAdmin } from "../../../hooks/useUserRole";
 import {
   Button,
   Card,
   ConfirmDialog,
   PageHeader,
-} from '../../../components/ui'
+} from "../../../components/ui";
 
 interface SceneDetailProps {
-  playId: number
-  actId: number
-  sceneId: number
+  playId: number;
+  actId: number;
+  sceneId: number;
 }
 
 export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
-  const { data: scene } = useSuspenseQuery(sceneQueryOptions(sceneId))
-  const { data: act } = useSuspenseQuery(actQueryOptions(actId))
-  const deleteScene = useDeleteScene(playId, actId)
-  const isAdmin = useIsPlayAdmin(playId)
-  const navigate = useNavigate()
+  const { data: scene } = useSuspenseQuery(sceneQueryOptions(sceneId));
+  const { data: act } = useSuspenseQuery(actQueryOptions(actId));
+  const deleteScene = useDeleteScene(playId, actId);
+  const isAdmin = useIsPlayAdmin(playId);
+  const navigate = useNavigate();
 
-  const [isEditing, setIsEditing] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
-  const [showForm, setShowForm] = useState(false)
+  const [isEditing, setIsEditing] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
-  const prettyName = `${act.number}.${scene.number}`
+  const prettyName = `${act.number}.${scene.number}`;
 
   const title = scene.heading
     ? `Scene ${prettyName}: ${scene.heading}`
-    : `Scene ${prettyName}`
+    : `Scene ${prettyName}`;
 
-  const lastFrenchScene = scene.french_scenes[scene.french_scenes.length - 1]
+  const lastFrenchScene = scene.french_scenes[scene.french_scenes.length - 1];
   const nextFrenchSceneNumber = lastFrenchScene
     ? String.fromCharCode(lastFrenchScene.number.toString().charCodeAt(0) + 1)
-    : 'a'
+    : "a";
 
   return (
     <div>
@@ -91,9 +91,17 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
         </Card>
       ) : (
         <div className="space-y-6">
-          {(scene.summary || scene.start_page) && (
+          {(scene.summary || scene.start_page || scene.heading) && (
             <Card className="p-6">
               <dl className="space-y-3 text-sm">
+                {scene.heading && (
+                  <div>
+                    <dt className="font-medium text-gray-700">Heading</dt>
+                    <dd className="text-gray-600 mt-1 leading-relaxed">
+                      {scene.heading}
+                    </dd>
+                  </div>
+                )}
                 {scene.summary && (
                   <div>
                     <dt className="font-medium text-gray-700">Summary</dt>
@@ -107,7 +115,7 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
                     <dt className="font-medium text-gray-700">Pages</dt>
                     <dd className="text-gray-600 mt-1">
                       {scene.start_page}
-                      {scene.end_page ? ` – ${scene.end_page}` : ''}
+                      {scene.end_page ? ` – ${scene.end_page}` : ""}
                     </dd>
                   </div>
                 )}
@@ -133,23 +141,6 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
             <h2 className="text-lg font-medium text-gray-900 mb-3">
               French Scenes
             </h2>
-            {isAdmin && !showForm && (
-              <Button className="mb-3" onClick={() => setShowForm(true)}>
-                Add French Scene
-              </Button>
-            )}
-
-            {showForm && (
-              <Card className="p-6 mb-4">
-                <FrenchSceneForm
-                  playId={playId}
-                  sceneId={sceneId}
-                  nextNumber={nextFrenchSceneNumber}
-                  onSuccess={() => setShowForm(false)}
-                  onCancel={() => setShowForm(false)}
-                />
-              </Card>
-            )}
 
             <Card>
               {scene.french_scenes.length === 0 ? (
@@ -158,7 +149,7 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
                 </p>
               ) : (
                 <ul className="divide-y divide-gray-100">
-                  {scene.french_scenes.map(fs => (
+                  {scene.french_scenes.map((fs) => (
                     <li key={fs.id}>
                       <Link
                         to="/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId"
@@ -170,13 +161,24 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
                         }}
                         className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
                       >
-                        <span className="text-gray-900">
-                          French Scene {prettyName}.{fs.number}
-                        </span>
-                        <span className="text-gray-400 text-xs">
-                          {fs.on_stages.length} on stage
-                          {fs.on_stages.length !== 1 ? 's' : ''}
-                        </span>
+                        <div>
+                          <span className="text-gray-900">
+                            French Scene {prettyName}.{fs.number}
+                          </span>
+                          {fs.summary && (
+                            <p className="text-xs text-gray-500 mt-0.5">{fs.summary}</p>
+                          )}
+                        </div>
+                        <div className="text-right shrink-0 ml-4">
+                          {fs.start_page && (
+                            <p className="text-xs text-gray-400">
+                              p. {fs.start_page}{fs.end_page ? `–${fs.end_page}` : ''}
+                            </p>
+                          )}
+                          <p className="text-xs text-gray-400">
+                            {fs.on_stages.length} on stage{fs.on_stages.length !== 1 ? "s" : ""}
+                          </p>
+                        </div>
                       </Link>
                     </li>
                   ))}
@@ -186,6 +188,23 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
           </div>
         </div>
       )}
+      {isAdmin && !showForm && (
+        <Button className="mb-3" onClick={() => setShowForm(true)}>
+          Add French Scene
+        </Button>
+      )}
+
+      {showForm && (
+        <Card className="p-6 mb-4">
+          <FrenchSceneForm
+            playId={playId}
+            sceneId={sceneId}
+            nextNumber={nextFrenchSceneNumber}
+            onSuccess={() => setShowForm(false)}
+            onCancel={() => setShowForm(false)}
+          />
+        </Card>
+      )}
 
       {confirmDelete && (
         <ConfirmDialog
@@ -193,15 +212,15 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
           isDestructive
           confirmLabel="Delete"
           onConfirm={async () => {
-            await deleteScene.mutateAsync(sceneId)
+            await deleteScene.mutateAsync(sceneId);
             navigate({
-              to: '/plays/$playId/acts/$actId',
+              to: "/plays/$playId/acts/$actId",
               params: { playId: String(playId), actId: String(actId) },
-            })
+            });
           }}
           onCancel={() => setConfirmDelete(false)}
         />
       )}
     </div>
-  )
+  );
 }

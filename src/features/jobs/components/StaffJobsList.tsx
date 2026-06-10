@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import { useDeleteJob } from '../api/jobs'
 import type { JobWithDetails } from '../types/job'
 import { JobForm } from './JobForm'
@@ -58,9 +59,17 @@ export function StaffJobsList({
                   <span className="font-medium text-gray-900">
                     {job.specialization?.title ?? 'Unknown role'}
                   </span>
-                  <span className="text-gray-500 ml-2">
-                    {job.user ? buildUserName(job.user) : 'Unfilled'}
-                  </span>
+                  {job.user && job.user_id ? (
+                    <Link
+                      to="/users/$userId"
+                      params={{ userId: String(job.user_id) }}
+                      className="text-gray-500 ml-2 hover:text-blue-600"
+                    >
+                      {buildUserName(job.user)}
+                    </Link>
+                  ) : (
+                    <span className="text-gray-500 ml-2">Unfilled</span>
+                  )}
                 </div>
                 {isAdmin && (
                   <Button

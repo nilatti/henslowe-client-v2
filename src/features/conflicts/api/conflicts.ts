@@ -30,6 +30,12 @@ export const spaceConflictPatternsQueryOptions = (spaceId: number) =>
       api.get(`/api/v1/spaces/${spaceId}/conflict_patterns`).then(r => r.data),
   })
 
+const invalidateUserConflicts = (qc: ReturnType<typeof useQueryClient>) =>
+  qc.invalidateQueries({
+    predicate: (query) =>
+      Array.isArray(query.queryKey) && query.queryKey.includes('user_conflicts'),
+  })
+
 export function useCreateConflict(
   invalidateKey: unknown[],
   userId?: number,
@@ -43,7 +49,10 @@ export function useCreateConflict(
         : `/api/v1/spaces/${spaceId}/conflicts`
       return api.post(url, { conflict: data }).then(r => r.data)
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: invalidateKey }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: invalidateKey })
+      invalidateUserConflicts(qc)
+    },
   })
 }
 
@@ -52,7 +61,10 @@ export function useUpdateConflict(invalidateKey: unknown[]) {
   return useMutation({
     mutationFn: (data: Conflict) =>
       api.put(`/api/v1/conflicts/${data.id}`, { conflict: data }).then(r => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: invalidateKey }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: invalidateKey })
+      invalidateUserConflicts(qc)
+    },
   })
 }
 
@@ -61,7 +73,10 @@ export function useDeleteConflict(invalidateKey: unknown[]) {
   return useMutation({
     mutationFn: (id: number) =>
       api.delete(`/api/v1/conflicts/${id}`).then(r => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: invalidateKey }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: invalidateKey })
+      invalidateUserConflicts(qc)
+    },
   })
 }
 
@@ -73,6 +88,7 @@ export function useDeleteConflictPattern(invalidateKey: unknown[]) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: invalidateKey })
       qc.invalidateQueries({ queryKey: ['conflicts'] })
+      invalidateUserConflicts(qc)
     },
   })
 }
@@ -94,6 +110,7 @@ export function useBuildConflictSchedule(
       setTimeout(() => {
         qc.invalidateQueries({ queryKey: invalidateKey })
         qc.invalidateQueries({ queryKey: ['conflicts'] })
+        invalidateUserConflicts(qc)
       }, 3000)
     },
   })

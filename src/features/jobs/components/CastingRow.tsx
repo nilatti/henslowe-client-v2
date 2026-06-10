@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import { useUpdateJob, useDeleteJob } from '../api/jobs'
 import type { JobWithDetails } from '../types/job'
 import { Button, ConfirmDialog } from '../../../components/ui'
@@ -28,13 +29,15 @@ export function CastingRow({
   const lineCount =
     casting.character?.new_line_count ?? casting.character?.original_line_count
 
-  const handleCast = async () => {
+  const handleCast = () => {
     if (!selectedUserId) return
-    await updateJob.mutateAsync({
+    const user = actorsAndAuditioners.find(a => a.id === Number(selectedUserId)) ?? null
+    setIsEditing(false)
+    updateJob.mutate({
       id: casting.id,
       user_id: Number(selectedUserId),
+      _user: user,
     })
-    setIsEditing(false)
   }
 
   const actorName = casting.user ? buildUserName(casting.user) : null
@@ -42,9 +45,22 @@ export function CastingRow({
   return (
     <li className="flex items-center justify-between px-4 py-3 text-sm border-b border-gray-100 last:border-0">
       <div className="flex items-center gap-2 min-w-0">
-        <span className="font-medium text-gray-900 truncate">
-          {casting.character?.name ?? 'Unknown character'}
-        </span>
+        {casting.character_id && casting.production?.play?.id ? (
+          <Link
+            to="/plays/$playId/characters/$characterId"
+            params={{
+              playId: String(casting.production.play.id),
+              characterId: String(casting.character_id),
+            }}
+            className="font-medium text-gray-900 hover:text-blue-600 truncate"
+          >
+            {casting.character?.name ?? 'Unknown character'}
+          </Link>
+        ) : (
+          <span className="font-medium text-gray-900 truncate">
+            {casting.character?.name ?? 'Unknown character'}
+          </span>
+        )}
         {lineCount != null && lineCount > 0 && (
           <span className="text-xs text-gray-400 shrink-0">
             ({lineCount} lines)
@@ -78,26 +94,34 @@ export function CastingRow({
           </div>
         ) : (
           <>
-            <span
-              onClick={() => isAdmin && setIsEditing(true)}
-              className={
-                isAdmin ? 'cursor-pointer hover:text-blue-600' : ''
-              }
-              style={
-                casting.user?.fake ? { color: 'var(--amber-600, #d97706)' } : {}
-              }
-            >
-              {actorName ?? (
-                <strong className="text-blue-600">Click to cast</strong>
-              )}
-            </span>
-            {isAdmin && (
-              <Button
-                variant="danger"
-                onClick={() => setConfirmDelete(true)}
+            {actorName ? (
+              <Link
+                to="/users/$userId"
+                params={{ userId: String(casting.user_id) }}
+                className={casting.user?.fake ? 'text-amber-600 italic' : 'hover:text-blue-600'}
               >
-                ×
-              </Button>
+                {actorName}
+              </Link>
+            ) : isAdmin ? (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="text-blue-600 font-semibold hover:text-blue-800"
+              >
+                Click to cast
+              </button>
+            ) : null}
+            {isAdmin && (
+              <div className="flex items-center gap-1">
+                <Button variant="secondary" onClick={() => setIsEditing(true)}>
+                  Change
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => setConfirmDelete(true)}
+                >
+                  ×
+                </Button>
+              </div>
             )}
           </>
         )}

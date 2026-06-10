@@ -55,12 +55,23 @@ export function SpecializationDetailPage({ specializationId }: Props) {
     },
   })
 
-  function handleSave() {
+  function handleSave(overrides?: Partial<{ production_admin: boolean; theater_admin: boolean }>) {
     updateMutation.mutate({
       id: specializationId,
       title: titleInput,
       description: descriptionInput || null,
+      production_admin: specialization.production_admin,
+      theater_admin: specialization.theater_admin,
+      ...overrides,
     })
+  }
+
+  function toggleProductionAdmin() {
+    handleSave({ production_admin: !specialization.production_admin })
+  }
+
+  function toggleTheaterAdmin() {
+    handleSave({ theater_admin: !specialization.theater_admin })
   }
 
   const users = getUniqueUsers(specialization.jobs)
@@ -147,6 +158,28 @@ export function SpecializationDetailPage({ specializationId }: Props) {
                 )}
               </p>
             )}
+            <div className="mt-4 space-y-2">
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={specialization.production_admin}
+                  onChange={toggleProductionAdmin}
+                  disabled={updateMutation.isPending}
+                  className="rounded border-gray-300"
+                />
+                Production admin
+              </label>
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={specialization.theater_admin}
+                  onChange={toggleTheaterAdmin}
+                  disabled={updateMutation.isPending}
+                  className="rounded border-gray-300"
+                />
+                Theater admin
+              </label>
+            </div>
             {showDeleteConfirm && (
               <ConfirmDialog
                 message={`Delete "${specialization.title}"? This cannot be undone.`}
@@ -161,8 +194,12 @@ export function SpecializationDetailPage({ specializationId }: Props) {
           <>
             <h1 className="text-xl font-semibold text-gray-900 mb-2">{specialization.title}</h1>
             {specialization.description && (
-              <p className="text-sm text-gray-600 italic">{specialization.description}</p>
+              <p className="text-sm text-gray-600 italic mb-3">{specialization.description}</p>
             )}
+            <div className="space-y-1 text-sm text-gray-600">
+              {specialization.production_admin && <p>Production admin</p>}
+              {specialization.theater_admin && <p>Theater admin</p>}
+            </div>
           </>
         )}
       </div>

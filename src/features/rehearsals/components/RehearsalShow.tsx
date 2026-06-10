@@ -1,24 +1,26 @@
-import { useState } from 'react'
-import { formatInTimeZone } from 'date-fns-tz'
-import { parseISO } from 'date-fns'
-import { useDeleteRehearsal } from '../api/rehearsals'
-import type { RehearsalWithDetails, RehearsalUser } from '../types/rehearsal'
-import { RehearsalForm } from './RehearsalForm'
-import { RehearsalContentManager } from './content/RehearsalContentManager'
-import { RehearsalPeopleManager } from './people/RehearsalPeopleManager'
-import { Button, ConfirmDialog } from '../../../components/ui'
-import { buildUserName } from '../../../utils/actorUtils'
-import { rehearsalContent } from '../../../utils/rehearsalUtils'
-import { DEFAULT_TIMEZONE } from '../../../utils/constants'
+import { useState } from "react";
+import { parseISO, format } from "date-fns";
+import {
+  useDeleteRehearsal,
+  type ProductionUserConflict,
+} from "../api/rehearsals";
+import type { RehearsalWithDetails, RehearsalUser } from "../types/rehearsal";
+import { RehearsalForm } from "./RehearsalForm";
+import { RehearsalContentManager } from "./content/RehearsalContentManager";
+import { RehearsalPeopleManager } from "./people/RehearsalPeopleManager";
+import { Button, ConfirmDialog } from "../../../components/ui";
+import { buildUserName } from "../../../utils/actorUtils";
+import { rehearsalContent } from "../../../utils/rehearsalUtils";
+import { getConflictedUserIds } from "../../conflicts/utils/conflictUtils";
 
 interface RehearsalShowProps {
-  rehearsal: RehearsalWithDetails
-  productionId: number
-  playId: number
-  actors: RehearsalUser[]
-  staffUsers: RehearsalUser[]
-  allUsers: RehearsalUser[]
-  isAdmin: boolean
+  rehearsal: RehearsalWithDetails;
+  productionId: number;
+  playId: number;
+  actors: RehearsalUser[];
+  productionStaff: RehearsalUser[];
+  isAdmin: boolean;
+  productionUserConflicts: ProductionUserConflict[];
 }
 
 export function RehearsalShow({
@@ -26,24 +28,34 @@ export function RehearsalShow({
   productionId,
   playId,
   actors,
-  staffUsers,
-  allUsers,
+  productionStaff,
   isAdmin,
+  productionUserConflicts,
 }: RehearsalShowProps) {
-  const deleteRehearsal = useDeleteRehearsal(productionId)
-  const [isEditing, setIsEditing] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
-  const [showContentManager, setShowContentManager] = useState(false)
-  const [showPeopleManager, setShowPeopleManager] = useState(false)
+  const deleteRehearsal = useDeleteRehearsal(productionId);
+  const [isEditing, setIsEditing] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showContentManager, setShowContentManager] = useState(false);
+  const [showPeopleManager, setShowPeopleManager] = useState(false);
 
-  const startTime = formatInTimeZone(parseISO(rehearsal.start_time), DEFAULT_TIMEZONE, 'h:mm a')
-  const endTime = formatInTimeZone(parseISO(rehearsal.end_time), DEFAULT_TIMEZONE, 'h:mm a')
+  const rehearsalStartDate = parseISO(rehearsal.start_time);
+  const rehearsalEndDate = parseISO(rehearsal.end_time);
+
+  const startTime = format(rehearsalStartDate, "h:mm a");
+  const endTime = format(rehearsalEndDate, "h:mm a");
+
+  const conflictedUserIds = getConflictedUserIds(
+    rehearsal.users,
+    productionUserConflicts,
+    rehearsalStartDate,
+    rehearsalEndDate,
+  );
 
   const content = rehearsalContent({
     acts: rehearsal.acts as never,
     frenchScenes: rehearsal.french_scenes as never,
     scenes: rehearsal.scenes as never,
-  })
+  });
 
   if (isEditing) {
     return (
@@ -55,7 +67,7 @@ export function RehearsalShow({
           onCancel={() => setIsEditing(false)}
         />
       </div>
-    )
+    );
   }
 
   return (
@@ -78,14 +90,46 @@ export function RehearsalShow({
           {content.length > 0 && (
             <div className="text-xs text-gray-600 mb-2">
               <span className="font-medium">Content: </span>
-              {content.join(', ')}
+              {content.join(", ")}
             </div>
           )}
 
           {rehearsal.users.length > 0 && (
-            <div className="text-xs text-gray-600">
-              <span className="font-medium">Called: </span>
-              {rehearsal.users.map(u => buildUserName(u)).join(', ')}
+            <div className="text-sm text-gray-600">
+              <span className="font-medium">Actors Called: </span>
+              <ul className="list-disc list-inside">
+                {rehearsal.users
+                  .filter((u) => actors.some((a) => a.id === u.id))
+                  .map((u) => (
+                    <li
+                      key={u.id}
+                      className={
+                        conflictedUserIds.has(u.id) ? "text-red-600" : undefined
+                      }
+                    >
+                      {buildUserName(u)}
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          )}
+          {rehearsal.users.length > 0 && (
+            <div className="text-sm text-gray-600">
+              <span className="font-medium">Production Staff Called: </span>
+              <ul className="list-disc list-inside">
+                {rehearsal.users
+                  .filter((u) => productionStaff.some((ps) => ps.id === u.id))
+                  .map((u) => (
+                    <li
+                      key={u.id}
+                      className={
+                        conflictedUserIds.has(u.id) ? "text-red-600" : undefined
+                      }
+                    >
+                      {buildUserName(u)}
+                    </li>
+                  ))}
+              </ul>
             </div>
           )}
         </div>
@@ -107,20 +151,20 @@ export function RehearsalShow({
           <Button
             variant="secondary"
             onClick={() => {
-              setShowContentManager(!showContentManager)
-              setShowPeopleManager(false)
+              setShowContentManager(!showContentManager);
+              setShowPeopleManager(false);
             }}
           >
-            {showContentManager ? 'Hide content' : 'Edit content'}
+            {showContentManager ? "Hide content" : "Edit content"}
           </Button>
           <Button
             variant="secondary"
             onClick={() => {
-              setShowPeopleManager(!showPeopleManager)
-              setShowContentManager(false)
+              setShowPeopleManager(!showPeopleManager);
+              setShowContentManager(false);
             }}
           >
-            {showPeopleManager ? 'Hide call list' : 'Edit call list'}
+            {showPeopleManager ? "Hide call list" : "Edit call list"}
           </Button>
         </div>
       )}
@@ -132,8 +176,9 @@ export function RehearsalShow({
             productionId={productionId}
             playId={playId}
             actors={actors}
-            staffUsers={staffUsers}
+            productionStaff={productionStaff}
             onClose={() => setShowContentManager(false)}
+            productionUserConflicts={productionUserConflicts}
           />
         </div>
       )}
@@ -143,8 +188,10 @@ export function RehearsalShow({
           <RehearsalPeopleManager
             rehearsal={rehearsal}
             productionId={productionId}
-            allUsers={allUsers}
-            isAdmin={isAdmin}
+            actors={actors}
+            productionStaff={productionStaff}
+            setShowPeopleManager={setShowPeopleManager}
+            productionUserConflicts={productionUserConflicts}
           />
         </div>
       )}
@@ -155,12 +202,12 @@ export function RehearsalShow({
           isDestructive
           confirmLabel="Delete"
           onConfirm={async () => {
-            await deleteRehearsal.mutateAsync(rehearsal.id)
-            setConfirmDelete(false)
+            await deleteRehearsal.mutateAsync(rehearsal.id);
+            setConfirmDelete(false);
           }}
           onCancel={() => setConfirmDelete(false)}
         />
       )}
     </div>
-  )
+  );
 }

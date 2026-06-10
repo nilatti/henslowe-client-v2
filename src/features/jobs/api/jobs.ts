@@ -2,6 +2,8 @@ import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query
 import api from '../../../api/client'
 import type { Job, JobWithDetails } from '../types/job'
 
+type UpdateJobPayload = Partial<Job> & { id: number; _user?: JobWithDetails['user'] }
+
 export const productionJobsQueryOptions = (productionId: number) =>
   queryOptions({
     queryKey: ['jobs', { productionId }],
@@ -44,9 +46,27 @@ export function useCreateJob(invalidateKey: unknown[]) {
 export function useUpdateJob(invalidateKey: unknown[]) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (data: Partial<Job> & { id: number }) =>
+    mutationFn: ({ _user, ...data }: UpdateJobPayload) =>
       api.put(`/api/v1/jobs/${data.id}`, { job: data }).then(r => r.data),
-    onSuccess: () => {
+    onMutate: async ({ _user, ...data }: UpdateJobPayload) => {
+      await qc.cancelQueries({ queryKey: invalidateKey })
+      const previous = qc.getQueryData(invalidateKey)
+      qc.setQueryData(invalidateKey, (old: JobWithDetails[] | undefined) => {
+        if (!old) return old
+        return old.map(job =>
+          job.id === data.id
+            ? { ...job, ...data, ...(_user !== undefined ? { user: _user } : {}) }
+            : job
+        )
+      })
+      return { previous }
+    },
+    onError: (_err, _data, context) => {
+      if (context?.previous !== undefined) {
+        qc.setQueryData(invalidateKey, context.previous)
+      }
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: invalidateKey })
     },
   })

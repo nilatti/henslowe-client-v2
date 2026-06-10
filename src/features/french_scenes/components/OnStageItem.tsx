@@ -31,7 +31,7 @@ export function OnStageItem({
   }
 
   return (
-    <li className="flex items-center justify-between px-4 py-2 text-sm border-b border-gray-100 last:border-0">
+    <li className="flex items-center justify-between px-4 py-2 text-sm border-b border-gray-100 last:border-0 hover:bg-gray-50">
       <div className="flex items-center gap-3">
         <span className="text-gray-900 font-medium">{name}</span>
         {onStage.character_group && (

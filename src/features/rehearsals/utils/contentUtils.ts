@@ -3,6 +3,17 @@ import type { TextUnitWithOnStages } from '../api/rehearsals'
 import type { RehearsalUser } from '../types/rehearsal'
 import { buildUserName } from '../../../utils/actorUtils'
 
+export function onStageUserIds(
+  findOnStages: { user_id: number | null; character_id: number | null }[],
+  characterToUserMap: Map<number, number>
+): number[] {
+  return _.compact(findOnStages.map(os => {
+    if (os.user_id != null) return os.user_id
+    if (os.character_id != null) return characterToUserMap.get(os.character_id) ?? null
+    return null
+  }))
+}
+
 export function markContentScheduled(
   playContent: TextUnitWithOnStages[],
   rehearsalContentIds: number[]
@@ -15,11 +26,12 @@ export function markContentScheduled(
 
 export function markContentRecommended(
   playContent: TextUnitWithOnStages[],
-  unavailableUsersList: RehearsalUser[]
+  unavailableUsersList: RehearsalUser[],
+  characterToUserMap = new Map<number, number>()
 ): TextUnitWithOnStages[] {
   const unavailableIds = new Set(unavailableUsersList.map(u => u.id))
   return playContent.map(item => {
-    const contentUserIds = _.compact(item.find_on_stages.map(os => os.user_id))
+    const contentUserIds = onStageUserIds(item.find_on_stages, characterToUserMap)
     const conflictingIds = contentUserIds.filter(id => unavailableIds.has(id))
     if (conflictingIds.length > 0) {
       return {
@@ -38,20 +50,20 @@ export function markContentRecommended(
 
 export function buildCallList(
   item: TextUnitWithOnStages,
-  actors: RehearsalUser[]
+  actors: RehearsalUser[],
+  characterToUserMap = new Map<number, number>()
 ): string {
-  const userIds = _.compact(item.find_on_stages.map(os => os.user_id))
+  const userIds = onStageUserIds(item.find_on_stages, characterToUserMap)
   const calledActors = _.compact(userIds.map(id => actors.find(a => a.id === id)))
   return _.uniq(calledActors.map(a => buildUserName(a))).sort().join(', ')
 }
 
 export function getCalledActors(
   selectedContent: TextUnitWithOnStages[],
-  actors: RehearsalUser[]
+  actors: RehearsalUser[],
+  characterToUserMap = new Map<number, number>()
 ): RehearsalUser[] {
-  const userIds = _.uniq(
-    _.compact(selectedContent.flatMap(item => item.find_on_stages.map(os => os.user_id)))
-  )
+  const userIds = _.uniq(selectedContent.flatMap(item => onStageUserIds(item.find_on_stages, characterToUserMap)))
   return _.compact(userIds.map(id => actors.find(a => a.id === id)))
 }
 

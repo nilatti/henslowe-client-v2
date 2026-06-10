@@ -18,6 +18,9 @@ export interface FrenchSceneInScene {
   number: string  // alphabetic: "a", "b", "c"
   scene_id: number
   pretty_name?: string
+  summary: string | null
+  start_page: number | null
+  end_page: number | null
   on_stages: SceneOnStage[]
   entrance_exits: SceneEntranceExit[]
 }

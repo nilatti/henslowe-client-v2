@@ -79,6 +79,7 @@ export function AuditionersList({
           <JobForm
             productionId={productionId}
             theaterId={theaterId}
+            specializationId={AUDITIONER_SPECIALIZATION_ID}
             invalidateKey={invalidateKey}
             onSuccess={() => setShowForm(false)}
             onCancel={() => setShowForm(false)}

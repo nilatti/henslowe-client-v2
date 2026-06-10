@@ -48,6 +48,7 @@ import { Route as AuthenticatedProductionsProductionIdDoublingChartsRouteImport 
 import { Route as AuthenticatedPlaysPlayIdWordCloudsRouteImport } from './routes/_authenticated/plays/$playId/word-clouds'
 import { Route as AuthenticatedPlaysPlayIdScriptRouteImport } from './routes/_authenticated/plays/$playId/script'
 import { Route as AuthenticatedPlaysPlayIdPartScriptsRouteImport } from './routes/_authenticated/plays/$playId/part-scripts'
+import { Route as AuthenticatedPlaysPlayIdCharactersCharacterIdIndexRouteImport } from './routes/_authenticated/plays/$playId/characters/$characterId/index'
 import { Route as AuthenticatedPlaysPlayIdActsActIdIndexRouteImport } from './routes/_authenticated/plays/$playId/acts/$actId/index'
 import { Route as AuthenticatedPlaysPlayIdActsActIdScenesNewRouteImport } from './routes/_authenticated/plays/$playId/acts/$actId/scenes/new'
 import { Route as AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRouteImport } from './routes/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/index'
@@ -267,6 +268,12 @@ const AuthenticatedPlaysPlayIdPartScriptsRoute =
     path: '/plays/$playId/part-scripts',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedPlaysPlayIdCharactersCharacterIdIndexRoute =
+  AuthenticatedPlaysPlayIdCharactersCharacterIdIndexRouteImport.update({
+    id: '/plays/$playId/characters/$characterId/',
+    path: '/plays/$playId/characters/$characterId/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedPlaysPlayIdActsActIdIndexRoute =
   AuthenticatedPlaysPlayIdActsActIdIndexRouteImport.update({
     id: '/plays/$playId/acts/$actId/',
@@ -341,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/theaters/$theaterId/': typeof AuthenticatedTheatersTheaterIdIndexRoute
   '/users/$userId/': typeof AuthenticatedUsersUserIdIndexRoute
   '/plays/$playId/acts/$actId/': typeof AuthenticatedPlaysPlayIdActsActIdIndexRoute
+  '/plays/$playId/characters/$characterId/': typeof AuthenticatedPlaysPlayIdCharactersCharacterIdIndexRoute
   '/plays/$playId/acts/$actId/scenes/new': typeof AuthenticatedPlaysPlayIdActsActIdScenesNewRoute
   '/plays/$playId/acts/$actId/scenes/$sceneId/': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRoute
   '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute
@@ -384,6 +392,7 @@ export interface FileRoutesByTo {
   '/theaters/$theaterId': typeof AuthenticatedTheatersTheaterIdIndexRoute
   '/users/$userId': typeof AuthenticatedUsersUserIdIndexRoute
   '/plays/$playId/acts/$actId': typeof AuthenticatedPlaysPlayIdActsActIdIndexRoute
+  '/plays/$playId/characters/$characterId': typeof AuthenticatedPlaysPlayIdCharactersCharacterIdIndexRoute
   '/plays/$playId/acts/$actId/scenes/new': typeof AuthenticatedPlaysPlayIdActsActIdScenesNewRoute
   '/plays/$playId/acts/$actId/scenes/$sceneId': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRoute
   '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute
@@ -431,6 +440,7 @@ export interface FileRoutesById {
   '/_authenticated/theaters/$theaterId/': typeof AuthenticatedTheatersTheaterIdIndexRoute
   '/_authenticated/users/$userId/': typeof AuthenticatedUsersUserIdIndexRoute
   '/_authenticated/plays/$playId/acts/$actId/': typeof AuthenticatedPlaysPlayIdActsActIdIndexRoute
+  '/_authenticated/plays/$playId/characters/$characterId/': typeof AuthenticatedPlaysPlayIdCharactersCharacterIdIndexRoute
   '/_authenticated/plays/$playId/acts/$actId/scenes/new': typeof AuthenticatedPlaysPlayIdActsActIdScenesNewRoute
   '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRoute
   '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new': typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute
@@ -477,6 +487,7 @@ export interface FileRouteTypes {
     | '/theaters/$theaterId/'
     | '/users/$userId/'
     | '/plays/$playId/acts/$actId/'
+    | '/plays/$playId/characters/$characterId/'
     | '/plays/$playId/acts/$actId/scenes/new'
     | '/plays/$playId/acts/$actId/scenes/$sceneId/'
     | '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new'
@@ -520,6 +531,7 @@ export interface FileRouteTypes {
     | '/theaters/$theaterId'
     | '/users/$userId'
     | '/plays/$playId/acts/$actId'
+    | '/plays/$playId/characters/$characterId'
     | '/plays/$playId/acts/$actId/scenes/new'
     | '/plays/$playId/acts/$actId/scenes/$sceneId'
     | '/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new'
@@ -566,6 +578,7 @@ export interface FileRouteTypes {
     | '/_authenticated/theaters/$theaterId/'
     | '/_authenticated/users/$userId/'
     | '/_authenticated/plays/$playId/acts/$actId/'
+    | '/_authenticated/plays/$playId/characters/$characterId/'
     | '/_authenticated/plays/$playId/acts/$actId/scenes/new'
     | '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/'
     | '/_authenticated/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/new'
@@ -856,6 +869,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlaysPlayIdPartScriptsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/plays/$playId/characters/$characterId/': {
+      id: '/_authenticated/plays/$playId/characters/$characterId/'
+      path: '/plays/$playId/characters/$characterId'
+      fullPath: '/plays/$playId/characters/$characterId/'
+      preLoaderRoute: typeof AuthenticatedPlaysPlayIdCharactersCharacterIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/plays/$playId/acts/$actId/': {
       id: '/_authenticated/plays/$playId/acts/$actId/'
       path: '/plays/$playId/acts/$actId'
@@ -920,6 +940,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTheatersTheaterIdIndexRoute: typeof AuthenticatedTheatersTheaterIdIndexRoute
   AuthenticatedUsersUserIdIndexRoute: typeof AuthenticatedUsersUserIdIndexRoute
   AuthenticatedPlaysPlayIdActsActIdIndexRoute: typeof AuthenticatedPlaysPlayIdActsActIdIndexRoute
+  AuthenticatedPlaysPlayIdCharactersCharacterIdIndexRoute: typeof AuthenticatedPlaysPlayIdCharactersCharacterIdIndexRoute
   AuthenticatedPlaysPlayIdActsActIdScenesNewRoute: typeof AuthenticatedPlaysPlayIdActsActIdScenesNewRoute
   AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRoute: typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRoute
   AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute: typeof AuthenticatedPlaysPlayIdActsActIdScenesSceneIdFrenchScenesNewRoute
@@ -963,6 +984,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedUsersUserIdIndexRoute: AuthenticatedUsersUserIdIndexRoute,
   AuthenticatedPlaysPlayIdActsActIdIndexRoute:
     AuthenticatedPlaysPlayIdActsActIdIndexRoute,
+  AuthenticatedPlaysPlayIdCharactersCharacterIdIndexRoute:
+    AuthenticatedPlaysPlayIdCharactersCharacterIdIndexRoute,
   AuthenticatedPlaysPlayIdActsActIdScenesNewRoute:
     AuthenticatedPlaysPlayIdActsActIdScenesNewRoute,
   AuthenticatedPlaysPlayIdActsActIdScenesSceneIdIndexRoute:

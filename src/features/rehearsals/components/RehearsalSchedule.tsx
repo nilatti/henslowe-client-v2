@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
-import _ from 'lodash'
+import { useState } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import _ from "lodash";
 import {
   format,
   parseISO,
@@ -10,25 +10,29 @@ import {
   addWeeks,
   subWeeks,
   isWithinInterval,
-} from 'date-fns'
+} from "date-fns";
 import {
   productionRehearsalsQueryOptions,
-} from '../api/rehearsals'
-import { productionJobsQueryOptions } from '../../jobs/api/jobs'
-import { getActors, getStaffJobs, getActorsAndAuditioners } from '../../jobs/utils/jobUtils'
-import { RehearsalShow } from './RehearsalShow'
-import { RehearsalForm } from './RehearsalForm'
-import { RehearsalPatternCreator } from './RehearsalPatternCreator'
-import { useUserRoleForProduction, useIsSuperAdmin } from '../../../hooks/useUserRole'
-import { Button, Card, PageHeader } from '../../../components/ui'
-import type { RehearsalUser } from '../types/rehearsal'
+  productionUserConflictsQueryOptions,
+} from "../api/rehearsals";
+import { productionJobsQueryOptions } from "../../jobs/api/jobs";
+import { getActors, getStaffJobs } from "../../jobs/utils/jobUtils";
+import { RehearsalShow } from "./RehearsalShow";
+import { RehearsalForm } from "./RehearsalForm";
+import { RehearsalPatternCreator } from "./RehearsalPatternCreator";
+import {
+  useUserRoleForProduction,
+  useIsSuperAdmin,
+} from "../../../hooks/useUserRole";
+import { Button, Card, PageHeader } from "../../../components/ui";
+import type { RehearsalUser } from "../types/rehearsal";
 
 interface RehearsalScheduleProps {
-  productionId: number
-  playId: number
-  productionTitle: string
-  theaterId: number
-  theaterName: string
+  productionId: number;
+  playId: number;
+  productionTitle: string;
+  theaterId: number;
+  theaterName: string;
 }
 
 export function RehearsalSchedule({
@@ -39,71 +43,75 @@ export function RehearsalSchedule({
   theaterName,
 }: RehearsalScheduleProps) {
   const { data: rehearsals } = useSuspenseQuery(
-    productionRehearsalsQueryOptions(productionId)
-  )
+    productionRehearsalsQueryOptions(productionId),
+  );
   const { data: jobs } = useSuspenseQuery(
-    productionJobsQueryOptions(productionId)
-  )
-  const role = useUserRoleForProduction(productionId, theaterId)
-  const isSuperAdmin = useIsSuperAdmin()
-  const isAdmin = role === 'admin' || isSuperAdmin
+    productionJobsQueryOptions(productionId),
+  );
+  const { data: productionUserConflicts } = useSuspenseQuery(
+    productionUserConflictsQueryOptions(productionId),
+  );
+  const role = useUserRoleForProduction(productionId, theaterId);
+  const isSuperAdmin = useIsSuperAdmin();
+  const isAdmin = role === "admin" || isSuperAdmin;
 
-  const [currentWeekStart, setCurrentWeekStart] = useState(
-    () => startOfWeek(new Date())
-  )
-  const [showForm, setShowForm] = useState(false)
-  const [showPatternCreator, setShowPatternCreator] = useState(false)
+  const [currentWeekStart, setCurrentWeekStart] = useState(() =>
+    startOfWeek(new Date()),
+  );
+  const [showForm, setShowForm] = useState(false);
+  const [showPatternCreator, setShowPatternCreator] = useState(false);
 
-  const currentWeekEnd = endOfWeek(currentWeekStart)
+  const currentWeekEnd = endOfWeek(currentWeekStart);
 
-  const weekRehearsals = rehearsals.filter(r =>
+  const weekRehearsals = rehearsals.filter((r) =>
     isWithinInterval(parseISO(r.start_time), {
       start: currentWeekStart,
       end: currentWeekEnd,
-    })
-  )
+    }),
+  );
 
-  const hasLastWeek = rehearsals.some(r =>
+  const hasLastWeek = rehearsals.some((r) =>
     isWithinInterval(parseISO(r.start_time), {
       start: subWeeks(currentWeekStart, 1),
       end: subWeeks(currentWeekEnd, 1),
-    })
-  )
+    }),
+  );
 
-  const hasNextWeek = rehearsals.some(r =>
+  const hasNextWeek = rehearsals.some((r) =>
     isWithinInterval(parseISO(r.start_time), {
       start: addWeeks(currentWeekStart, 1),
       end: addWeeks(currentWeekEnd, 1),
-    })
-  )
+    }),
+  );
 
-  const rehearsalsWithDate = weekRehearsals.map(r => ({
+  const rehearsalsWithDate = weekRehearsals.map((r) => ({
     ...r,
-    date: format(parseISO(r.start_time), 'yyyy-MM-dd'),
-  }))
+    date: format(parseISO(r.start_time), "yyyy-MM-dd"),
+  }));
 
-  const groupedRehearsals = _.groupBy(rehearsalsWithDate, 'date')
+  const groupedRehearsals = _.groupBy(rehearsalsWithDate, "date");
 
-  const toRehearsalUser = (u: NonNullable<(typeof jobs)[number]['user']>): RehearsalUser => ({
+  const toRehearsalUser = (
+    u: NonNullable<(typeof jobs)[number]["user"]>,
+  ): RehearsalUser => ({
     id: u.id,
-    first_name: u.first_name ?? '',
-    last_name: u.last_name ?? '',
-    email: u.email ?? '',
+    first_name: u.first_name ?? "",
+    last_name: u.last_name ?? "",
+    email: u.email ?? "",
     fake: u.fake,
-  })
+  });
 
-  const actors = getActors(jobs).map(toRehearsalUser)
-  const staffUsers = _.uniqBy(
-    getStaffJobs(jobs).filter(j => j.user).map(j => toRehearsalUser(j.user!)),
-    'id'
-  )
-  const allUsers = getActorsAndAuditioners(jobs).map(toRehearsalUser)
-  const hiredUsers: RehearsalUser[] = _.uniqBy(
-    jobs.filter(j => j.user && !j.user.fake).map(j => toRehearsalUser(j.user!)),
-    'id'
-  )
+  const actors = getActors(jobs)
+    .filter((u) => !u.fake)
+    .map(toRehearsalUser);
+  const productionStaff = _.uniqBy(
+    getStaffJobs(jobs)
+      .filter((j) => j.user && !j.user.fake)
+      .map((j) => toRehearsalUser(j.user!)),
+    "id",
+  );
 
-  const weekLabel = `${format(currentWeekStart, 'MMMM d')} – ${format(currentWeekEnd, 'MMMM d, yyyy')}`
+  const weekLabel = `${format(currentWeekStart, "MMMM d")} – ${format(currentWeekEnd, "MMMM d, yyyy")}`;
 
   return (
     <div>
@@ -134,7 +142,7 @@ export function RehearsalSchedule({
         >
           {productionTitle}
         </Link>
-        {' at '}
+        {" at "}
         <Link
           to="/theaters/$theaterId"
           params={{ theaterId: String(theaterId) }}
@@ -148,7 +156,8 @@ export function RehearsalSchedule({
         <div className="mb-6">
           <RehearsalPatternCreator
             productionId={productionId}
-            hiredUsers={hiredUsers}
+            actors={actors}
+            productionStaff={productionStaff}
             onClose={() => setShowPatternCreator(false)}
           />
         </div>
@@ -190,24 +199,24 @@ export function RehearsalSchedule({
         <div className="space-y-4">
           {Object.keys(groupedRehearsals)
             .sort()
-            .map(date => (
+            .map((date) => (
               <Card key={date}>
                 <div className="px-4 py-2 border-b border-gray-100 bg-gray-50">
                   <h3 className="text-sm font-semibold text-gray-900">
-                    {format(parseISO(date), 'EEEE, MMMM d')}
+                    {format(parseISO(date), "EEEE, MMMM d")}
                   </h3>
                 </div>
                 <div className="px-4 pb-2">
-                  {groupedRehearsals[date].map(rehearsal => (
+                  {groupedRehearsals[date].map((rehearsal) => (
                     <RehearsalShow
                       key={rehearsal.id}
                       rehearsal={rehearsal}
                       productionId={productionId}
                       playId={playId}
                       actors={actors}
-                      staffUsers={staffUsers}
-                      allUsers={allUsers}
+                      productionStaff={productionStaff}
                       isAdmin={isAdmin}
+                      productionUserConflicts={productionUserConflicts}
                     />
                   ))}
                 </div>
@@ -216,5 +225,5 @@ export function RehearsalSchedule({
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -9,6 +9,8 @@ export function NewSpecializationPage() {
   const navigate = useNavigate()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [productionAdmin, setProductionAdmin] = useState(false)
+  const [theaterAdmin, setTheaterAdmin] = useState(false)
 
   const createMutation = useMutation({
     mutationFn: createSpecializationFn,
@@ -23,7 +25,7 @@ export function NewSpecializationPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    createMutation.mutate({ title, description: description || null })
+    createMutation.mutate({ title, description: description || null, production_admin: productionAdmin, theater_admin: theaterAdmin })
   }
 
   return (
@@ -54,6 +56,26 @@ export function NewSpecializationPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+          </div>
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={productionAdmin}
+                onChange={e => setProductionAdmin(e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              Production admin
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={theaterAdmin}
+                onChange={e => setTheaterAdmin(e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              Theater admin
+            </label>
           </div>
           <div className="flex gap-3">
             <Button type="submit" variant="primary" disabled={createMutation.isPending}>

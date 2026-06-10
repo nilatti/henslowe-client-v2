@@ -1,10 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactElement } from "react";
-import { parseISO } from "date-fns";
-import { formatInTimeZone } from "date-fns-tz";
+import { parseISO, format } from "date-fns";
 import { buildUserName } from "./actorUtils";
 import type { User } from "./actorUtils";
-import { DATE_TIME_FORMAT, TIME_FORMAT, DEFAULT_TIMEZONE } from "./constants";
+import { DATE_TIME_FORMAT, TIME_FORMAT } from "./constants";
 
 interface Conflict {
   start_time: string;
@@ -84,9 +83,8 @@ function rehearsalContent({ acts, frenchScenes, scenes }: {
   return content;
 }
 
-function upcomingRehearsalsList({ rehearsals, timezone }: {
+function upcomingRehearsalsList({ rehearsals }: {
   rehearsals: Rehearsal[];
-  timezone?: string;
 }): ReactElement[] {
   const dateRangeStart = new Date();
   dateRangeStart.setDate(dateRangeStart.getDate() - 1);
@@ -102,9 +100,9 @@ function upcomingRehearsalsList({ rehearsals, timezone }: {
     .map((rehearsal) => (
       <tr key={rehearsal.id}>
         <td>
-          {formatInTimeZone(parseISO(rehearsal.start_time), timezone || DEFAULT_TIMEZONE, DATE_TIME_FORMAT)}
+          {format(parseISO(rehearsal.start_time), DATE_TIME_FORMAT)}
           -
-          {formatInTimeZone(parseISO(rehearsal.end_time), timezone || DEFAULT_TIMEZONE, TIME_FORMAT)}
+          {format(parseISO(rehearsal.end_time), TIME_FORMAT)}
         </td>
         <td>{rehearsal.space && <span>{rehearsal.space.name}</span>}</td>
         <td>{rehearsal.title && <strong>{rehearsal.title}</strong>}</td>
