@@ -7,7 +7,7 @@ import {
   useDeleteProduction,
 } from "../api/productions";
 import { ProductionForm } from "./ProductionForm";
-import { CastList } from "../../jobs/components/CastList";
+import { ProductionJobs } from "../../jobs/components/ProductionJobs";
 import {
   useIsSuperAdmin,
   useUserRoleForProduction,
@@ -124,13 +124,7 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
                 <div>
                   <dt className="font-medium text-gray-700">Play</dt>
                   <dd className="text-gray-600 mt-1">
-                    <Link
-                      to="/plays/$playId"
-                      params={{ playId: String(production.play?.id ?? 0) }}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      {production.play?.title}
-                    </Link>
+                    {production.play?.title}
                   </dd>
                 </div>
                 {(production.start_date || production.end_date) && (
@@ -158,7 +152,7 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
           )}
 
           {activeTab === "people" && (
-            <CastList
+            <ProductionJobs
               productionId={productionId}
               theaterId={production.theater?.id ?? 0}
               productionStartDate={production.start_date}

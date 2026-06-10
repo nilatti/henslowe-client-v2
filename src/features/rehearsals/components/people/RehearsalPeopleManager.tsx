@@ -17,6 +17,7 @@ interface RehearsalPeopleManagerProps {
   productionStaff: RehearsalUser[];
   setShowPeopleManager: (show: boolean) => void;
   productionUserConflicts: ProductionUserConflict[];
+  actorCharacterNames?: Map<number, string[]>;
 }
 
 export function RehearsalPeopleManager({
@@ -26,6 +27,7 @@ export function RehearsalPeopleManager({
   productionStaff,
   setShowPeopleManager,
   productionUserConflicts,
+  actorCharacterNames,
 }: RehearsalPeopleManagerProps) {
   const update = useUpdateRehearsal(productionId);
   const [selectedIds, setSelectedIds] = useState<number[]>(
@@ -62,6 +64,7 @@ export function RehearsalPeopleManager({
         productionUserConflicts={productionUserConflicts}
         rehearsalStartDate={new Date(rehearsal.start_time)}
         rehearsalEndDate={new Date(rehearsal.end_time)}
+        actorCharacterNames={actorCharacterNames}
       />
       <div className="flex gap-2">
         <Button onClick={handleSave} disabled={update.isPending}>

@@ -16,7 +16,7 @@ import {
   productionUserConflictsQueryOptions,
 } from "../api/rehearsals";
 import { productionJobsQueryOptions } from "../../jobs/api/jobs";
-import { getActors, getStaffJobs } from "../../jobs/utils/jobUtils";
+import { getActors, getStaffJobs, getCastings } from "../../jobs/utils/jobUtils";
 import { RehearsalShow } from "./RehearsalShow";
 import { RehearsalForm } from "./RehearsalForm";
 import { RehearsalPatternCreator } from "./RehearsalPatternCreator";
@@ -99,6 +99,7 @@ export function RehearsalSchedule({
     last_name: u.last_name ?? "",
     email: u.email ?? "",
     fake: u.fake,
+    preferred_name: u.preferred_name ?? null,
   });
 
   const actors = getActors(jobs)
@@ -110,6 +111,14 @@ export function RehearsalSchedule({
       .map((j) => toRehearsalUser(j.user!)),
     "id",
   );
+
+  const actorCharacterNames = new Map<number, string[]>();
+  getCastings(jobs).forEach((j) => {
+    if (j.user && j.character) {
+      const existing = actorCharacterNames.get(j.user.id) ?? [];
+      actorCharacterNames.set(j.user.id, [...existing, j.character.name]);
+    }
+  });
 
   const weekLabel = `${format(currentWeekStart, "MMMM d")} – ${format(currentWeekEnd, "MMMM d, yyyy")}`;
 
@@ -158,6 +167,7 @@ export function RehearsalSchedule({
             productionId={productionId}
             actors={actors}
             productionStaff={productionStaff}
+            actorCharacterNames={actorCharacterNames}
             onClose={() => setShowPatternCreator(false)}
           />
         </div>
@@ -167,6 +177,7 @@ export function RehearsalSchedule({
         <Card className="p-6 mb-6">
           <RehearsalForm
             productionId={productionId}
+            theaterId={theaterId}
             onSuccess={() => setShowForm(false)}
             onCancel={() => setShowForm(false)}
           />
@@ -213,10 +224,12 @@ export function RehearsalSchedule({
                       rehearsal={rehearsal}
                       productionId={productionId}
                       playId={playId}
+                      theaterId={theaterId}
                       actors={actors}
                       productionStaff={productionStaff}
                       isAdmin={isAdmin}
                       productionUserConflicts={productionUserConflicts}
+                      actorCharacterNames={actorCharacterNames}
                     />
                   ))}
                 </div>

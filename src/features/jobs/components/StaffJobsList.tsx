@@ -29,7 +29,9 @@ export function StaffJobsList({
     <div>
       {isAdmin && !showForm && (
         <div className="mb-3">
-          <Button onClick={() => setShowForm(true)}>Add Job</Button>
+          <Button type="button" onClick={() => setShowForm(true)}>
+            Add Job
+          </Button>
         </div>
       )}
 

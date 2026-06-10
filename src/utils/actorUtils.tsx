@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import _ from "lodash";
 import { Link } from "@tanstack/react-router";
 import type { ReactElement } from "react";

@@ -2,6 +2,7 @@ export interface Rehearsal {
   id: number
   production_id: number
   space_id: number | null
+  space: { id: number; name: string } | null
   start_time: string
   end_time: string
   title: string | null
@@ -17,6 +18,7 @@ export interface RehearsalUser {
   last_name: string
   email: string
   fake: boolean
+  preferred_name?: string | null
 }
 
 export interface RehearsalTextUnit {

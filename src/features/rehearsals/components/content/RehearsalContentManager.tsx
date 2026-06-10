@@ -127,6 +127,16 @@ export function RehearsalContentManager({
     );
   };
 
+  const handleReset = async () => {
+    await updateRehearsal.mutateAsync({
+      id: rehearsal.id,
+      text_unit: null,
+      act_ids: [],
+      scene_ids: [],
+      french_scene_ids: [],
+    } as Parameters<typeof updateRehearsal.mutateAsync>[0]);
+  };
+
   const handleSchedule = () => {
     const selected = playContent.filter((item) => item.isScheduled);
     const newCalledActors = getCalledActors(selected, actors, characterToUserMap);
@@ -211,6 +221,9 @@ export function RehearsalContentManager({
           </Button>
           <Button variant="secondary" onClick={onClose}>
             Cancel
+          </Button>
+          <Button variant="danger" onClick={handleReset} disabled={updateRehearsal.isPending}>
+            Reset
           </Button>
         </div>
       </div>

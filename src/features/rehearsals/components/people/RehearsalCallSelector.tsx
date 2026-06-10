@@ -14,6 +14,7 @@ interface RehearsalCallSelectorProps {
   productionUserConflicts?: ProductionUserConflict[];
   rehearsalStartDate?: Date;
   rehearsalEndDate?: Date;
+  actorCharacterNames?: Map<number, string[]>;
 }
 
 export default function RehearsalCallSelector({
@@ -24,6 +25,7 @@ export default function RehearsalCallSelector({
   rehearsalStartDate,
   rehearsalEndDate,
   productionUserConflicts = [],
+  actorCharacterNames,
 }: RehearsalCallSelectorProps) {
   const conflictMap = useMemo(() => {
     const map = new Map<number, Conflict[]>();
@@ -110,6 +112,9 @@ export default function RehearsalCallSelector({
                 className="rounded border-gray-300"
               />
               {buildUserName(u)}
+              {actorCharacterNames?.get(u.id)?.length
+                ? ` (${actorCharacterNames.get(u.id)!.join(", ")})`
+                : null}
               {formatConflicts(conflictMap.get(u.id) ?? [])}
             </label>
           ))}

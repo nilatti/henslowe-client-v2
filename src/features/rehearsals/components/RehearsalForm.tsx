@@ -1,11 +1,14 @@
 import { useForm } from "@tanstack/react-form";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useCreateRehearsal, useUpdateRehearsal } from "../api/rehearsals";
 import type { RehearsalWithDetails } from "../types/rehearsal";
+import { theaterSkeletonQueryOptions } from "../../theaters/api/theaters";
 import { Button } from "../../../components/ui";
 
 interface RehearsalFormProps {
   productionId: number;
+  theaterId: number;
   rehearsal?: RehearsalWithDetails;
   onSuccess: () => void;
   onCancel: () => void;
@@ -17,6 +20,7 @@ function toLocalInput(iso: string) {
 
 export function RehearsalForm({
   productionId,
+  theaterId,
   rehearsal,
   onSuccess,
   onCancel,
@@ -24,6 +28,7 @@ export function RehearsalForm({
   const create = useCreateRehearsal(productionId);
   const update = useUpdateRehearsal(productionId);
   const isEditing = !!rehearsal;
+  const { data: theater } = useQuery(theaterSkeletonQueryOptions(theaterId));
 
   const now = format(new Date(), "yyyy-MM-dd'T'HH:mm");
 
@@ -35,6 +40,7 @@ export function RehearsalForm({
       end_time: rehearsal?.end_time ? toLocalInput(rehearsal.end_time) : now,
       title: rehearsal?.title ?? "",
       notes: rehearsal?.notes ?? "",
+      space_id: rehearsal?.space_id ?? null as number | null,
     },
     onSubmit: async ({ value }) => {
       const payload = {
@@ -43,6 +49,7 @@ export function RehearsalForm({
         end_time: new Date(value.end_time).toISOString(),
         title: value.title || null,
         notes: value.notes || null,
+        space_id: value.space_id,
       };
       if (isEditing) {
         await update.mutateAsync({ ...payload, id: rehearsal.id });
@@ -130,6 +137,35 @@ export function RehearsalForm({
           </div>
         )}
       </form.Field>
+
+      {theater && theater.spaces.length > 0 && (
+        <form.Field name="space_id">
+          {(field) => (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Location
+              </label>
+              <select
+                value={field.state.value ?? ""}
+                onChange={(e) =>
+                  field.handleChange(
+                    e.target.value ? Number(e.target.value) : null,
+                  )
+                }
+                onBlur={field.handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">No location</option>
+                {theater.spaces.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </form.Field>
+      )}
 
       <div className="flex gap-3 justify-end pt-2">
         <Button variant="secondary" type="button" onClick={onCancel}>

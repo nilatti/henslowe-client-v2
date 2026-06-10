@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { parseISO, format } from "date-fns";
 import {
   useDeleteRehearsal,
@@ -17,20 +18,24 @@ interface RehearsalShowProps {
   rehearsal: RehearsalWithDetails;
   productionId: number;
   playId: number;
+  theaterId: number;
   actors: RehearsalUser[];
   productionStaff: RehearsalUser[];
   isAdmin: boolean;
   productionUserConflicts: ProductionUserConflict[];
+  actorCharacterNames?: Map<number, string[]>;
 }
 
 export function RehearsalShow({
   rehearsal,
   productionId,
   playId,
+  theaterId,
   actors,
   productionStaff,
   isAdmin,
   productionUserConflicts,
+  actorCharacterNames,
 }: RehearsalShowProps) {
   const deleteRehearsal = useDeleteRehearsal(productionId);
   const [isEditing, setIsEditing] = useState(false);
@@ -62,6 +67,7 @@ export function RehearsalShow({
       <div className="py-3">
         <RehearsalForm
           productionId={productionId}
+          theaterId={theaterId}
           rehearsal={rehearsal}
           onSuccess={() => setIsEditing(false)}
           onCancel={() => setIsEditing(false)}
@@ -82,6 +88,17 @@ export function RehearsalShow({
               <span className="text-sm text-gray-600">{rehearsal.title}</span>
             )}
           </div>
+          {rehearsal.space && (
+            <div className="mb-1">
+              <Link
+                to="/spaces/$spaceId"
+                params={{ spaceId: String(rehearsal.space.id) }}
+                className="text-xs text-blue-600 hover:text-blue-800"
+              >
+                {rehearsal.space.name}
+              </Link>
+            </div>
+          )}
 
           {rehearsal.notes && (
             <p className="text-xs text-gray-500 mb-2">{rehearsal.notes}</p>
@@ -192,6 +209,7 @@ export function RehearsalShow({
             productionStaff={productionStaff}
             setShowPeopleManager={setShowPeopleManager}
             productionUserConflicts={productionUserConflicts}
+            actorCharacterNames={actorCharacterNames}
           />
         </div>
       )}

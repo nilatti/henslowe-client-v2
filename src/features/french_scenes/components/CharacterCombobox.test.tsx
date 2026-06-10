@@ -1,7 +1,11 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { CharacterCombobox } from './CharacterCombobox'
+
+beforeEach(() => {
+  Element.prototype.scrollIntoView = vi.fn()
+})
 
 vi.mock('../../plays/api/characters', () => ({
   useCreateCharacter: () => ({
@@ -122,7 +126,10 @@ describe('CharacterCombobox', () => {
     await user.click(input)
     await user.type(input, 'Ghost')
 
-    expect(screen.getByText(/Add.*Ghost.*as new character/)).toBeInTheDocument()
+    const addOption = screen.getAllByRole('listitem').find(
+      li => li.textContent?.includes('Ghost') && li.textContent?.includes('as new character'),
+    )
+    expect(addOption).toBeInTheDocument()
   })
 
   it('does NOT show "Add" option when query exactly matches an existing character name (case-insensitive)', async () => {
@@ -132,7 +139,10 @@ describe('CharacterCombobox', () => {
     await user.click(input)
     await user.type(input, 'hamlet')
 
-    expect(screen.queryByText(/Add.*hamlet.*as new character/i)).not.toBeInTheDocument()
+    const addOption = screen.getAllByRole('listitem').find(
+      li => li.textContent?.includes('as new character'),
+    )
+    expect(addOption).toBeUndefined()
   })
 
   it('calls onSelect("character", 99) when the "Add" option is clicked', async () => {
@@ -141,7 +151,10 @@ describe('CharacterCombobox', () => {
 
     await user.click(input)
     await user.type(input, 'Ghost')
-    await user.click(screen.getByText(/Add.*Ghost.*as new character/))
+    const addOption = screen.getAllByRole('listitem').find(
+      li => li.textContent?.includes('Ghost') && li.textContent?.includes('as new character'),
+    )!
+    await user.click(addOption)
 
     await waitFor(() => {
       expect(onSelect).toHaveBeenCalledWith('character', 99)

@@ -4,10 +4,11 @@ import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
 import { useCreateJob, useUpdateJob, productionJobsQueryOptions } from '../api/jobs'
 import { specializationsQueryOptions } from '../../specializations/queries'
 import { usersQueryOptions } from '../../users/api/users'
+import { AUDITIONER_SPECIALIZATION_ID } from '../../../utils/constants'
 import type { Job, JobWithDetails } from '../types/job'
 import { Button } from '../../../components/ui'
-import { buildUserName } from '../../../utils/actorUtils'
 import { useAuth } from '../../../hooks/useAuth'
+import { UserCombobox } from './UserCombobox'
 import { format } from 'date-fns'
 
 interface JobFormProps {
@@ -42,9 +43,6 @@ export function JobForm({
   const isEditing = !!job
 
   const isSubscribed = currentUser?.subscription_status === 'active'
-  const availableUsers = isSubscribed || isSuperAdmin
-    ? (users as (typeof users[number] & { fake?: boolean })[]).filter(u => !u.fake)
-    : (users as (typeof users[number] & { fake?: boolean })[]).filter(u => u.fake)
 
   const today = format(new Date(), 'yyyy-MM-dd')
 
@@ -75,6 +73,13 @@ export function JobForm({
 
   const selectedSpecializationId = useStore(form.store, state => state.values.specialization_id)
 
+  const isAuditionerJob = selectedSpecializationId === AUDITIONER_SPECIALIZATION_ID ||
+    specializationId === AUDITIONER_SPECIALIZATION_ID
+  const usersTyped = users as (typeof users[number] & { fake?: boolean })[]
+  const availableUsers = (isAuditionerJob && !isSubscribed && !isSuperAdmin)
+    ? usersTyped.filter(u => u.fake)
+    : usersTyped.filter(u => !u.fake)
+
   const takenUserIds = new Set(
     (productionJobs ?? [])
       .filter(j =>
@@ -98,22 +103,11 @@ export function JobForm({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Person
             </label>
-            <select
+            <UserCombobox
+              users={filteredUsers}
               value={field.state.value}
-              onChange={e => field.handleChange(Number(e.target.value))}
-              onBlur={field.handleBlur}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value={0}>Select person</option>
-              {filteredUsers
-                .sort((a, b) => a.last_name.localeCompare(b.last_name))
-                .map(u => (
-                  <option key={u.id} value={u.id}>
-                    {buildUserName(u)}
-                    {u.fake ? ' (placeholder)' : ''}
-                  </option>
-                ))}
-            </select>
+              onChange={id => field.handleChange(id)}
+            />
           </div>
         )}
       </form.Field>

@@ -10,6 +10,7 @@ interface RehearsalPatternCreatorProps {
   actors: RehearsalUser[];
   productionStaff: RehearsalUser[];
   onClose: () => void;
+  actorCharacterNames?: Map<number, string[]>;
 }
 
 export function RehearsalPatternCreator({
@@ -17,6 +18,7 @@ export function RehearsalPatternCreator({
   actors,
   productionStaff,
   onClose,
+  actorCharacterNames,
 }: RehearsalPatternCreatorProps) {
   const buildSchedule = useBuildRehearsalSchedule(productionId);
   const [submitted, setSubmitted] = useState(false);
@@ -209,6 +211,7 @@ export function RehearsalPatternCreator({
                   productionStaff={productionStaff}
                   selectedIds={defaultUserIds}
                   handleToggle={toggleUser}
+                  actorCharacterNames={actorCharacterNames}
                 />
               </div>
             </div>
