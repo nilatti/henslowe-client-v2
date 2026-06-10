@@ -7,7 +7,7 @@ import { playScriptQueryOptions } from "../../script/api/script";
 import { getCastings, getActors } from "../../jobs/utils/jobUtils";
 import { DoublingChartShow } from "./DoublingChartShow";
 import type { ChartPlay } from "./DoublingChartShow";
-import { CastList } from "../../jobs/components/ProductionJobs";
+import { ProductionJobs } from "../../jobs/components/ProductionJobs";
 import { Tabs } from "../../../components/ui";
 
 interface DoublingChartContainerProps {
@@ -53,7 +53,7 @@ export function DoublingChartContainer({
 
   return (
     <div className="space-y-6">
-      <CastList
+      <ProductionJobs
         productionId={productionId}
         theaterId={production.theater.id}
         productionStartDate={production.start_date}
