@@ -23,7 +23,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/router-devtools": "^1.166.13",
     "@tanstack/router-plugin": "^1.167.27",
-    "axios": "^1.15.2",
+    "axios": "^1.16.0",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "diff": "^9.0.0",
