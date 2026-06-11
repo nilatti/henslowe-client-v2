@@ -7,6 +7,7 @@ import {
   useDeleteProduction,
 } from "../api/productions";
 import { ProductionForm } from "./ProductionForm";
+import { ProductionPhasesSection } from "./ProductionPhasesSection";
 import { ProductionJobs } from "../../jobs/components/ProductionJobs";
 import {
   useIsSuperAdmin,
@@ -148,6 +149,11 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
                   </div>
                 )}
               </dl>
+              <ProductionPhasesSection
+                productionId={productionId}
+                productionPhases={production.production_phases ?? []}
+                isAdmin={isAdmin}
+              />
             </Card>
           )}
 

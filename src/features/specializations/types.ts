@@ -1,9 +1,15 @@
+import type { Phase } from '../phases/types'
+
 export interface Specialization {
   id: number
   title: string
   description?: string | null
   production_admin: boolean
   theater_admin: boolean
+  default_start_phase_id: number | null
+  default_end_phase_id: number | null
+  default_start_phase: Phase | null
+  default_end_phase: Phase | null
 }
 
 export interface SpecializationUser {
@@ -40,4 +46,6 @@ export interface SpecializationJob {
 
 export interface SpecializationDetail extends Specialization {
   jobs: SpecializationJob[]
+  default_start_phase: Phase | null
+  default_end_phase: Phase | null
 }

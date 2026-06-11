@@ -16,6 +16,7 @@ import {
   productionUserConflictsQueryOptions,
 } from "../api/rehearsals";
 import { productionJobsQueryOptions } from "../../jobs/api/jobs";
+import { productionSkeletonQueryOptions } from "../../productions/api/productions";
 import { getActors, getStaffJobs, getCastings } from "../../jobs/utils/jobUtils";
 import { RehearsalShow } from "./RehearsalShow";
 import { RehearsalForm } from "./RehearsalForm";
@@ -50,6 +51,9 @@ export function RehearsalSchedule({
   );
   const { data: productionUserConflicts } = useSuspenseQuery(
     productionUserConflictsQueryOptions(productionId),
+  );
+  const { data: productionSkeleton } = useSuspenseQuery(
+    productionSkeletonQueryOptions(productionId),
   );
   const role = useUserRoleForProduction(productionId, theaterId);
   const isSuperAdmin = useIsSuperAdmin();
@@ -178,6 +182,7 @@ export function RehearsalSchedule({
           <RehearsalForm
             productionId={productionId}
             theaterId={theaterId}
+            defaultSpaceId={productionSkeleton?.default_space_id}
             onSuccess={() => setShowForm(false)}
             onCancel={() => setShowForm(false)}
           />

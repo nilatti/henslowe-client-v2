@@ -70,7 +70,7 @@ export function SongsManager({ frenchScene, playSkeleton }: SongsManagerProps) {
           <p className="px-4 py-3 text-sm text-gray-500">No songs yet.</p>
         ) : (
           <ul>
-            {[...frenchScene.songs].sort((a, b) => a.position - b.position).map((song, i, arr) => (
+            {[...frenchScene.songs].sort((a, b) => (a.position ?? 0) - (b.position ?? 0)).map((song, i, arr) => (
               <SongItem
                 key={song.id}
                 song={song}

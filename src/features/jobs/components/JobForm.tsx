@@ -4,6 +4,7 @@ import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
 import { useCreateJob, useUpdateJob, productionJobsQueryOptions } from '../api/jobs'
 import { specializationsQueryOptions } from '../../specializations/queries'
 import { usersQueryOptions } from '../../users/api/users'
+import { productionSkeletonQueryOptions } from '../../productions/api/productions'
 import { AUDITIONER_SPECIALIZATION_ID } from '../../../utils/constants'
 import type { Job, JobWithDetails } from '../types/job'
 import { Button } from '../../../components/ui'
@@ -41,17 +42,32 @@ export function JobForm({
   const { user: currentUser } = useAuth()
   const isSuperAdmin = currentUser?.is_superadmin === true
   const isEditing = !!job
+  const { data: productionSkeleton } = useQuery({
+    ...productionSkeletonQueryOptions(productionId ?? 0),
+    enabled: !!productionId && !isEditing,
+  })
 
   const isSubscribed = currentUser?.subscription_status === 'active'
 
   const today = format(new Date(), 'yyyy-MM-dd')
 
+  function getPhaseDate(phaseId: number | null | undefined, field: 'start_date' | 'end_date'): string {
+    if (!phaseId || !productionSkeleton) return ''
+    const pp = productionSkeleton.production_phases?.find(p => p.phase_id === phaseId)
+    return pp?.[field] ?? ''
+  }
+
+  const resolvedSpecId = specializationId ?? 0
+  const resolvedSpec = specializations?.find(s => s.id === resolvedSpecId)
+  const defaultStart = isEditing ? (job?.start_date ?? today) : (getPhaseDate(resolvedSpec?.default_start_phase_id, 'start_date') || today)
+  const defaultEnd = isEditing ? (job?.end_date ?? '') : getPhaseDate(resolvedSpec?.default_end_phase_id, 'end_date')
+
   const form = useForm({
     defaultValues: {
       user_id: job?.user_id ?? 0,
-      specialization_id: job?.specialization_id ?? specializationId ?? 0,
-      start_date: job?.start_date ?? today,
-      end_date: job?.end_date ?? '',
+      specialization_id: resolvedSpecId,
+      start_date: defaultStart,
+      end_date: defaultEnd,
     },
     onSubmit: async ({ value }) => {
       const payload: Partial<Job> = {
@@ -72,6 +88,16 @@ export function JobForm({
   })
 
   const selectedSpecializationId = useStore(form.store, state => state.values.specialization_id)
+
+  function applyPhaseDefaults(specId: number) {
+    if (isEditing || !productionSkeleton) return
+    const spec = specializations.find(s => s.id === specId)
+    if (!spec) return
+    const start = getPhaseDate(spec.default_start_phase_id, 'start_date')
+    const end = getPhaseDate(spec.default_end_phase_id, 'end_date')
+    if (start) form.setFieldValue('start_date', start)
+    if (end) form.setFieldValue('end_date', end)
+  }
 
   const isAuditionerJob = selectedSpecializationId === AUDITIONER_SPECIALIZATION_ID ||
     specializationId === AUDITIONER_SPECIALIZATION_ID
@@ -121,7 +147,11 @@ export function JobForm({
               </label>
               <select
                 value={field.state.value}
-                onChange={e => field.handleChange(Number(e.target.value))}
+                onChange={e => {
+                  const id = Number(e.target.value)
+                  field.handleChange(id)
+                  applyPhaseDefaults(id)
+                }}
                 onBlur={field.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >

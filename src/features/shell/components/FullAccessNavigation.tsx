@@ -98,6 +98,9 @@ function NavLinks({ superAdmin, userName }: { superAdmin: boolean; userName: str
           <Link to="/specializations" className={linkClass} activeProps={{ className: activeClass }}>
             Specializations
           </Link>
+          <Link to="/phases" className={linkClass} activeProps={{ className: activeClass }}>
+            Phases
+          </Link>
         </>
       )}
       <Link to="/account" className={linkClass} activeProps={{ className: activeClass }}>

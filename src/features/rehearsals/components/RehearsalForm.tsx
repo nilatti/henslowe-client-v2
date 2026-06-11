@@ -10,6 +10,7 @@ interface RehearsalFormProps {
   productionId: number;
   theaterId: number;
   rehearsal?: RehearsalWithDetails;
+  defaultSpaceId?: number | null;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -22,6 +23,7 @@ export function RehearsalForm({
   productionId,
   theaterId,
   rehearsal,
+  defaultSpaceId,
   onSuccess,
   onCancel,
 }: RehearsalFormProps) {
@@ -40,7 +42,7 @@ export function RehearsalForm({
       end_time: rehearsal?.end_time ? toLocalInput(rehearsal.end_time) : now,
       title: rehearsal?.title ?? "",
       notes: rehearsal?.notes ?? "",
-      space_id: rehearsal?.space_id ?? null as number | null,
+      space_id: rehearsal?.space_id ?? defaultSpaceId ?? null as number | null,
     },
     onSubmit: async ({ value }) => {
       const payload = {

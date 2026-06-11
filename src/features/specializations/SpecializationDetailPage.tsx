@@ -4,6 +4,7 @@ import { useNavigate } from '@tanstack/react-router'
 import _ from 'lodash'
 import { useIsSuperAdmin } from '../../hooks/useUserRole'
 import { specializationQueryOptions, updateSpecializationFn, deleteSpecializationFn } from './queries'
+import { phasesQueryOptions } from '../phases/queries'
 import { Button, ConfirmDialog } from '../../components/ui'
 import { UserLink } from '../../utils/actorUtils'
 import type { SpecializationJob, SpecializationUser } from './types'
@@ -22,6 +23,7 @@ export function SpecializationDetailPage({ specializationId }: Props) {
   const navigate = useNavigate()
   const isSuperAdmin = useIsSuperAdmin()
   const { data: specialization } = useSuspenseQuery(specializationQueryOptions(specializationId))
+  const { data: phases } = useSuspenseQuery(phasesQueryOptions())
 
   const [editingTitle, setEditingTitle] = useState(false)
   const [editingDescription, setEditingDescription] = useState(false)
@@ -55,13 +57,15 @@ export function SpecializationDetailPage({ specializationId }: Props) {
     },
   })
 
-  function handleSave(overrides?: Partial<{ production_admin: boolean; theater_admin: boolean }>) {
+  function handleSave(overrides?: Partial<{ production_admin: boolean; theater_admin: boolean; default_start_phase_id: number | null; default_end_phase_id: number | null }>) {
     updateMutation.mutate({
       id: specializationId,
       title: titleInput,
       description: descriptionInput || null,
       production_admin: specialization.production_admin,
       theater_admin: specialization.theater_admin,
+      default_start_phase_id: specialization.default_start_phase_id,
+      default_end_phase_id: specialization.default_end_phase_id,
       ...overrides,
     })
   }
@@ -72,6 +76,14 @@ export function SpecializationDetailPage({ specializationId }: Props) {
 
   function toggleTheaterAdmin() {
     handleSave({ theater_admin: !specialization.theater_admin })
+  }
+
+  function setDefaultStartPhase(id: number | null) {
+    handleSave({ default_start_phase_id: id })
+  }
+
+  function setDefaultEndPhase(id: number | null) {
+    handleSave({ default_end_phase_id: id })
   }
 
   const users = getUniqueUsers(specialization.jobs)
@@ -180,6 +192,41 @@ export function SpecializationDetailPage({ specializationId }: Props) {
                 Theater admin
               </label>
             </div>
+            {phases.length > 0 && (
+              <div className="mt-4 space-y-3 border-t border-gray-100 pt-4">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Default job date phases</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Start phase</label>
+                    <select
+                      className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      value={specialization.default_start_phase_id ?? ''}
+                      onChange={e => setDefaultStartPhase(e.target.value ? Number(e.target.value) : null)}
+                      disabled={updateMutation.isPending}
+                    >
+                      <option value="">No default</option>
+                      {phases.map(p => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">End phase</label>
+                    <select
+                      className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      value={specialization.default_end_phase_id ?? ''}
+                      onChange={e => setDefaultEndPhase(e.target.value ? Number(e.target.value) : null)}
+                      disabled={updateMutation.isPending}
+                    >
+                      <option value="">No default</option>
+                      {phases.map(p => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
             {showDeleteConfirm && (
               <ConfirmDialog
                 message={`Delete "${specialization.title}"? This cannot be undone.`}

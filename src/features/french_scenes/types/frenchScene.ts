@@ -36,9 +36,9 @@ export interface Song {
   id: number
   french_scene_id: number
   title: string
-  position: number
+  position?: number
   characters: OnStageCharacter[]
-  character_groups: OnStageCharacter[]
+  character_groups?: OnStageCharacter[]
   created_at: string
   updated_at: string
 }

@@ -31,11 +31,14 @@ import { Route as AuthenticatedSpecializationsIndexRouteImport } from './routes/
 import { Route as AuthenticatedSpacesIndexRouteImport } from './routes/_authenticated/spaces/index'
 import { Route as AuthenticatedProductionsIndexRouteImport } from './routes/_authenticated/productions/index'
 import { Route as AuthenticatedPlaysIndexRouteImport } from './routes/_authenticated/plays/index'
+import { Route as AuthenticatedPhasesIndexRouteImport } from './routes/_authenticated/phases/index'
 import { Route as AuthenticatedAuthorsIndexRouteImport } from './routes/_authenticated/authors/index'
 import { Route as AuthenticatedUsersNewRouteImport } from './routes/_authenticated/users/new'
 import { Route as AuthenticatedTheatersNewRouteImport } from './routes/_authenticated/theaters/new'
 import { Route as AuthenticatedSpecializationsNewRouteImport } from './routes/_authenticated/specializations/new'
 import { Route as AuthenticatedSpecializationsSpecializationIdRouteImport } from './routes/_authenticated/specializations/$specializationId'
+import { Route as AuthenticatedPhasesNewRouteImport } from './routes/_authenticated/phases/new'
+import { Route as AuthenticatedPhasesPhaseIdRouteImport } from './routes/_authenticated/phases/$phaseId'
 import { Route as AuthenticatedUsersUserIdIndexRouteImport } from './routes/_authenticated/users/$userId/index'
 import { Route as AuthenticatedTheatersTheaterIdIndexRouteImport } from './routes/_authenticated/theaters/$theaterId/index'
 import { Route as AuthenticatedSpacesSpaceIdIndexRouteImport } from './routes/_authenticated/spaces/$spaceId/index'
@@ -167,6 +170,12 @@ const AuthenticatedPlaysIndexRoute = AuthenticatedPlaysIndexRouteImport.update({
   path: '/plays/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedPhasesIndexRoute =
+  AuthenticatedPhasesIndexRouteImport.update({
+    id: '/phases/',
+    path: '/phases/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAuthorsIndexRoute =
   AuthenticatedAuthorsIndexRouteImport.update({
     id: '/authors/',
@@ -194,6 +203,17 @@ const AuthenticatedSpecializationsSpecializationIdRoute =
   AuthenticatedSpecializationsSpecializationIdRouteImport.update({
     id: '/specializations/$specializationId',
     path: '/specializations/$specializationId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPhasesNewRoute = AuthenticatedPhasesNewRouteImport.update({
+  id: '/phases/new',
+  path: '/phases/new',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPhasesPhaseIdRoute =
+  AuthenticatedPhasesPhaseIdRouteImport.update({
+    id: '/phases/$phaseId',
+    path: '/phases/$phaseId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedUsersUserIdIndexRoute =
@@ -324,11 +344,14 @@ export interface FileRoutesByFullPath {
   '/free/part-scripts': typeof FreePartScriptsRoute
   '/free/word-cloud': typeof FreeWordCloudRoute
   '/free/': typeof FreeIndexRoute
+  '/phases/$phaseId': typeof AuthenticatedPhasesPhaseIdRoute
+  '/phases/new': typeof AuthenticatedPhasesNewRoute
   '/specializations/$specializationId': typeof AuthenticatedSpecializationsSpecializationIdRoute
   '/specializations/new': typeof AuthenticatedSpecializationsNewRoute
   '/theaters/new': typeof AuthenticatedTheatersNewRoute
   '/users/new': typeof AuthenticatedUsersNewRoute
   '/authors/': typeof AuthenticatedAuthorsIndexRoute
+  '/phases/': typeof AuthenticatedPhasesIndexRoute
   '/plays/': typeof AuthenticatedPlaysIndexRoute
   '/productions/': typeof AuthenticatedProductionsIndexRoute
   '/spaces/': typeof AuthenticatedSpacesIndexRoute
@@ -368,11 +391,14 @@ export interface FileRoutesByTo {
   '/free/part-scripts': typeof FreePartScriptsRoute
   '/free/word-cloud': typeof FreeWordCloudRoute
   '/free': typeof FreeIndexRoute
+  '/phases/$phaseId': typeof AuthenticatedPhasesPhaseIdRoute
+  '/phases/new': typeof AuthenticatedPhasesNewRoute
   '/specializations/$specializationId': typeof AuthenticatedSpecializationsSpecializationIdRoute
   '/specializations/new': typeof AuthenticatedSpecializationsNewRoute
   '/theaters/new': typeof AuthenticatedTheatersNewRoute
   '/users/new': typeof AuthenticatedUsersNewRoute
   '/authors': typeof AuthenticatedAuthorsIndexRoute
+  '/phases': typeof AuthenticatedPhasesIndexRoute
   '/plays': typeof AuthenticatedPlaysIndexRoute
   '/productions': typeof AuthenticatedProductionsIndexRoute
   '/spaces': typeof AuthenticatedSpacesIndexRoute
@@ -416,11 +442,14 @@ export interface FileRoutesById {
   '/free/part-scripts': typeof FreePartScriptsRoute
   '/free/word-cloud': typeof FreeWordCloudRoute
   '/free/': typeof FreeIndexRoute
+  '/_authenticated/phases/$phaseId': typeof AuthenticatedPhasesPhaseIdRoute
+  '/_authenticated/phases/new': typeof AuthenticatedPhasesNewRoute
   '/_authenticated/specializations/$specializationId': typeof AuthenticatedSpecializationsSpecializationIdRoute
   '/_authenticated/specializations/new': typeof AuthenticatedSpecializationsNewRoute
   '/_authenticated/theaters/new': typeof AuthenticatedTheatersNewRoute
   '/_authenticated/users/new': typeof AuthenticatedUsersNewRoute
   '/_authenticated/authors/': typeof AuthenticatedAuthorsIndexRoute
+  '/_authenticated/phases/': typeof AuthenticatedPhasesIndexRoute
   '/_authenticated/plays/': typeof AuthenticatedPlaysIndexRoute
   '/_authenticated/productions/': typeof AuthenticatedProductionsIndexRoute
   '/_authenticated/spaces/': typeof AuthenticatedSpacesIndexRoute
@@ -463,11 +492,14 @@ export interface FileRouteTypes {
     | '/free/part-scripts'
     | '/free/word-cloud'
     | '/free/'
+    | '/phases/$phaseId'
+    | '/phases/new'
     | '/specializations/$specializationId'
     | '/specializations/new'
     | '/theaters/new'
     | '/users/new'
     | '/authors/'
+    | '/phases/'
     | '/plays/'
     | '/productions/'
     | '/spaces/'
@@ -507,11 +539,14 @@ export interface FileRouteTypes {
     | '/free/part-scripts'
     | '/free/word-cloud'
     | '/free'
+    | '/phases/$phaseId'
+    | '/phases/new'
     | '/specializations/$specializationId'
     | '/specializations/new'
     | '/theaters/new'
     | '/users/new'
     | '/authors'
+    | '/phases'
     | '/plays'
     | '/productions'
     | '/spaces'
@@ -554,11 +589,14 @@ export interface FileRouteTypes {
     | '/free/part-scripts'
     | '/free/word-cloud'
     | '/free/'
+    | '/_authenticated/phases/$phaseId'
+    | '/_authenticated/phases/new'
     | '/_authenticated/specializations/$specializationId'
     | '/_authenticated/specializations/new'
     | '/_authenticated/theaters/new'
     | '/_authenticated/users/new'
     | '/_authenticated/authors/'
+    | '/_authenticated/phases/'
     | '/_authenticated/plays/'
     | '/_authenticated/productions/'
     | '/_authenticated/spaces/'
@@ -750,6 +788,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlaysIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/phases/': {
+      id: '/_authenticated/phases/'
+      path: '/phases'
+      fullPath: '/phases/'
+      preLoaderRoute: typeof AuthenticatedPhasesIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/authors/': {
       id: '/_authenticated/authors/'
       path: '/authors'
@@ -783,6 +828,20 @@ declare module '@tanstack/react-router' {
       path: '/specializations/$specializationId'
       fullPath: '/specializations/$specializationId'
       preLoaderRoute: typeof AuthenticatedSpecializationsSpecializationIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/phases/new': {
+      id: '/_authenticated/phases/new'
+      path: '/phases/new'
+      fullPath: '/phases/new'
+      preLoaderRoute: typeof AuthenticatedPhasesNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/phases/$phaseId': {
+      id: '/_authenticated/phases/$phaseId'
+      path: '/phases/$phaseId'
+      fullPath: '/phases/$phaseId'
+      preLoaderRoute: typeof AuthenticatedPhasesPhaseIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/users/$userId/': {
@@ -916,11 +975,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedPhasesPhaseIdRoute: typeof AuthenticatedPhasesPhaseIdRoute
+  AuthenticatedPhasesNewRoute: typeof AuthenticatedPhasesNewRoute
   AuthenticatedSpecializationsSpecializationIdRoute: typeof AuthenticatedSpecializationsSpecializationIdRoute
   AuthenticatedSpecializationsNewRoute: typeof AuthenticatedSpecializationsNewRoute
   AuthenticatedTheatersNewRoute: typeof AuthenticatedTheatersNewRoute
   AuthenticatedUsersNewRoute: typeof AuthenticatedUsersNewRoute
   AuthenticatedAuthorsIndexRoute: typeof AuthenticatedAuthorsIndexRoute
+  AuthenticatedPhasesIndexRoute: typeof AuthenticatedPhasesIndexRoute
   AuthenticatedPlaysIndexRoute: typeof AuthenticatedPlaysIndexRoute
   AuthenticatedProductionsIndexRoute: typeof AuthenticatedProductionsIndexRoute
   AuthenticatedSpacesIndexRoute: typeof AuthenticatedSpacesIndexRoute
@@ -949,12 +1011,15 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedPhasesPhaseIdRoute: AuthenticatedPhasesPhaseIdRoute,
+  AuthenticatedPhasesNewRoute: AuthenticatedPhasesNewRoute,
   AuthenticatedSpecializationsSpecializationIdRoute:
     AuthenticatedSpecializationsSpecializationIdRoute,
   AuthenticatedSpecializationsNewRoute: AuthenticatedSpecializationsNewRoute,
   AuthenticatedTheatersNewRoute: AuthenticatedTheatersNewRoute,
   AuthenticatedUsersNewRoute: AuthenticatedUsersNewRoute,
   AuthenticatedAuthorsIndexRoute: AuthenticatedAuthorsIndexRoute,
+  AuthenticatedPhasesIndexRoute: AuthenticatedPhasesIndexRoute,
   AuthenticatedPlaysIndexRoute: AuthenticatedPlaysIndexRoute,
   AuthenticatedProductionsIndexRoute: AuthenticatedProductionsIndexRoute,
   AuthenticatedSpacesIndexRoute: AuthenticatedSpacesIndexRoute,

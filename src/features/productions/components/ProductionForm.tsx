@@ -1,11 +1,13 @@
 import { useForm } from '@tanstack/react-form'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
 import { canonicalPlaysQueryOptions } from '../../plays/api/plays'
-import { theatersQueryOptions } from '../../theaters/api/theaters'
+import { theatersQueryOptions, theaterSkeletonQueryOptions } from '../../theaters/api/theaters'
 import { useCreateProduction, useUpdateProduction } from '../api/productions'
+import { productionJobsQueryOptions } from '../../jobs/api/jobs'
 import type { Production } from '../types/production'
 import { Button } from '../../../components/ui'
 import { useAdminTheaterIds } from '../../../hooks/useUserRole'
+import { buildUserName } from '../../../utils/actorUtils'
 
 interface ProductionFormProps {
   production?: Production
@@ -24,6 +26,11 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
   const create = useCreateProduction()
   const update = useUpdateProduction(production?.id ?? 0)
   const isEditing = !!production
+  const { data: theater } = useQuery(theaterSkeletonQueryOptions(production?.theater_id ?? 0))
+  const { data: productionJobs } = useQuery({
+    ...productionJobsQueryOptions(production?.id ?? 0),
+    enabled: isEditing,
+  })
 
   const form = useForm({
     defaultValues: {
@@ -38,6 +45,8 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
       lines_per_minute: production?.lines_per_minute
         ? String(production.lines_per_minute)
         : '',
+      default_space_id: production?.default_space_id ?? null as number | null,
+      default_call_user_ids: production?.default_call_users?.map(u => u.id) ?? [] as number[],
     },
     onSubmit: async ({ value }) => {
       const data: Record<string, unknown> = {
@@ -50,6 +59,8 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
         data.theater_id = value.theater_id
       }
       if (isEditing) {
+        data.default_space_id = value.default_space_id
+        data.default_call_user_ids = value.default_call_user_ids
         await update.mutateAsync(data)
         onSuccess()
       } else {
@@ -175,6 +186,73 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
           </div>
         )}
       </form.Field>
+
+      {isEditing && theater && theater.spaces.length > 0 && (
+        <form.Field name="default_space_id">
+          {field => (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Default location
+              </label>
+              <select
+                value={field.state.value ?? ''}
+                onChange={e => field.handleChange(e.target.value ? Number(e.target.value) : null)}
+                onBlur={field.handleBlur}
+                className={inputClass}
+              >
+                <option value="">No default</option>
+                {theater.spaces.map(s => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </form.Field>
+      )}
+
+      {isEditing && productionJobs && productionJobs.length > 0 && (
+        <form.Field name="default_call_user_ids">
+          {field => {
+            const allUsers = Array.from(
+              new Map(
+                productionJobs
+                  .filter(j => j.user && !j.user.fake)
+                  .map(j => [j.user!.id, j.user!])
+              ).values()
+            )
+            return (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Default calls
+                </label>
+                <div className="border border-gray-300 rounded-md max-h-48 overflow-y-auto">
+                  {allUsers.map(u => (
+                    <label
+                      key={u.id}
+                      className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 cursor-pointer text-sm"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={field.state.value.includes(u.id)}
+                        onChange={e => {
+                          if (e.target.checked) {
+                            field.handleChange([...field.state.value, u.id])
+                          } else {
+                            field.handleChange(field.state.value.filter((id: number) => id !== u.id))
+                          }
+                        }}
+                      />
+                      {buildUserName(u)}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )
+          }}
+        </form.Field>
+      )}
 
       <div className="flex gap-3 justify-end pt-2">
         <Button variant="secondary" type="button" onClick={onCancel}>
