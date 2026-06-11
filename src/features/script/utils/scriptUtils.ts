@@ -28,16 +28,22 @@ export function sortScriptItems<
   T extends { number: string | null | undefined },
 >(items: T[]): T[] {
   return [...items].sort((a, b) => {
-    const aNum = parseLineNumber(a.number ?? '')
-    const bNum = parseLineNumber(b.number ?? '')
-    return aNum - bNum
+    const aSegs = parseLineNumber(a.number ?? '')
+    const bSegs = parseLineNumber(b.number ?? '')
+    const len = Math.max(aSegs.length, bSegs.length)
+    for (let i = 0; i < len; i++) {
+      // Missing trailing segments sort before 0, placing e.g. "4.1.16"
+      // before "SD 4.1.16.0" (which is a sub-position of that line).
+      const diff = (i < aSegs.length ? aSegs[i] : -1) - (i < bSegs.length ? bSegs[i] : -1)
+      if (diff !== 0) return diff
+    }
+    return 0
   })
 }
 
-function parseLineNumber(num: string): number {
-  // Strip SD/SC prefix, then parse the dotted number (e.g. "1.2.3" -> 1.2)
+function parseLineNumber(num: string): number[] {
   const stripped = num.replace(/^(SD|SC)\s*/, '')
-  return parseFloat(stripped) || 0
+  return stripped.split('.').map(n => parseInt(n, 10) || 0)
 }
 
 export function buildDiff(
