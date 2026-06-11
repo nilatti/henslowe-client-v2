@@ -105,10 +105,23 @@ export function useCreateSong(frenchSceneId: number) {
 export function useUpdateSong(frenchSceneId: number) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (data: { id: number; title?: string; character_ids?: number[] }): Promise<Song> =>
+    mutationFn: (data: { id: number; title?: string; character_ids?: number[]; character_group_ids?: number[] }): Promise<Song> =>
       api.put(`/api/v1/songs/${data.id}`, { song: data }).then(r => r.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['french_scenes', frenchSceneId] })
+    },
+  })
+}
+
+export function useMoveSong(frenchSceneId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { id: number; direction: 'up' | 'down' }): Promise<Song[]> =>
+      api.patch(`/api/v1/songs/${data.id}/move`, { direction: data.direction }).then(r => r.data),
+    onSuccess: (songs) => {
+      qc.setQueryData(['french_scenes', frenchSceneId], (old: any) =>
+        old ? { ...old, songs } : old
+      )
     },
   })
 }

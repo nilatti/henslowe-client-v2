@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useCreateSong } from '../api/frenchScenes'
+import { useCreateSong, useMoveSong } from '../api/frenchScenes'
 import { SongItem } from './SongItem'
 import type { FrenchSceneDetail } from '../types/frenchScene'
 import type { PlaySkeleton } from '../../plays/types/play'
@@ -13,6 +13,7 @@ interface SongsManagerProps {
 
 export function SongsManager({ frenchScene, playSkeleton }: SongsManagerProps) {
   const createSong = useCreateSong(frenchScene.id)
+  const moveSong = useMoveSong(frenchScene.id)
   const isAdmin = useIsPlayAdmin(playSkeleton.id)
   const [showForm, setShowForm] = useState(false)
   const [newTitle, setNewTitle] = useState('')
@@ -69,13 +70,16 @@ export function SongsManager({ frenchScene, playSkeleton }: SongsManagerProps) {
           <p className="px-4 py-3 text-sm text-gray-500">No songs yet.</p>
         ) : (
           <ul>
-            {frenchScene.songs.map(song => (
+            {[...frenchScene.songs].sort((a, b) => a.position - b.position).map((song, i, arr) => (
               <SongItem
                 key={song.id}
                 song={song}
                 frenchSceneId={frenchScene.id}
                 playSkeleton={playSkeleton}
                 isAdmin={isAdmin}
+                isFirst={i === 0}
+                isLast={i === arr.length - 1}
+                onMove={dir => moveSong.mutate({ id: song.id, direction: dir })}
               />
             ))}
           </ul>

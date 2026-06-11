@@ -3,18 +3,31 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 const mockCreateAsync = vi.fn().mockResolvedValue(undefined)
+const mockMoveMutate = vi.fn()
 const mockIsPlayAdmin = vi.fn().mockReturnValue(true)
 
 vi.mock('../api/frenchScenes', () => ({
   useCreateSong: () => ({ mutateAsync: mockCreateAsync, isPending: false }),
+  useMoveSong: () => ({ mutate: mockMoveMutate }),
 }))
 
 vi.mock('../../../hooks/useUserRole', () => ({
   useIsPlayAdmin: () => mockIsPlayAdmin(),
 }))
 
+// Expose isFirst/isLast/onMove so ordering and move tests can observe them
 vi.mock('./SongItem', () => ({
-  SongItem: ({ song }: { song: { title: string } }) => <li>{song.title}</li>,
+  SongItem: ({ song, isFirst, isLast, onMove }: any) => (
+    <li>
+      {song.title}
+      {onMove && (
+        <>
+          <button disabled={isFirst} onClick={() => onMove('up')} aria-label={`up-${song.title}`}>▲</button>
+          <button disabled={isLast} onClick={() => onMove('down')} aria-label={`down-${song.title}`}>▼</button>
+        </>
+      )}
+    </li>
+  ),
 }))
 
 import { SongsManager } from './SongsManager'
@@ -45,8 +58,13 @@ function renderManager(songs: FrenchSceneDetail['songs'] = []) {
   render(<SongsManager frenchScene={makeFrenchScene(songs)} playSkeleton={playSkeleton} />)
 }
 
+const song1 = { id: 1, french_scene_id: 1, title: 'Consider Yourself', position: 1, characters: [], character_groups: [], created_at: '', updated_at: '' }
+const song2 = { id: 2, french_scene_id: 1, title: 'Food, Glorious Food', position: 2, characters: [], character_groups: [], created_at: '', updated_at: '' }
+const song3 = { id: 3, french_scene_id: 1, title: 'Oliver!', position: 3, characters: [], character_groups: [], created_at: '', updated_at: '' }
+
 beforeEach(() => {
   mockCreateAsync.mockReset().mockResolvedValue(undefined)
+  mockMoveMutate.mockReset()
   mockIsPlayAdmin.mockReturnValue(true)
 })
 
@@ -62,13 +80,46 @@ describe('SongsManager — display', () => {
   })
 
   it('renders a SongItem for each song', () => {
-    renderManager([
-      { id: 1, french_scene_id: 1, title: 'Consider Yourself', characters: [], created_at: '', updated_at: '' },
-      { id: 2, french_scene_id: 1, title: 'Food, Glorious Food', characters: [], created_at: '', updated_at: '' },
-    ])
+    renderManager([song1, song2])
     expect(screen.getByText('Consider Yourself')).toBeInTheDocument()
     expect(screen.getByText('Food, Glorious Food')).toBeInTheDocument()
     expect(screen.getByText('Songs (2)')).toBeInTheDocument()
+  })
+})
+
+describe('SongsManager — ordering', () => {
+  it('renders songs sorted by position, not insertion order', () => {
+    renderManager([song3, song1, song2])
+    const items = screen.getAllByRole('listitem')
+    expect(items[0]).toHaveTextContent('Consider Yourself')
+    expect(items[1]).toHaveTextContent('Food, Glorious Food')
+    expect(items[2]).toHaveTextContent('Oliver!')
+  })
+
+  it('disables the up button for the first song', () => {
+    renderManager([song1, song2])
+    expect(screen.getByRole('button', { name: 'up-Consider Yourself' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'up-Food, Glorious Food' })).not.toBeDisabled()
+  })
+
+  it('disables the down button for the last song', () => {
+    renderManager([song1, song2])
+    expect(screen.getByRole('button', { name: 'down-Food, Glorious Food' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'down-Consider Yourself' })).not.toBeDisabled()
+  })
+
+  it('calls moveSong.mutate with the song id and direction "up"', async () => {
+    const user = userEvent.setup()
+    renderManager([song1, song2])
+    await user.click(screen.getByRole('button', { name: 'up-Food, Glorious Food' }))
+    expect(mockMoveMutate).toHaveBeenCalledWith({ id: 2, direction: 'up' })
+  })
+
+  it('calls moveSong.mutate with the song id and direction "down"', async () => {
+    const user = userEvent.setup()
+    renderManager([song1, song2])
+    await user.click(screen.getByRole('button', { name: 'down-Consider Yourself' }))
+    expect(mockMoveMutate).toHaveBeenCalledWith({ id: 1, direction: 'down' })
   })
 })
 
