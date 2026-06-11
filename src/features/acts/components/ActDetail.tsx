@@ -84,6 +84,14 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
                     </dd>
                   </div>
                 )}
+                {act.summary && (
+                  <div>
+                    <dt className="font-medium text-gray-700">Summary</dt>
+                    <dd className="text-gray-600 mt-1 leading-relaxed">
+                      {act.summary}
+                    </dd>
+                  </div>
+                )}
                 {act.start_page && (
                   <div>
                     <dt className="font-medium text-gray-700">Pages</dt>

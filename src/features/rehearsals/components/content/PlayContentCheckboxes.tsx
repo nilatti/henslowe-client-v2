@@ -1,4 +1,5 @@
 import type { TextUnitWithOnStages } from '../../api/rehearsals'
+import { minutesPerPage } from '../../utils/rehearsalMetrics'
 
 interface PlayContentCheckboxesProps {
   playContent: TextUnitWithOnStages[]
@@ -44,6 +45,14 @@ export function PlayContentCheckboxes({
                 Called: {item.furtherInfo}
               </div>
             )}
+            {(() => {
+              const mpp = minutesPerPage(item)
+              return mpp != null ? (
+                <div className="text-xs text-gray-400 mt-0.5">
+                  {mpp.toFixed(1)} min/pg
+                </div>
+              ) : null
+            })()}
             {item.isRecommended === false &&
               (item.reasonsForRecommendation?.unavailableUsers?.length ?? 0) > 0 && (
                 <div className="text-xs text-amber-600 mt-0.5">

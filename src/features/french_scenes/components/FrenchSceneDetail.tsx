@@ -119,7 +119,7 @@ export function FrenchSceneDetail({
                 {frenchScene.summary && (
                   <div>
                     <dt className="font-medium text-gray-700">Summary</dt>
-                    <dd className="text-gray-600 mt-1 leading-relaxed">
+                    <dd className="text-gray-600 mt-1 leading-relaxed whitespace-pre-wrap">
                       {frenchScene.summary}
                     </dd>
                   </div>

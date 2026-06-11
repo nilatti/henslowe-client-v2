@@ -21,6 +21,7 @@ export function OnStagesManager({
 
   const [showForm, setShowForm] = useState(false);
   const [nonspeaking, setNonspeaking] = useState(false);
+  const [offstage, setOffstage] = useState(false);
 
   const onStageCharacterIds = new Set(
     frenchScene.on_stages.map((os) => os.character_id).filter(Boolean),
@@ -38,8 +39,10 @@ export function OnStagesManager({
       character_id: type === "character" ? id : null,
       character_group_id: type === "character_group" ? id : null,
       nonspeaking,
+      offstage,
     });
     setNonspeaking(false);
+    setOffstage(false);
   };
 
   const sortedOnStages = [...frenchScene.on_stages].sort((a, b) => {
@@ -80,6 +83,16 @@ export function OnStagesManager({
                 className="rounded border-gray-300"
               />
               Nonspeaking in this French scene
+            </label>
+
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={offstage}
+                onChange={(e) => setOffstage(e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              Offstage in this French scene
             </label>
 
             <div className="flex justify-end">

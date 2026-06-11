@@ -155,6 +155,7 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
             <ProductionJobs
               productionId={productionId}
               theaterId={production.theater?.id ?? 0}
+              playId={production.play?.id ?? 0}
               productionStartDate={production.start_date}
               productionEndDate={production.end_date}
             />

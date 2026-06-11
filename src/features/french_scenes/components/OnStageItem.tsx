@@ -30,6 +30,13 @@ export function OnStageItem({
     })
   }
 
+  const handleToggleOffstage = async () => {
+    await updateOnStage.mutateAsync({
+      id: onStage.id,
+      offstage: !onStage.offstage,
+    })
+  }
+
   return (
     <li className="flex items-center justify-between px-4 py-2 text-sm border-b border-gray-100 last:border-0 hover:bg-gray-50">
       <div className="flex items-center gap-3">
@@ -57,6 +64,22 @@ export function OnStageItem({
           <span className="text-xs text-gray-400">
             {onStage.nonspeaking ? 'Nonspeaking' : 'Speaking'}
           </span>
+        )}
+        {isAdmin && (
+          <button
+            onClick={handleToggleOffstage}
+            className={`text-xs px-2 py-1 rounded-full border transition-colors ${
+              onStage.offstage
+                ? 'border-gray-300 text-gray-500 hover:border-amber-400 hover:text-amber-600'
+                : 'border-amber-400 text-amber-600 hover:border-gray-300 hover:text-gray-500'
+            }`}
+            title="Toggle onstage/offstage"
+          >
+            {onStage.offstage ? 'Offstage' : 'Onstage'}
+          </button>
+        )}
+        {!isAdmin && onStage.offstage && (
+          <span className="text-xs text-gray-400">Offstage</span>
         )}
         {isAdmin && (
           <Button

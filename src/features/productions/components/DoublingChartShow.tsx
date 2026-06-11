@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { Link } from '@tanstack/react-router'
 import {
   filterEmptyContent,
   getFrenchScenesFromPlay,
@@ -9,14 +10,18 @@ import {
 import { buildUserName } from '../../../utils/actorUtils'
 import type { User } from '../../../utils/actorUtils'
 import type { JobWithDetails } from '../../jobs/types/job'
+import { Button } from '../../../components/ui'
+import { downloadCsv, slugify } from '../../../utils/csvUtils'
 
 interface ChartOnStage {
   character_id: number
   nonspeaking: boolean
+  offstage: boolean
   character?: { id: number; name: string } | null
 }
 
 interface ChartFrenchScene {
+  id: number
   on_stages?: ChartOnStage[]
   pretty_name?: string
   original_line_count?: number
@@ -24,6 +29,7 @@ interface ChartFrenchScene {
 }
 
 interface ChartScene {
+  id: number
   french_scenes: ChartFrenchScene[]
   original_line_count?: number
   new_line_count?: number
@@ -31,6 +37,7 @@ interface ChartScene {
 }
 
 interface ChartAct {
+  id: number
   number: number
   scenes: ChartScene[]
   original_line_count?: number
@@ -48,6 +55,18 @@ interface DoublingChartShowProps {
   play: ChartPlay
   castings: JobWithDetails[]
   actors: User[]
+}
+
+interface CharacterCell {
+  name: string
+  id?: number
+  nonspeaking: boolean
+  offstage: boolean
+}
+
+interface BlockCell {
+  characters: CharacterCell[]
+  doublingProblem: boolean
 }
 
 export function DoublingChartShow({ level, play, castings, actors }: DoublingChartShowProps) {
@@ -84,72 +103,141 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
     return blocks
   }
 
-  function generateColumns(): React.ReactNode[] {
+  function getColumnLabels(): string[] {
     const acts = filterEmptyContent(play.acts) as unknown as ChartAct[]
     if (level === 'act') {
-      return acts.map(act => (
-        <th key={crypto.randomUUID()} className="border border-gray-400 px-2 py-2 text-sm font-bold text-left bg-white">
-          Act {act.number}
-        </th>
-      ))
+      return acts.map(act => `Act ${act.number}`)
     } else if (level === 'scene') {
       const scenes = getScenesFromPlay(play) as unknown as ChartScene[]
-      return (filterEmptyContent(scenes) as unknown as ChartScene[]).map(scene => (
-        <th key={crypto.randomUUID()} className="border border-gray-400 px-2 py-2 text-sm font-bold text-left bg-white">
-          {scene.pretty_name ?? ''}
-        </th>
-      ))
+      return (filterEmptyContent(scenes) as unknown as ChartScene[]).map(s => s.pretty_name ?? '')
     } else {
       const fss = getFrenchScenesFromPlay(play) as unknown as ChartFrenchScene[]
-      return fss.map(fs => (
-        <th key={crypto.randomUUID()} className="border border-gray-400 px-2 py-2 text-sm font-bold text-left bg-white" style={{ minWidth: '70px' }}>
-          {fs.pretty_name ?? ''}
-        </th>
-      ))
+      return fss.map(fs => fs.pretty_name ?? '')
     }
   }
 
-  function generateRow(actor: User): React.ReactNode {
-    const blocks = getOnStages()
+  function generateColumns(): React.ReactNode[] {
+    const acts = filterEmptyContent(play.acts) as unknown as ChartAct[]
+    const thClass = 'border border-gray-400 px-2 py-2 text-sm font-bold text-left bg-white'
+    const linkClass = 'text-blue-600 hover:text-blue-800 hover:underline'
+
+    if (level === 'act') {
+      return acts.map(act => (
+        <th key={act.id} className={thClass} style={{ minWidth: '70px' }}>
+          <Link
+            to="/plays/$playId/acts/$actId"
+            params={{ playId: String(play.id), actId: String(act.id) }}
+            className={linkClass}
+          >
+            Act {act.number}
+          </Link>
+        </th>
+      ))
+    } else if (level === 'scene') {
+      return acts.flatMap(act => {
+        const scenes = filterEmptyContent(act.scenes) as unknown as ChartScene[]
+        return scenes.map(scene => (
+          <th key={scene.id} className={thClass} style={{ minWidth: '70px' }}>
+            <Link
+              to="/plays/$playId/acts/$actId/scenes/$sceneId"
+              params={{ playId: String(play.id), actId: String(act.id), sceneId: String(scene.id) }}
+              className={linkClass}
+            >
+              {scene.pretty_name ?? ''}
+            </Link>
+          </th>
+        ))
+      })
+    } else {
+      return acts.flatMap(act => {
+        const scenes = filterEmptyContent(act.scenes) as unknown as ChartScene[]
+        return scenes.flatMap(scene =>
+          scene.french_scenes.map(fs => (
+            <th key={fs.id} className={thClass} style={{ minWidth: '70px' }}>
+              <Link
+                to="/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId"
+                params={{ playId: String(play.id), actId: String(act.id), sceneId: String(scene.id), frenchSceneId: String(fs.id) }}
+                className={linkClass}
+              >
+                {fs.pretty_name ?? ''}
+              </Link>
+            </th>
+          ))
+        )
+      })
+    }
+  }
+
+  function getActorBlockCells(actor: User, blocks: ChartOnStage[][]): BlockCell[] {
     const actorCharacterIds = castings
       .filter(c => c.user_id === actor.id)
       .map(c => c.character_id)
       .filter((id): id is number => id !== null)
 
-    const rowData = blocks.map(block => {
-      const blockCharacters: ChartOnStage[] = []
-      block.forEach(onStage => {
-        if (_.includes(actorCharacterIds, onStage.character_id)) {
-          blockCharacters.push(onStage)
-        }
-      })
-      const uniqBlockCharacters = _.uniqBy(blockCharacters, os => os.character?.id)
-      const names = _.map(uniqBlockCharacters, os =>
-        os.nonspeaking ? `(${os.character?.name ?? ''})` : (os.character?.name ?? '')
+    return blocks.map(block => {
+      const uniqChars = _.uniqBy(
+        block.filter(os => _.includes(actorCharacterIds, os.character_id)),
+        os => os.character?.id,
       )
-      const doublingProblem = uniqBlockCharacters.length > 1
-
-      return (
-        <td
-          key={crypto.randomUUID()}
-          className={`border border-gray-400 px-2 py-1 text-xs break-words ${
-            doublingProblem ? 'bg-orange-400 text-white font-medium' : ''
-          }`}
-        >
-          {_.join(names, ', ')}
-        </td>
-      )
+      return {
+        characters: uniqChars.map(os => ({
+          name: os.character?.name ?? '',
+          id: os.character?.id,
+          nonspeaking: os.nonspeaking,
+          offstage: os.offstage,
+        })),
+        doublingProblem: uniqChars.length > 1,
+      }
     })
+  }
+
+  function renderCharacterLink(ch: CharacterCell): React.ReactNode {
+    const nameEl = ch.id ? (
+      <Link
+        to="/plays/$playId/characters/$characterId"
+        params={{ playId: String(play.id), characterId: String(ch.id) }}
+        className="hover:underline"
+      >
+        {ch.name}
+      </Link>
+    ) : ch.name
+
+    return (ch.nonspeaking || ch.offstage) ? <>({nameEl})</> : nameEl
+  }
+
+  function generateRow(actor: User): React.ReactNode {
+    const blocks = getOnStages()
+    const cells = getActorBlockCells(actor, blocks)
 
     return (
-      <tr key={crypto.randomUUID()} className="odd:bg-white even:bg-teal-50 hover:bg-blue-50 transition-colors">
+      <tr key={actor.id} className="odd:bg-white even:bg-teal-50 hover:bg-blue-50 transition-colors">
         <td
           className="border border-gray-400 px-2 py-1 text-sm font-medium sticky left-0 bg-inherit z-10"
           style={{ width: '220px', minWidth: '220px' }}
         >
-          {buildUserName(actor)}
+          <Link
+            to="/users/$userId"
+            params={{ userId: String(actor.id) }}
+            className="text-blue-600 hover:text-blue-800 hover:underline"
+          >
+            {buildUserName(actor)}
+          </Link>
         </td>
-        {rowData}
+        {cells.map(({ characters, doublingProblem }, i) => (
+          <td
+            key={i}
+            className={`border border-gray-400 px-2 py-1 text-xs break-words ${
+              doublingProblem ? 'bg-orange-400 text-white font-medium' : ''
+            }`}
+          >
+            {characters.map((ch, j) => (
+              <span key={ch.id ?? j}>
+                {j > 0 && ', '}
+                {renderCharacterLink(ch)}
+              </span>
+            ))}
+          </td>
+        ))}
       </tr>
     )
   }
@@ -161,25 +249,33 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
       .map(c => c.character_id)
       .filter((id): id is number => id !== null)
 
-    const rowData = blocks.map(block => {
-      const blockChars: ChartOnStage[] = []
-      block.forEach(onStage => {
-        if (_.includes(uncastCharacterIds, onStage.character_id)) {
-          blockChars.push(onStage)
-        }
-      })
-      const uniqChars = _.uniqBy(blockChars, os => os.character?.id)
-      const names = _.map(uniqChars, os => os.character?.name ?? '')
-
+    const rowData = blocks.map((block, i) => {
+      const uniqChars = _.uniqBy(
+        block.filter(os => _.includes(uncastCharacterIds, os.character_id)),
+        os => os.character?.id,
+      )
       return (
-        <td key={crypto.randomUUID()} className="border border-gray-400 px-2 py-1 text-xs break-words">
-          {_.join(names, ', ')}
+        <td key={i} className="border border-gray-400 px-2 py-1 text-xs break-words">
+          {uniqChars.map((os, j) => (
+            <span key={os.character?.id ?? j}>
+              {j > 0 && ', '}
+              {os.character?.id ? (
+                <Link
+                  to="/plays/$playId/characters/$characterId"
+                  params={{ playId: String(play.id), characterId: String(os.character.id) }}
+                  className="hover:underline"
+                >
+                  {os.character.name}
+                </Link>
+              ) : (os.character?.name ?? '')}
+            </span>
+          ))}
         </td>
       )
     })
 
     return (
-      <tr key={crypto.randomUUID()} className="odd:bg-white even:bg-teal-50 border-t-2 border-gray-400">
+      <tr key="uncast" className="odd:bg-white even:bg-teal-50 border-t-2 border-gray-400">
         <td
           className="border border-gray-400 px-2 py-1 text-sm font-medium italic sticky left-0 bg-inherit z-10"
           style={{ width: '220px', minWidth: '220px' }}
@@ -191,31 +287,77 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
     )
   }
 
+  function generateCsvRows(): string[][] {
+    const blocks = getOnStages()
+    const columnLabels = getColumnLabels()
+    const header = ['Actor', ...columnLabels]
+
+    const actorRows = actors.map(actor => {
+      const cells = getActorBlockCells(actor, blocks)
+      return [
+        buildUserName(actor),
+        ...cells.map(c =>
+          _.join(
+            c.characters.map(ch => (ch.nonspeaking || ch.offstage) ? `(${ch.name})` : ch.name),
+            ', ',
+          )
+        ),
+      ]
+    })
+
+    const uncastCharacterIds = castings
+      .filter(c => c.character && !c.character.name.match(/Could Not Find Character/) && !c.user_id)
+      .map(c => c.character_id)
+      .filter((id): id is number => id !== null)
+
+    const uncastCells = blocks.map(block => {
+      const uniqChars = _.uniqBy(
+        block.filter(os => _.includes(uncastCharacterIds, os.character_id)),
+        os => os.character?.id,
+      )
+      return _.join(uniqChars.map(os => os.character?.name ?? ''), ', ')
+    })
+
+    return [header, ...actorRows, ['Still to cast', ...uncastCells]]
+  }
+
+  function handleDownload() {
+    const levelLabel = level === 'act' ? 'acts' : level === 'scene' ? 'scenes' : 'french-scenes'
+    downloadCsv(generateCsvRows(), `${slugify(play.title)}-doubling-chart-${levelLabel}.csv`)
+  }
+
   return (
-    <div className="w-full overflow-x-auto">
-      <table
-        className="border-collapse w-full"
-        style={{
-          width: tableWidth,
-          tableLayout: 'auto',
-        }}
-      >
-        <thead>
-          <tr>
-            <th
-              className="border border-gray-400 px-2 py-2 text-sm font-bold text-left bg-white sticky left-0 z-10"
-              style={{ width: '220px', minWidth: '220px' }}
-            >
-              Actor
-            </th>
-            {generateColumns()}
-          </tr>
-        </thead>
-        <tbody>
-          {actors.map(actor => generateRow(actor))}
-          {generateUncastRow()}
-        </tbody>
-      </table>
+    <div>
+      <div className="flex justify-end mb-2">
+        <Button variant="secondary" className="text-xs px-3 py-1.5" onClick={handleDownload}>
+          Download CSV
+        </Button>
+      </div>
+      <div className="w-full overflow-x-auto">
+        <table
+          className="border-collapse w-full"
+          style={{
+            width: tableWidth,
+            tableLayout: 'auto',
+          }}
+        >
+          <thead>
+            <tr>
+              <th
+                className="border border-gray-400 px-2 py-2 text-sm font-bold text-left bg-white sticky left-0 z-10"
+                style={{ width: '220px', minWidth: '220px' }}
+              >
+                Actor
+              </th>
+              {generateColumns()}
+            </tr>
+          </thead>
+          <tbody>
+            {actors.map(actor => generateRow(actor))}
+            {generateUncastRow()}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

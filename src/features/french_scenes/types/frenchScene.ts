@@ -26,6 +26,7 @@ export interface OnStage {
   category: string | null
   description: string | null
   nonspeaking: boolean
+  offstage: boolean
   character?: OnStageCharacter | null
   character_group?: OnStageCharacter | null
   user?: { id: number, first_name: string, last_name: string } | null

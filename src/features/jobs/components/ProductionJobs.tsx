@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { productionJobsQueryOptions } from "../api/jobs";
+import { playSkeletonQueryOptions } from "../../plays/api/plays";
 import { CastingRow } from "./CastingRow";
+import { CharacterGroupCastingSection } from "./CharacterGroupCastingSection";
 import { AuditionersList } from "./AuditionersList";
 import { StaffJobsList } from "./StaffJobsList";
 import { FakeActorsPanel } from "./FakeActorsPanel";
@@ -15,11 +17,13 @@ import {
   getCastings,
   getStaffJobs,
   getActorsAndAuditioners,
+  getAuditioners,
 } from "../utils/jobUtils";
 
 interface CastListProps {
   productionId: number;
   theaterId: number;
+  playId: number;
   productionStartDate: string | null;
   productionEndDate: string | null;
 }
@@ -27,12 +31,16 @@ interface CastListProps {
 export function ProductionJobs({
   productionId,
   theaterId,
+  playId,
   productionStartDate,
   productionEndDate,
 }: CastListProps) {
   const invalidateKey = ["jobs", { productionId }];
   const { data: jobs } = useSuspenseQuery(
     productionJobsQueryOptions(productionId),
+  );
+  const { data: playSkeleton } = useSuspenseQuery(
+    playSkeletonQueryOptions(playId),
   );
   const role = useUserRoleForProduction(productionId, theaterId);
   const isSuperAdmin = useIsSuperAdmin();
@@ -44,6 +52,8 @@ export function ProductionJobs({
   const castings = getCastings(jobs);
   const staffJobs = getStaffJobs(jobs);
   const actorsAndAuditioners = getActorsAndAuditioners(jobs);
+  const auditioners = getAuditioners(jobs);
+  const characterGroups = playSkeleton.character_groups ?? [];
 
   return (
     <div className="space-y-8">
@@ -112,6 +122,17 @@ export function ProductionJobs({
             </ul>
           )}
         </Card>
+
+        <CharacterGroupCastingSection
+          characterGroups={characterGroups}
+          jobs={jobs}
+          auditioners={auditioners}
+          isAdmin={isAdmin}
+          invalidateKey={invalidateKey}
+          productionId={productionId}
+          productionStartDate={productionStartDate}
+          productionEndDate={productionEndDate}
+        />
       </div>
 
       {/* Auditioners */}

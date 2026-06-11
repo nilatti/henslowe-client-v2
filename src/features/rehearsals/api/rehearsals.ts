@@ -18,6 +18,8 @@ export interface TextUnitWithOnStages {
   number: number | string;
   pretty_name?: string;
   heading?: string;
+  start_page?: number | null;
+  end_page?: number | null;
   find_on_stages: { user_id: number | null; character_id: number | null }[];
   rehearsals?: { id: number; start_time: string; end_time: string }[];
   isScheduled?: boolean;

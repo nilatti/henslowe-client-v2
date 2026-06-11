@@ -105,7 +105,7 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
                 {scene.summary && (
                   <div>
                     <dt className="font-medium text-gray-700">Summary</dt>
-                    <dd className="text-gray-600 mt-1 leading-relaxed">
+                    <dd className="text-gray-600 mt-1 leading-relaxed whitespace-pre-wrap">
                       {scene.summary}
                     </dd>
                   </div>
@@ -166,7 +166,7 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
                             French Scene {prettyName}.{fs.number}
                           </span>
                           {fs.summary && (
-                            <p className="text-xs text-gray-500 mt-0.5">{fs.summary}</p>
+                            <p className="text-xs text-gray-500 mt-0.5 whitespace-pre-wrap">{fs.summary}</p>
                           )}
                         </div>
                         <div className="text-right shrink-0 ml-4">

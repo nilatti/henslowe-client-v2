@@ -4,6 +4,7 @@ import { Link } from '@tanstack/react-router'
 import { playQueryOptions } from '../../../plays/api/plays'
 import CharacterInfoTab from './CharacterInfoTab'
 import NewCharacterForm from './NewCharacterForm'
+import { CharacterMatrixChart } from './CharacterMatrixChart'
 import type { CharacterWithLines, CharacterGroupWithLines } from '../../../plays/types/play'
 
 type CharacterEntry =
@@ -21,6 +22,7 @@ interface Props {
 
 export default function CharactersBreakdown({ playId, embedded = false }: Props) {
   const { data: play } = useSuspenseQuery(playQueryOptions(playId))
+  const [view, setView] = useState<'details' | 'matrix'>('details')
   const [activeKey, setActiveKey] = useState<string | null>(null)
 
   const charactersAll: CharacterEntry[] = [
@@ -67,46 +69,73 @@ export default function CharactersBreakdown({ playId, embedded = false }: Props)
         </>
       )}
 
-      <div className="flex min-h-0">
-        {/* Sidebar */}
-        <div className="w-52 shrink-0 border-r border-gray-200 overflow-y-auto max-h-[70vh]">
-          {charactersAll.map(c => (
+      <div className="flex gap-1 mb-4">
+        <button
+          onClick={() => setView('details')}
+          className={`px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${
+            view === 'details'
+              ? 'bg-blue-600 text-white'
+              : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'
+          }`}
+        >
+          Details
+        </button>
+        <button
+          onClick={() => setView('matrix')}
+          className={`px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${
+            view === 'matrix'
+              ? 'bg-blue-600 text-white'
+              : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'
+          }`}
+        >
+          Scene Matrix
+        </button>
+      </div>
+
+      {view === 'details' && (
+        <div className="flex min-h-0">
+          {/* Sidebar */}
+          <div className="w-52 shrink-0 border-r border-gray-200 overflow-y-auto max-h-[70vh]">
+            {charactersAll.map(c => (
+              <button
+                key={tabKey(c)}
+                onClick={() => setActiveKey(tabKey(c))}
+                className={`w-full text-left px-3 py-2 text-sm truncate border-b border-gray-100 ${
+                  selectedKey === tabKey(c)
+                    ? 'bg-blue-50 text-blue-700 font-medium border-r-2 border-blue-600'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                {c.name}
+              </button>
+            ))}
             <button
-              key={tabKey(c)}
-              onClick={() => setActiveKey(tabKey(c))}
-              className={`w-full text-left px-3 py-2 text-sm truncate border-b border-gray-100 ${
-                selectedKey === tabKey(c)
+              onClick={() => setActiveKey('new')}
+              className={`w-full text-left px-3 py-2 text-sm ${
+                selectedKey === 'new'
                   ? 'bg-blue-50 text-blue-700 font-medium border-r-2 border-blue-600'
-                  : 'text-gray-700 hover:bg-gray-50'
+                  : 'text-gray-500 hover:bg-gray-50'
               }`}
             >
-              {c.name}
+              Add New Character
             </button>
-          ))}
-          <button
-            onClick={() => setActiveKey('new')}
-            className={`w-full text-left px-3 py-2 text-sm ${
-              selectedKey === 'new'
-                ? 'bg-blue-50 text-blue-700 font-medium border-r-2 border-blue-600'
-                : 'text-gray-500 hover:bg-gray-50'
-            }`}
-          >
-            Add New Character
-          </button>
-        </div>
+          </div>
 
-        {/* Main panel */}
-        <div className="flex-1 min-w-0">
-          {selectedKey === 'new' ? (
-            <NewCharacterForm
-              playId={playId}
-              onCreated={(id, type) => setActiveKey(`${type}-${id}`)}
-            />
-          ) : selectedCharacter ? (
-            <CharacterInfoTab key={selectedKey} character={selectedCharacter} playId={playId} />
-          ) : null}
+          {/* Main panel */}
+          <div className="flex-1 min-w-0">
+            {selectedKey === 'new' ? (
+              <NewCharacterForm
+                playId={playId}
+                onCreated={(id, type) => setActiveKey(`${type}-${id}`)}
+              />
+            ) : selectedCharacter ? (
+              <CharacterInfoTab key={selectedKey} character={selectedCharacter} playId={playId} />
+            ) : null}
+          </div>
         </div>
-      </div>
+      )}
+
+      {view === 'matrix' && <CharacterMatrixChart playId={playId} />}
     </div>
   )
 }

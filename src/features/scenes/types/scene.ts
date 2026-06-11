@@ -30,6 +30,7 @@ export interface SceneOnStage {
   character_id: number | null
   character_group_id: number | null
   nonspeaking: boolean
+  offstage: boolean
 }
 
 export interface SceneEntranceExit {

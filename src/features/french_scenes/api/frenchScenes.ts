@@ -58,6 +58,7 @@ export function useCreateOnStage(frenchSceneId: number) {
       character_group_id?: number | null
       french_scene_id: number
       nonspeaking: boolean
+      offstage: boolean
       description?: string | null
     }) =>
       api.post(`/api/v1/french_scenes/${frenchSceneId}/on_stages`, { on_stage: data }).then(r => r.data),
