@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { sceneQueryOptions, useDeleteScene } from "../api/scenes";
 import { actQueryOptions } from "../../acts/api/acts";
+import { playSkeletonQueryOptions } from "../../plays/api/plays";
 import { SceneForm } from "./SceneForm";
 import { FrenchSceneForm } from "../../french_scenes/components/FrenchSceneForm";
 import { useIsPlayAdmin } from "../../../hooks/useUserRole";
@@ -22,6 +23,7 @@ interface SceneDetailProps {
 export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
   const { data: scene } = useSuspenseQuery(sceneQueryOptions(sceneId));
   const { data: act } = useSuspenseQuery(actQueryOptions(actId));
+  const { data: playSkeleton } = useSuspenseQuery(playSkeletonQueryOptions(playId));
   const deleteScene = useDeleteScene(playId, actId);
   const isAdmin = useIsPlayAdmin(playId);
   const navigate = useNavigate();
@@ -31,6 +33,13 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
   const [showForm, setShowForm] = useState(false);
 
   const prettyName = `${act.number}.${scene.number}`;
+
+  const allScenes = playSkeleton.acts.flatMap(a =>
+    a.scenes.map(s => ({ id: s.id, prettyName: s.pretty_name, actId: a.id }))
+  );
+  const sceneIndex = allScenes.findIndex(s => s.id === sceneId);
+  const prevScene = sceneIndex > 0 ? allScenes[sceneIndex - 1] : null;
+  const nextScene = sceneIndex < allScenes.length - 1 ? allScenes[sceneIndex + 1] : null;
 
   const title = scene.heading
     ? `Scene ${prettyName}: ${scene.heading}`
@@ -168,6 +177,9 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
                           {fs.summary && (
                             <p className="text-xs text-gray-500 mt-0.5 whitespace-pre-wrap">{fs.summary}</p>
                           )}
+                          {fs.songs.length > 0 && (
+                            <p className="text-xs text-gray-400 mt-0.5">{fs.songs.map(s => s.title).join(' · ')}</p>
+                          )}
                         </div>
                         <div className="text-right shrink-0 ml-4">
                           {fs.start_page && (
@@ -204,6 +216,29 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
             onCancel={() => setShowForm(false)}
           />
         </Card>
+      )}
+
+      {(prevScene || nextScene) && (
+        <div className="flex justify-between mt-6 pt-4 border-t border-gray-100">
+          {prevScene ? (
+            <Link
+              to="/plays/$playId/acts/$actId/scenes/$sceneId"
+              params={{ playId: String(playId), actId: String(prevScene.actId), sceneId: String(prevScene.id) }}
+              className="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              ← Scene {prevScene.prettyName}
+            </Link>
+          ) : <span />}
+          {nextScene ? (
+            <Link
+              to="/plays/$playId/acts/$actId/scenes/$sceneId"
+              params={{ playId: String(playId), actId: String(nextScene.actId), sceneId: String(nextScene.id) }}
+              className="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              Scene {nextScene.prettyName} →
+            </Link>
+          ) : <span />}
+        </div>
       )}
 
       {confirmDelete && (

@@ -6,6 +6,7 @@ import { playSkeletonQueryOptions } from '../../plays/api/plays'
 import { productionSkeletonQueryOptions } from '../../productions/api/productions'
 import { FrenchSceneForm } from './FrenchSceneForm'
 import { OnStagesManager } from './OnStagesManager'
+import { SongsManager } from './SongsManager'
 import { EntranceExitsList } from '../../productions/components/EntranceExits/EntranceExitsList'
 import { useIsPlayAdmin } from '../../../hooks/useUserRole'
 import {
@@ -50,6 +51,20 @@ export function FrenchSceneDetail({
   const sceneNumber = playSkeleton.acts
     .flatMap(a => a.scenes)
     .find(s => s.id === sceneId)?.number
+
+  const allFrenchScenes = playSkeleton.acts.flatMap(a =>
+    a.scenes.flatMap(s =>
+      s.french_scenes.map(fs => ({
+        id: fs.id,
+        label: `${a.number}.${s.number}.${fs.number}`,
+        actId: a.id,
+        sceneId: s.id,
+      }))
+    )
+  )
+  const fsIndex = allFrenchScenes.findIndex(fs => fs.id === frenchSceneId)
+  const prevFs = fsIndex > 0 ? allFrenchScenes[fsIndex - 1] : null
+  const nextFs = fsIndex < allFrenchScenes.length - 1 ? allFrenchScenes[fsIndex + 1] : null
 
   return (
     <div>
@@ -156,6 +171,11 @@ export function FrenchSceneDetail({
             playSkeleton={playSkeleton}
           />
 
+          <SongsManager
+            frenchScene={frenchScene}
+            playSkeleton={playSkeleton}
+          />
+
           {playSkeleton.production_id != null && (
             <Card className="p-4">
               <EntranceExitsList
@@ -179,6 +199,29 @@ export function FrenchSceneDetail({
               View full script →
             </Link>
           </Card>
+        </div>
+      )}
+
+      {(prevFs || nextFs) && (
+        <div className="flex justify-between mt-6 pt-4 border-t border-gray-100">
+          {prevFs ? (
+            <Link
+              to="/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId"
+              params={{ playId: String(playId), actId: String(prevFs.actId), sceneId: String(prevFs.sceneId), frenchSceneId: String(prevFs.id) }}
+              className="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              ← French Scene {prevFs.label}
+            </Link>
+          ) : <span />}
+          {nextFs ? (
+            <Link
+              to="/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId"
+              params={{ playId: String(playId), actId: String(nextFs.actId), sceneId: String(nextFs.sceneId), frenchSceneId: String(nextFs.id) }}
+              className="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              French Scene {nextFs.label} →
+            </Link>
+          ) : <span />}
         </div>
       )}
 

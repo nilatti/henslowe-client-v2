@@ -32,10 +32,20 @@ export interface OnStage {
   user?: { id: number, first_name: string, last_name: string } | null
 }
 
+export interface Song {
+  id: number
+  french_scene_id: number
+  title: string
+  characters: OnStageCharacter[]
+  created_at: string
+  updated_at: string
+}
+
 export interface FrenchSceneDetail extends FrenchScene {
   on_stages: OnStage[]
   entrance_exits: EntranceExit[]
   characters: OnStageCharacter[]
+  songs: Song[]
 }
 
 export interface EntranceExit {

@@ -23,6 +23,7 @@ export interface FrenchSceneInScene {
   end_page: number | null
   on_stages: SceneOnStage[]
   entrance_exits: SceneEntranceExit[]
+  songs: { id: number; title: string }[]
 }
 
 export interface SceneOnStage {

@@ -58,6 +58,7 @@ export function DoublingChartContainer({
         theaterId={production.theater.id}
         productionStartDate={production.start_date}
         productionEndDate={production.end_date}
+        playId={playId ?? 0}
       />
 
       <div>

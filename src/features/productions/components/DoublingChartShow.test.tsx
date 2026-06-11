@@ -9,6 +9,10 @@ vi.mock('../../../utils/csvUtils', async (importOriginal) => {
   return { ...actual, downloadCsv: mockDownloadCsv }
 })
 
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children, className }: any) => <span className={className}>{children}</span>,
+}))
+
 import { DoublingChartShow } from './DoublingChartShow'
 import type { ChartPlay } from './DoublingChartShow'
 

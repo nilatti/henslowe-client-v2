@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { actQueryOptions, useDeleteAct } from "../api/acts";
+import { playSkeletonQueryOptions } from "../../plays/api/plays";
 import { ActForm } from "./ActForm";
 import { SceneForm } from "../../scenes/components/SceneForm";
 import { useIsPlayAdmin } from "../../../hooks/useUserRole";
@@ -19,6 +20,7 @@ interface ActDetailProps {
 
 export function ActDetail({ playId, actId }: ActDetailProps) {
   const { data: act } = useSuspenseQuery(actQueryOptions(actId));
+  const { data: playSkeleton } = useSuspenseQuery(playSkeletonQueryOptions(playId));
   const deleteAct = useDeleteAct(playId);
   const isAdmin = useIsPlayAdmin(playId);
   const navigate = useNavigate();
@@ -29,6 +31,10 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
 
   const lastScene = act.scenes[act.scenes.length - 1];
   const nextSceneNumber = lastScene ? Number(lastScene.number) + 1 : 1;
+
+  const actIndex = playSkeleton.acts.findIndex(a => a.id === actId);
+  const prevAct = actIndex > 0 ? playSkeleton.acts[actIndex - 1] : null;
+  const nextAct = actIndex < playSkeleton.acts.length - 1 ? playSkeleton.acts[actIndex + 1] : null;
 
   const title = act.heading
     ? `Act ${act.number}: ${act.heading}`
@@ -129,23 +135,29 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
                 </p>
               ) : (
                 <ul className="divide-y divide-gray-100">
-                  {act.scenes.map((scene) => (
-                    <li key={scene.id}>
-                      <Link
-                        to="/plays/$playId/acts/$actId/scenes/$sceneId"
-                        params={{
-                          playId: String(playId),
-                          actId: String(actId),
-                          sceneId: String(scene.id),
-                        }}
-                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
-                      >
-                        <span className="text-gray-900">
-                          Scene {scene.number}
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
+                  {act.scenes.map((scene) => {
+                    const songs = scene.french_scenes?.flatMap(fs => fs.songs) ?? []
+                    return (
+                      <li key={scene.id}>
+                        <Link
+                          to="/plays/$playId/acts/$actId/scenes/$sceneId"
+                          params={{
+                            playId: String(playId),
+                            actId: String(actId),
+                            sceneId: String(scene.id),
+                          }}
+                          className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
+                        >
+                          <div>
+                            <span className="text-gray-900">Scene {scene.number}</span>
+                            {songs.length > 0 && (
+                              <p className="text-xs text-gray-400 mt-0.5">{songs.map(s => s.title).join(' · ')}</p>
+                            )}
+                          </div>
+                        </Link>
+                      </li>
+                    )
+                  })}
                 </ul>
               )}
             </Card>
@@ -166,6 +178,29 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
               </Card>
             )}
           </div>
+        </div>
+      )}
+
+      {(prevAct || nextAct) && (
+        <div className="flex justify-between mt-6 pt-4 border-t border-gray-100">
+          {prevAct ? (
+            <Link
+              to="/plays/$playId/acts/$actId"
+              params={{ playId: String(playId), actId: String(prevAct.id) }}
+              className="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              ← Act {prevAct.number}
+            </Link>
+          ) : <span />}
+          {nextAct ? (
+            <Link
+              to="/plays/$playId/acts/$actId"
+              params={{ playId: String(playId), actId: String(nextAct.id) }}
+              className="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              Act {nextAct.number} →
+            </Link>
+          ) : <span />}
         </div>
       )}
 

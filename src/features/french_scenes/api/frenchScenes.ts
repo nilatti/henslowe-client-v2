@@ -1,6 +1,6 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '../../../api/client'
-import type { FrenchScene, FrenchSceneDetail, OnStage } from '../types/frenchScene'
+import type { FrenchScene, FrenchSceneDetail, OnStage, Song } from '../types/frenchScene'
 
 export const frenchSceneQueryOptions = (id: number) =>
   queryOptions({
@@ -85,6 +85,39 @@ export function useDeleteOnStage(frenchSceneId: number) {
   return useMutation({
     mutationFn: (id: number) =>
       api.delete(`/api/v1/on_stages/${id}`).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['french_scenes', frenchSceneId] })
+    },
+  })
+}
+
+export function useCreateSong(frenchSceneId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { title: string; character_ids?: number[] }): Promise<Song> =>
+      api.post(`/api/v1/french_scenes/${frenchSceneId}/songs`, { song: data }).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['french_scenes', frenchSceneId] })
+    },
+  })
+}
+
+export function useUpdateSong(frenchSceneId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { id: number; title?: string; character_ids?: number[] }): Promise<Song> =>
+      api.put(`/api/v1/songs/${data.id}`, { song: data }).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['french_scenes', frenchSceneId] })
+    },
+  })
+}
+
+export function useDeleteSong(frenchSceneId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) =>
+      api.delete(`/api/v1/songs/${id}`).then(r => r.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['french_scenes', frenchSceneId] })
     },

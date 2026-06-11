@@ -62,6 +62,12 @@ export function ActsTab({ play, playId }: ActsTabProps) {
                     {scene.summary && (
                       <p className="text-xs text-gray-500 mt-0.5">{scene.summary}</p>
                     )}
+                    {(() => {
+                      const songs = scene.french_scenes?.flatMap(fs => fs.songs) ?? []
+                      return songs.length > 0 ? (
+                        <p className="text-xs text-gray-400 mt-0.5">{songs.map(s => s.title).join(' · ')}</p>
+                      ) : null
+                    })()}
                   </div>
                   <span className="text-gray-400 text-xs shrink-0 ml-4">
                     {scene.french_scenes?.length ?? 0} french scene

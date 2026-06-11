@@ -42,6 +42,7 @@ export interface Character {
 export interface FrenchSceneSkeleton {
   id: number
   number: string
+  songs: { id: number; title: string }[]
 }
 
 export interface SceneSkeleton {
