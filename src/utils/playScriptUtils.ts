@@ -12,6 +12,8 @@ interface Line {
 
 interface OnStage {
   character_id: number;
+  nonspeaking: boolean;
+  offstage: boolean;
 }
 
 interface FrenchScene {
