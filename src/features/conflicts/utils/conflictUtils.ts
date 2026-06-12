@@ -20,6 +20,7 @@ export const getConflictedUserIds = (
   productionUserConflicts: ProductionUserConflict[],
   rehearsalStartDate: Date,
   rehearsalEndDate: Date,
+  currentRehearsalId?: number,
 ) => {
   const conflictedUserIds = new Set<number>();
   const conflictsByUserId = userConflictsMap(productionUserConflicts);
@@ -27,6 +28,7 @@ export const getConflictedUserIds = (
   users.forEach((u) => {
     const conflicts = conflictsByUserId.get(u.id) ?? [];
     for (const c of conflicts) {
+      if (currentRehearsalId != null && c.rehearsal_id === currentRehearsalId) continue;
       if (parseISO(c.start_time) < rehearsalEndDate && parseISO(c.end_time) > rehearsalStartDate) {
         conflictedUserIds.add(u.id);
         break;
@@ -42,11 +44,13 @@ export const getConflictsForUserForRehearsal = (
   productionUserConflicts: ProductionUserConflict[],
   rehearsalStartDate: Date,
   rehearsalEndDate: Date,
+  currentRehearsalId?: number,
 ) => {
   const conflictsByUserId = userConflictsMap(productionUserConflicts);
   const conflicts = conflictsByUserId.get(userId) ?? [];
 
   return conflicts.filter((c) => {
+    if (currentRehearsalId != null && c.rehearsal_id === currentRehearsalId) return false;
     const cStart = parseISO(c.start_time);
     const cEnd = parseISO(c.end_time);
     return cStart < rehearsalEndDate && cEnd > rehearsalStartDate;

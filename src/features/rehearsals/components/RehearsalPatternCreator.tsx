@@ -49,13 +49,20 @@ export function RehearsalPatternCreator({
     );
   };
 
+  const tzOffset = (() => {
+    const offset = new Date().getTimezoneOffset();
+    const sign = offset <= 0 ? "+" : "-";
+    const abs = Math.abs(offset);
+    return `${sign}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(abs % 60).padStart(2, "0")}`;
+  })();
+
   const handleSubmit = async () => {
     await buildSchedule.mutateAsync({
       days_of_week: daysOfWeek,
       start_date: startDate,
       end_date: endDate,
-      start_time: startTime,
-      end_time: endTime,
+      start_time: `${startTime}${tzOffset}`,
+      end_time: `${endTime}${tzOffset}`,
       block_length: blockLength,
       break_length: parseInt(breakLength) || 0,
       time_between_breaks: parseInt(timeBetweenBreaks) || 0,

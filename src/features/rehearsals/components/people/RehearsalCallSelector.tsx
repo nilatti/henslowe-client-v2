@@ -14,6 +14,7 @@ interface RehearsalCallSelectorProps {
   productionUserConflicts?: ProductionUserConflict[];
   rehearsalStartDate?: Date;
   rehearsalEndDate?: Date;
+  currentRehearsalId?: number;
   actorCharacterNames?: Map<number, string[]>;
 }
 
@@ -24,6 +25,7 @@ export default function RehearsalCallSelector({
   handleToggle,
   rehearsalStartDate,
   rehearsalEndDate,
+  currentRehearsalId,
   productionUserConflicts = [],
   actorCharacterNames,
 }: RehearsalCallSelectorProps) {
@@ -42,6 +44,7 @@ export default function RehearsalCallSelector({
           productionUserConflicts,
           rehearsalStartDate,
           rehearsalEndDate,
+          currentRehearsalId,
         ),
       );
     }
@@ -53,6 +56,7 @@ export default function RehearsalCallSelector({
     productionUserConflicts,
     rehearsalStartDate,
     rehearsalEndDate,
+    currentRehearsalId,
   ]);
 
   const formatConflicts = (conflicts: Conflict[]) =>

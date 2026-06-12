@@ -7,6 +7,7 @@ export interface Conflict {
   category: string
   regular: boolean
   conflict_pattern_id: number | null
+  rehearsal_id: number | null
   created_at: string
   updated_at: string
 }

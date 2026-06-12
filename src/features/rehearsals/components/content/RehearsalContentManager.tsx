@@ -101,6 +101,7 @@ export function RehearsalContentManager({
     productionUserConflicts,
     rehearsalStartDate,
     rehearsalEndDate,
+    rehearsal.id,
   );
   const unavailableActors = actors.filter((a) => conflictedIds.has(a.id));
 

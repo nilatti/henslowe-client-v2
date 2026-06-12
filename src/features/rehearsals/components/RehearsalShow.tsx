@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import { Link } from "@tanstack/react-router";
 import { parseISO, format } from "date-fns";
 import {
@@ -11,7 +11,6 @@ import { RehearsalContentManager } from "./content/RehearsalContentManager";
 import { RehearsalPeopleManager } from "./people/RehearsalPeopleManager";
 import { Button, ConfirmDialog } from "../../../components/ui";
 import { buildUserName } from "../../../utils/actorUtils";
-import { rehearsalContent } from "../../../utils/rehearsalUtils";
 import { getConflictedUserIds } from "../../conflicts/utils/conflictUtils";
 
 interface RehearsalShowProps {
@@ -54,13 +53,35 @@ export function RehearsalShow({
     productionUserConflicts,
     rehearsalStartDate,
     rehearsalEndDate,
+    rehearsal.id,
   );
 
-  const content = rehearsalContent({
-    acts: rehearsal.acts as never,
-    frenchScenes: rehearsal.french_scenes as never,
-    scenes: rehearsal.scenes as never,
-  });
+  const contentLinks = [
+    ...rehearsal.acts.map((act) => ({
+      key: `act-${act.id}`,
+      node: act.play_id ? (
+        <Link to="/plays/$playId/acts/$actId" params={{ playId: String(act.play_id), actId: String(act.id) }} className="text-blue-600 hover:underline">
+          {act.heading}
+        </Link>
+      ) : <span>{act.heading}</span>,
+    })),
+    ...rehearsal.scenes.map((scene) => ({
+      key: `scene-${scene.id}`,
+      node: scene.act_id ? (
+        <Link to="/plays/$playId/acts/$actId/scenes/$sceneId" params={{ playId: String(playId), actId: String(scene.act_id), sceneId: String(scene.id) }} className="text-blue-600 hover:underline">
+          {scene.pretty_name}
+        </Link>
+      ) : <span>{scene.pretty_name}</span>,
+    })),
+    ...rehearsal.french_scenes.map((fs) => ({
+      key: `fs-${fs.id}`,
+      node: fs.scene ? (
+        <Link to="/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId" params={{ playId: String(playId), actId: String(fs.scene.act_id), sceneId: String(fs.scene_id ?? fs.scene.id), frenchSceneId: String(fs.id) }} className="text-blue-600 hover:underline">
+          {fs.pretty_name}
+        </Link>
+      ) : <span>{fs.pretty_name}</span>,
+    })),
+  ];
 
   if (isEditing) {
     return (
@@ -104,10 +125,14 @@ export function RehearsalShow({
             <p className="text-xs text-gray-500 mb-2">{rehearsal.notes}</p>
           )}
 
-          {content.length > 0 && (
+          {contentLinks.length > 0 && (
             <div className="text-xs text-gray-600 mb-2">
               <span className="font-medium">Content: </span>
-              {content.join(", ")}
+              {contentLinks.map(({ key, node }, i) => (
+                <Fragment key={key}>
+                  {node}{i < contentLinks.length - 1 && ", "}
+                </Fragment>
+              ))}
             </div>
           )}
 
@@ -124,7 +149,9 @@ export function RehearsalShow({
                         conflictedUserIds.has(u.id) ? "text-red-600" : undefined
                       }
                     >
-                      {buildUserName(u)}
+                      <Link to="/users/$userId" params={{ userId: String(u.id) }} className="hover:underline">
+                        {buildUserName(u)}
+                      </Link>
                     </li>
                   ))}
               </ul>
@@ -143,7 +170,9 @@ export function RehearsalShow({
                         conflictedUserIds.has(u.id) ? "text-red-600" : undefined
                       }
                     >
-                      {buildUserName(u)}
+                      <Link to="/users/$userId" params={{ userId: String(u.id) }} className="hover:underline">
+                        {buildUserName(u)}
+                      </Link>
                     </li>
                   ))}
               </ul>

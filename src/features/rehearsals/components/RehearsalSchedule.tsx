@@ -196,18 +196,19 @@ export function RehearsalSchedule({
                 </div>
                 <div className="px-4 pb-2">
                   {groupedRehearsals[date].map((rehearsal) => (
-                    <RehearsalShow
-                      key={rehearsal.id}
-                      rehearsal={rehearsal}
-                      productionId={productionId}
-                      playId={playId}
-                      theaterId={theaterId}
-                      actors={actors}
-                      productionStaff={productionStaff}
-                      isAdmin={isAdmin}
-                      productionUserConflicts={productionUserConflicts}
-                      actorCharacterNames={actorCharacterNames}
-                    />
+                    <div key={rehearsal.id} id={`rehearsal-${rehearsal.id}`}>
+                      <RehearsalShow
+                        rehearsal={rehearsal}
+                        productionId={productionId}
+                        playId={playId}
+                        theaterId={theaterId}
+                        actors={actors}
+                        productionStaff={productionStaff}
+                        isAdmin={isAdmin}
+                        productionUserConflicts={productionUserConflicts}
+                        actorCharacterNames={actorCharacterNames}
+                      />
+                    </div>
                   ))}
                 </div>
               </Card>

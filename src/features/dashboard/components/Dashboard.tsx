@@ -25,8 +25,15 @@ export function Dashboard() {
     )
     .map((job) => job.production!)
 
+  const playIdByProductionId = new Map(
+    data.jobs
+      .filter((j) => j.production?.play)
+      .map((j) => [j.production!.id, j.production!.play!.id])
+  )
+
   const rehearsals = upcomingRehearsalsList({
     rehearsals: data.rehearsals ?? [],
+    playIdByProductionId,
   })
 
   return (
@@ -99,13 +106,12 @@ export function Dashboard() {
         <div className="overflow-x-auto mt-2">
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="border-b border-gray-200 text-left">
-                <th className="py-2 pr-4 font-medium text-gray-700">Time</th>
-                <th className="py-2 pr-4 font-medium text-gray-700">Location</th>
-                <th className="py-2 pr-4 font-medium text-gray-700">Title</th>
-                <th className="py-2 pr-4 font-medium text-gray-700">Notes</th>
-                <th className="py-2 pr-4 font-medium text-gray-700">Material</th>
-                <th className="py-2 pr-4 font-medium text-gray-700">Who is called</th>
+              <tr className="border-b border-gray-400 text-left">
+                <th className="p-[10px] font-medium text-gray-700 border-r border-gray-300">Time</th>
+                <th className="p-[10px] font-medium text-gray-700 border-r border-gray-300">Location</th>
+                <th className="p-[10px] font-medium text-gray-700 border-r border-gray-300">Title</th>
+                <th className="p-[10px] font-medium text-gray-700 border-r border-gray-300">Material</th>
+                <th className="p-[10px] font-medium text-gray-700">Notes</th>
               </tr>
             </thead>
             <tbody>{rehearsals}</tbody>

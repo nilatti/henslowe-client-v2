@@ -64,6 +64,7 @@ export function RehearsalPeopleManager({
         productionUserConflicts={productionUserConflicts}
         rehearsalStartDate={new Date(rehearsal.start_time)}
         rehearsalEndDate={new Date(rehearsal.end_time)}
+        currentRehearsalId={rehearsal.id}
         actorCharacterNames={actorCharacterNames}
       />
       <div className="flex gap-2">

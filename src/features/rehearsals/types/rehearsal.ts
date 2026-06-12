@@ -26,6 +26,10 @@ export interface RehearsalTextUnit {
   number: number | string
   pretty_name?: string
   heading?: string
+  play_id?: number
+  act_id?: number
+  scene_id?: number
+  scene?: { id: number; act_id: number }
   find_on_stages?: { user_id: number | null }[]
 }
 
