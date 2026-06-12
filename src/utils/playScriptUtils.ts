@@ -208,24 +208,20 @@ function getLinesFromCharacters(characters: Character[]): Line[] {
 }
 
 function getOnStagesFromAct(act: Act): OnStage[] {
-  const onStages: OnStage[][] = [];
   const frenchScenes = getFrenchScenesFromAct(act);
-  frenchScenes.map((frenchScene) => {
-    onStages.push(frenchScene.on_stages ?? []);
-  });
-  const flat = _.flattenDeep(onStages);
-  const compact = _.compact(flat);
-  return _.uniqBy(compact, "character_id");
+  const flat = _.compact(_.flattenDeep(frenchScenes.map(fs => fs.on_stages ?? [])));
+  return _.map(
+    _.groupBy(flat, "character_id"),
+    entries => ({ ...entries[0], nonspeaking: entries.every(e => e.nonspeaking), offstage: entries.every(e => e.offstage) })
+  );
 }
 
 function getOnStagesFromScene(scene: Scene): OnStage[] {
-  const onStages: OnStage[][] = [];
-  const frenchScenes = scene.french_scenes;
-  frenchScenes.map((frenchScene) => {
-    onStages.push(frenchScene.on_stages ?? []);
-  });
-  const flat = _.flattenDeep(onStages);
-  return _.uniqBy(flat, "character_id");
+  const flat = _.flattenDeep(scene.french_scenes.map(fs => fs.on_stages ?? []));
+  return _.map(
+    _.groupBy(flat, "character_id"),
+    entries => ({ ...entries[0], nonspeaking: entries.every(e => e.nonspeaking), offstage: entries.every(e => e.offstage) })
+  );
 }
 
 function letterValue(str: string): unknown {

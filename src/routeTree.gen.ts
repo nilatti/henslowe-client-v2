@@ -37,6 +37,7 @@ import { Route as AuthenticatedUsersNewRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedTheatersNewRouteImport } from './routes/_authenticated/theaters/new'
 import { Route as AuthenticatedSpecializationsNewRouteImport } from './routes/_authenticated/specializations/new'
 import { Route as AuthenticatedSpecializationsSpecializationIdRouteImport } from './routes/_authenticated/specializations/$specializationId'
+import { Route as AuthenticatedProductionsProductionIdRouteImport } from './routes/_authenticated/productions/$productionId'
 import { Route as AuthenticatedPhasesNewRouteImport } from './routes/_authenticated/phases/new'
 import { Route as AuthenticatedPhasesPhaseIdRouteImport } from './routes/_authenticated/phases/$phaseId'
 import { Route as AuthenticatedUsersUserIdIndexRouteImport } from './routes/_authenticated/users/$userId/index'
@@ -46,7 +47,9 @@ import { Route as AuthenticatedProductionsProductionIdIndexRouteImport } from '.
 import { Route as AuthenticatedPlaysPlayIdIndexRouteImport } from './routes/_authenticated/plays/$playId/index'
 import { Route as AuthenticatedAuthorsAuthorIdIndexRouteImport } from './routes/_authenticated/authors/$authorId/index'
 import { Route as AuthenticatedProductionsProductionIdSetDesignRouteImport } from './routes/_authenticated/productions/$productionId/set-design'
+import { Route as AuthenticatedProductionsProductionIdScriptRouteImport } from './routes/_authenticated/productions/$productionId/script'
 import { Route as AuthenticatedProductionsProductionIdRehearsalsRouteImport } from './routes/_authenticated/productions/$productionId/rehearsals'
+import { Route as AuthenticatedProductionsProductionIdPeopleRouteImport } from './routes/_authenticated/productions/$productionId/people'
 import { Route as AuthenticatedProductionsProductionIdDoublingChartsRouteImport } from './routes/_authenticated/productions/$productionId/doubling-charts'
 import { Route as AuthenticatedPlaysPlayIdWordCloudsRouteImport } from './routes/_authenticated/plays/$playId/word-clouds'
 import { Route as AuthenticatedPlaysPlayIdScriptRouteImport } from './routes/_authenticated/plays/$playId/script'
@@ -205,6 +208,12 @@ const AuthenticatedSpecializationsSpecializationIdRoute =
     path: '/specializations/$specializationId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedProductionsProductionIdRoute =
+  AuthenticatedProductionsProductionIdRouteImport.update({
+    id: '/productions/$productionId',
+    path: '/productions/$productionId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedPhasesNewRoute = AuthenticatedPhasesNewRouteImport.update({
   id: '/phases/new',
   path: '/phases/new',
@@ -236,9 +245,9 @@ const AuthenticatedSpacesSpaceIdIndexRoute =
   } as any)
 const AuthenticatedProductionsProductionIdIndexRoute =
   AuthenticatedProductionsProductionIdIndexRouteImport.update({
-    id: '/productions/$productionId/',
-    path: '/productions/$productionId/',
-    getParentRoute: () => AuthenticatedRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedProductionsProductionIdRoute,
   } as any)
 const AuthenticatedPlaysPlayIdIndexRoute =
   AuthenticatedPlaysPlayIdIndexRouteImport.update({
@@ -254,21 +263,33 @@ const AuthenticatedAuthorsAuthorIdIndexRoute =
   } as any)
 const AuthenticatedProductionsProductionIdSetDesignRoute =
   AuthenticatedProductionsProductionIdSetDesignRouteImport.update({
-    id: '/productions/$productionId/set-design',
-    path: '/productions/$productionId/set-design',
-    getParentRoute: () => AuthenticatedRoute,
+    id: '/set-design',
+    path: '/set-design',
+    getParentRoute: () => AuthenticatedProductionsProductionIdRoute,
+  } as any)
+const AuthenticatedProductionsProductionIdScriptRoute =
+  AuthenticatedProductionsProductionIdScriptRouteImport.update({
+    id: '/script',
+    path: '/script',
+    getParentRoute: () => AuthenticatedProductionsProductionIdRoute,
   } as any)
 const AuthenticatedProductionsProductionIdRehearsalsRoute =
   AuthenticatedProductionsProductionIdRehearsalsRouteImport.update({
-    id: '/productions/$productionId/rehearsals',
-    path: '/productions/$productionId/rehearsals',
-    getParentRoute: () => AuthenticatedRoute,
+    id: '/rehearsals',
+    path: '/rehearsals',
+    getParentRoute: () => AuthenticatedProductionsProductionIdRoute,
+  } as any)
+const AuthenticatedProductionsProductionIdPeopleRoute =
+  AuthenticatedProductionsProductionIdPeopleRouteImport.update({
+    id: '/people',
+    path: '/people',
+    getParentRoute: () => AuthenticatedProductionsProductionIdRoute,
   } as any)
 const AuthenticatedProductionsProductionIdDoublingChartsRoute =
   AuthenticatedProductionsProductionIdDoublingChartsRouteImport.update({
-    id: '/productions/$productionId/doubling-charts',
-    path: '/productions/$productionId/doubling-charts',
-    getParentRoute: () => AuthenticatedRoute,
+    id: '/doubling-charts',
+    path: '/doubling-charts',
+    getParentRoute: () => AuthenticatedProductionsProductionIdRoute,
   } as any)
 const AuthenticatedPlaysPlayIdWordCloudsRoute =
   AuthenticatedPlaysPlayIdWordCloudsRouteImport.update({
@@ -346,6 +367,7 @@ export interface FileRoutesByFullPath {
   '/free/': typeof FreeIndexRoute
   '/phases/$phaseId': typeof AuthenticatedPhasesPhaseIdRoute
   '/phases/new': typeof AuthenticatedPhasesNewRoute
+  '/productions/$productionId': typeof AuthenticatedProductionsProductionIdRouteWithChildren
   '/specializations/$specializationId': typeof AuthenticatedSpecializationsSpecializationIdRoute
   '/specializations/new': typeof AuthenticatedSpecializationsNewRoute
   '/theaters/new': typeof AuthenticatedTheatersNewRoute
@@ -362,7 +384,9 @@ export interface FileRoutesByFullPath {
   '/plays/$playId/script': typeof AuthenticatedPlaysPlayIdScriptRoute
   '/plays/$playId/word-clouds': typeof AuthenticatedPlaysPlayIdWordCloudsRoute
   '/productions/$productionId/doubling-charts': typeof AuthenticatedProductionsProductionIdDoublingChartsRoute
+  '/productions/$productionId/people': typeof AuthenticatedProductionsProductionIdPeopleRoute
   '/productions/$productionId/rehearsals': typeof AuthenticatedProductionsProductionIdRehearsalsRoute
+  '/productions/$productionId/script': typeof AuthenticatedProductionsProductionIdScriptRoute
   '/productions/$productionId/set-design': typeof AuthenticatedProductionsProductionIdSetDesignRoute
   '/authors/$authorId/': typeof AuthenticatedAuthorsAuthorIdIndexRoute
   '/plays/$playId/': typeof AuthenticatedPlaysPlayIdIndexRoute
@@ -409,7 +433,9 @@ export interface FileRoutesByTo {
   '/plays/$playId/script': typeof AuthenticatedPlaysPlayIdScriptRoute
   '/plays/$playId/word-clouds': typeof AuthenticatedPlaysPlayIdWordCloudsRoute
   '/productions/$productionId/doubling-charts': typeof AuthenticatedProductionsProductionIdDoublingChartsRoute
+  '/productions/$productionId/people': typeof AuthenticatedProductionsProductionIdPeopleRoute
   '/productions/$productionId/rehearsals': typeof AuthenticatedProductionsProductionIdRehearsalsRoute
+  '/productions/$productionId/script': typeof AuthenticatedProductionsProductionIdScriptRoute
   '/productions/$productionId/set-design': typeof AuthenticatedProductionsProductionIdSetDesignRoute
   '/authors/$authorId': typeof AuthenticatedAuthorsAuthorIdIndexRoute
   '/plays/$playId': typeof AuthenticatedPlaysPlayIdIndexRoute
@@ -444,6 +470,7 @@ export interface FileRoutesById {
   '/free/': typeof FreeIndexRoute
   '/_authenticated/phases/$phaseId': typeof AuthenticatedPhasesPhaseIdRoute
   '/_authenticated/phases/new': typeof AuthenticatedPhasesNewRoute
+  '/_authenticated/productions/$productionId': typeof AuthenticatedProductionsProductionIdRouteWithChildren
   '/_authenticated/specializations/$specializationId': typeof AuthenticatedSpecializationsSpecializationIdRoute
   '/_authenticated/specializations/new': typeof AuthenticatedSpecializationsNewRoute
   '/_authenticated/theaters/new': typeof AuthenticatedTheatersNewRoute
@@ -460,7 +487,9 @@ export interface FileRoutesById {
   '/_authenticated/plays/$playId/script': typeof AuthenticatedPlaysPlayIdScriptRoute
   '/_authenticated/plays/$playId/word-clouds': typeof AuthenticatedPlaysPlayIdWordCloudsRoute
   '/_authenticated/productions/$productionId/doubling-charts': typeof AuthenticatedProductionsProductionIdDoublingChartsRoute
+  '/_authenticated/productions/$productionId/people': typeof AuthenticatedProductionsProductionIdPeopleRoute
   '/_authenticated/productions/$productionId/rehearsals': typeof AuthenticatedProductionsProductionIdRehearsalsRoute
+  '/_authenticated/productions/$productionId/script': typeof AuthenticatedProductionsProductionIdScriptRoute
   '/_authenticated/productions/$productionId/set-design': typeof AuthenticatedProductionsProductionIdSetDesignRoute
   '/_authenticated/authors/$authorId/': typeof AuthenticatedAuthorsAuthorIdIndexRoute
   '/_authenticated/plays/$playId/': typeof AuthenticatedPlaysPlayIdIndexRoute
@@ -494,6 +523,7 @@ export interface FileRouteTypes {
     | '/free/'
     | '/phases/$phaseId'
     | '/phases/new'
+    | '/productions/$productionId'
     | '/specializations/$specializationId'
     | '/specializations/new'
     | '/theaters/new'
@@ -510,7 +540,9 @@ export interface FileRouteTypes {
     | '/plays/$playId/script'
     | '/plays/$playId/word-clouds'
     | '/productions/$productionId/doubling-charts'
+    | '/productions/$productionId/people'
     | '/productions/$productionId/rehearsals'
+    | '/productions/$productionId/script'
     | '/productions/$productionId/set-design'
     | '/authors/$authorId/'
     | '/plays/$playId/'
@@ -557,7 +589,9 @@ export interface FileRouteTypes {
     | '/plays/$playId/script'
     | '/plays/$playId/word-clouds'
     | '/productions/$productionId/doubling-charts'
+    | '/productions/$productionId/people'
     | '/productions/$productionId/rehearsals'
+    | '/productions/$productionId/script'
     | '/productions/$productionId/set-design'
     | '/authors/$authorId'
     | '/plays/$playId'
@@ -591,6 +625,7 @@ export interface FileRouteTypes {
     | '/free/'
     | '/_authenticated/phases/$phaseId'
     | '/_authenticated/phases/new'
+    | '/_authenticated/productions/$productionId'
     | '/_authenticated/specializations/$specializationId'
     | '/_authenticated/specializations/new'
     | '/_authenticated/theaters/new'
@@ -607,7 +642,9 @@ export interface FileRouteTypes {
     | '/_authenticated/plays/$playId/script'
     | '/_authenticated/plays/$playId/word-clouds'
     | '/_authenticated/productions/$productionId/doubling-charts'
+    | '/_authenticated/productions/$productionId/people'
     | '/_authenticated/productions/$productionId/rehearsals'
+    | '/_authenticated/productions/$productionId/script'
     | '/_authenticated/productions/$productionId/set-design'
     | '/_authenticated/authors/$authorId/'
     | '/_authenticated/plays/$playId/'
@@ -830,6 +867,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSpecializationsSpecializationIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/productions/$productionId': {
+      id: '/_authenticated/productions/$productionId'
+      path: '/productions/$productionId'
+      fullPath: '/productions/$productionId'
+      preLoaderRoute: typeof AuthenticatedProductionsProductionIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/phases/new': {
       id: '/_authenticated/phases/new'
       path: '/phases/new'
@@ -867,10 +911,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/productions/$productionId/': {
       id: '/_authenticated/productions/$productionId/'
-      path: '/productions/$productionId'
+      path: '/'
       fullPath: '/productions/$productionId/'
       preLoaderRoute: typeof AuthenticatedProductionsProductionIdIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedProductionsProductionIdRoute
     }
     '/_authenticated/plays/$playId/': {
       id: '/_authenticated/plays/$playId/'
@@ -888,24 +932,38 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/productions/$productionId/set-design': {
       id: '/_authenticated/productions/$productionId/set-design'
-      path: '/productions/$productionId/set-design'
+      path: '/set-design'
       fullPath: '/productions/$productionId/set-design'
       preLoaderRoute: typeof AuthenticatedProductionsProductionIdSetDesignRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedProductionsProductionIdRoute
+    }
+    '/_authenticated/productions/$productionId/script': {
+      id: '/_authenticated/productions/$productionId/script'
+      path: '/script'
+      fullPath: '/productions/$productionId/script'
+      preLoaderRoute: typeof AuthenticatedProductionsProductionIdScriptRouteImport
+      parentRoute: typeof AuthenticatedProductionsProductionIdRoute
     }
     '/_authenticated/productions/$productionId/rehearsals': {
       id: '/_authenticated/productions/$productionId/rehearsals'
-      path: '/productions/$productionId/rehearsals'
+      path: '/rehearsals'
       fullPath: '/productions/$productionId/rehearsals'
       preLoaderRoute: typeof AuthenticatedProductionsProductionIdRehearsalsRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedProductionsProductionIdRoute
+    }
+    '/_authenticated/productions/$productionId/people': {
+      id: '/_authenticated/productions/$productionId/people'
+      path: '/people'
+      fullPath: '/productions/$productionId/people'
+      preLoaderRoute: typeof AuthenticatedProductionsProductionIdPeopleRouteImport
+      parentRoute: typeof AuthenticatedProductionsProductionIdRoute
     }
     '/_authenticated/productions/$productionId/doubling-charts': {
       id: '/_authenticated/productions/$productionId/doubling-charts'
-      path: '/productions/$productionId/doubling-charts'
+      path: '/doubling-charts'
       fullPath: '/productions/$productionId/doubling-charts'
       preLoaderRoute: typeof AuthenticatedProductionsProductionIdDoublingChartsRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedProductionsProductionIdRoute
     }
     '/_authenticated/plays/$playId/word-clouds': {
       id: '/_authenticated/plays/$playId/word-clouds'
@@ -973,10 +1031,41 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedProductionsProductionIdRouteChildren {
+  AuthenticatedProductionsProductionIdDoublingChartsRoute: typeof AuthenticatedProductionsProductionIdDoublingChartsRoute
+  AuthenticatedProductionsProductionIdPeopleRoute: typeof AuthenticatedProductionsProductionIdPeopleRoute
+  AuthenticatedProductionsProductionIdRehearsalsRoute: typeof AuthenticatedProductionsProductionIdRehearsalsRoute
+  AuthenticatedProductionsProductionIdScriptRoute: typeof AuthenticatedProductionsProductionIdScriptRoute
+  AuthenticatedProductionsProductionIdSetDesignRoute: typeof AuthenticatedProductionsProductionIdSetDesignRoute
+  AuthenticatedProductionsProductionIdIndexRoute: typeof AuthenticatedProductionsProductionIdIndexRoute
+}
+
+const AuthenticatedProductionsProductionIdRouteChildren: AuthenticatedProductionsProductionIdRouteChildren =
+  {
+    AuthenticatedProductionsProductionIdDoublingChartsRoute:
+      AuthenticatedProductionsProductionIdDoublingChartsRoute,
+    AuthenticatedProductionsProductionIdPeopleRoute:
+      AuthenticatedProductionsProductionIdPeopleRoute,
+    AuthenticatedProductionsProductionIdRehearsalsRoute:
+      AuthenticatedProductionsProductionIdRehearsalsRoute,
+    AuthenticatedProductionsProductionIdScriptRoute:
+      AuthenticatedProductionsProductionIdScriptRoute,
+    AuthenticatedProductionsProductionIdSetDesignRoute:
+      AuthenticatedProductionsProductionIdSetDesignRoute,
+    AuthenticatedProductionsProductionIdIndexRoute:
+      AuthenticatedProductionsProductionIdIndexRoute,
+  }
+
+const AuthenticatedProductionsProductionIdRouteWithChildren =
+  AuthenticatedProductionsProductionIdRoute._addFileChildren(
+    AuthenticatedProductionsProductionIdRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedPhasesPhaseIdRoute: typeof AuthenticatedPhasesPhaseIdRoute
   AuthenticatedPhasesNewRoute: typeof AuthenticatedPhasesNewRoute
+  AuthenticatedProductionsProductionIdRoute: typeof AuthenticatedProductionsProductionIdRouteWithChildren
   AuthenticatedSpecializationsSpecializationIdRoute: typeof AuthenticatedSpecializationsSpecializationIdRoute
   AuthenticatedSpecializationsNewRoute: typeof AuthenticatedSpecializationsNewRoute
   AuthenticatedTheatersNewRoute: typeof AuthenticatedTheatersNewRoute
@@ -992,12 +1081,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedPlaysPlayIdPartScriptsRoute: typeof AuthenticatedPlaysPlayIdPartScriptsRoute
   AuthenticatedPlaysPlayIdScriptRoute: typeof AuthenticatedPlaysPlayIdScriptRoute
   AuthenticatedPlaysPlayIdWordCloudsRoute: typeof AuthenticatedPlaysPlayIdWordCloudsRoute
-  AuthenticatedProductionsProductionIdDoublingChartsRoute: typeof AuthenticatedProductionsProductionIdDoublingChartsRoute
-  AuthenticatedProductionsProductionIdRehearsalsRoute: typeof AuthenticatedProductionsProductionIdRehearsalsRoute
-  AuthenticatedProductionsProductionIdSetDesignRoute: typeof AuthenticatedProductionsProductionIdSetDesignRoute
   AuthenticatedAuthorsAuthorIdIndexRoute: typeof AuthenticatedAuthorsAuthorIdIndexRoute
   AuthenticatedPlaysPlayIdIndexRoute: typeof AuthenticatedPlaysPlayIdIndexRoute
-  AuthenticatedProductionsProductionIdIndexRoute: typeof AuthenticatedProductionsProductionIdIndexRoute
   AuthenticatedSpacesSpaceIdIndexRoute: typeof AuthenticatedSpacesSpaceIdIndexRoute
   AuthenticatedTheatersTheaterIdIndexRoute: typeof AuthenticatedTheatersTheaterIdIndexRoute
   AuthenticatedUsersUserIdIndexRoute: typeof AuthenticatedUsersUserIdIndexRoute
@@ -1013,6 +1098,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedPhasesPhaseIdRoute: AuthenticatedPhasesPhaseIdRoute,
   AuthenticatedPhasesNewRoute: AuthenticatedPhasesNewRoute,
+  AuthenticatedProductionsProductionIdRoute:
+    AuthenticatedProductionsProductionIdRouteWithChildren,
   AuthenticatedSpecializationsSpecializationIdRoute:
     AuthenticatedSpecializationsSpecializationIdRoute,
   AuthenticatedSpecializationsNewRoute: AuthenticatedSpecializationsNewRoute,
@@ -1032,17 +1119,9 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedPlaysPlayIdScriptRoute: AuthenticatedPlaysPlayIdScriptRoute,
   AuthenticatedPlaysPlayIdWordCloudsRoute:
     AuthenticatedPlaysPlayIdWordCloudsRoute,
-  AuthenticatedProductionsProductionIdDoublingChartsRoute:
-    AuthenticatedProductionsProductionIdDoublingChartsRoute,
-  AuthenticatedProductionsProductionIdRehearsalsRoute:
-    AuthenticatedProductionsProductionIdRehearsalsRoute,
-  AuthenticatedProductionsProductionIdSetDesignRoute:
-    AuthenticatedProductionsProductionIdSetDesignRoute,
   AuthenticatedAuthorsAuthorIdIndexRoute:
     AuthenticatedAuthorsAuthorIdIndexRoute,
   AuthenticatedPlaysPlayIdIndexRoute: AuthenticatedPlaysPlayIdIndexRoute,
-  AuthenticatedProductionsProductionIdIndexRoute:
-    AuthenticatedProductionsProductionIdIndexRoute,
   AuthenticatedSpacesSpaceIdIndexRoute: AuthenticatedSpacesSpaceIdIndexRoute,
   AuthenticatedTheatersTheaterIdIndexRoute:
     AuthenticatedTheatersTheaterIdIndexRoute,

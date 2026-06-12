@@ -1,0 +1,151 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import type { Mock } from 'vitest'
+
+const { mockUseSuspenseQuery } = vi.hoisted(() => ({
+  mockUseSuspenseQuery: vi.fn(),
+}))
+
+vi.mock('@tanstack/react-query', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@tanstack/react-query')>()
+  return { ...actual, useSuspenseQuery: mockUseSuspenseQuery }
+})
+
+vi.mock('../api/rehearsals', () => ({
+  productionRehearsalsQueryOptions: (id: number) => ({ queryKey: ['rehearsals', { productionId: id }] }),
+  productionUserConflictsQueryOptions: (id: number) => ({ queryKey: ['productions', id, 'user_conflicts'] }),
+}))
+
+vi.mock('../../jobs/api/jobs', () => ({
+  productionJobsQueryOptions: (id: number) => ({ queryKey: ['jobs', { productionId: id }] }),
+}))
+
+vi.mock('../../productions/api/productions', () => ({
+  productionSkeletonQueryOptions: (id: number) => ({ queryKey: ['productions', id, 'skeleton'] }),
+}))
+
+vi.mock('../../../hooks/useUserRole', () => ({
+  useUserRoleForProduction: vi.fn(),
+  useIsSuperAdmin: vi.fn(),
+}))
+
+vi.mock('./RehearsalShow', () => ({ RehearsalShow: () => null }))
+vi.mock('./RehearsalForm', () => ({
+  RehearsalForm: ({ onCancel }: any) => (
+    <div data-testid="rehearsal-form">
+      <button onClick={onCancel}>Cancel form</button>
+    </div>
+  ),
+}))
+vi.mock('./RehearsalPatternCreator', () => ({
+  RehearsalPatternCreator: ({ onClose }: any) => (
+    <div data-testid="pattern-creator">
+      <button onClick={onClose}>Close pattern</button>
+    </div>
+  ),
+}))
+
+vi.mock('../../../components/ui', () => ({
+  Button: ({ children, onClick, disabled }: any) => (
+    <button onClick={onClick} disabled={disabled}>{children}</button>
+  ),
+  Card: ({ children, className }: any) => <div className={className}>{children}</div>,
+}))
+
+import { RehearsalSchedule } from './RehearsalSchedule'
+import { useUserRoleForProduction, useIsSuperAdmin } from '../../../hooks/useUserRole'
+
+function setupQueries(rehearsals: any[] = []) {
+  mockUseSuspenseQuery.mockImplementation(({ queryKey }: { queryKey: unknown[] }) => {
+    if (queryKey[0] === 'rehearsals') return { data: rehearsals }
+    if (queryKey[0] === 'jobs') return { data: [] }
+    if (queryKey[0] === 'productions' && queryKey[2] === 'user_conflicts') return { data: [] }
+    if (queryKey[0] === 'productions' && queryKey[2] === 'skeleton') return { data: { default_space_id: null } }
+    throw new Error(`Unexpected queryKey: ${JSON.stringify(queryKey)}`)
+  })
+}
+
+function renderSchedule(opts: { isAdmin?: boolean; rehearsals?: any[] } = {}) {
+  const { isAdmin = false, rehearsals = [] } = opts
+  setupQueries(rehearsals)
+  ;(useUserRoleForProduction as Mock).mockReturnValue(isAdmin ? 'admin' : 'member')
+  ;(useIsSuperAdmin as Mock).mockReturnValue(false)
+  render(<RehearsalSchedule productionId={1} playId={10} theaterId={5} />)
+}
+
+beforeEach(() => {
+  mockUseSuspenseQuery.mockReset()
+  ;(useUserRoleForProduction as Mock).mockReset()
+  ;(useIsSuperAdmin as Mock).mockReset()
+})
+
+describe('RehearsalSchedule — admin controls', () => {
+  it('shows Add Rehearsal and Pattern generator buttons for admins', () => {
+    renderSchedule({ isAdmin: true })
+    expect(screen.getByRole('button', { name: /add rehearsal/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /pattern generator/i })).toBeInTheDocument()
+  })
+
+  it('hides admin buttons for non-admins', () => {
+    renderSchedule({ isAdmin: false })
+    expect(screen.queryByRole('button', { name: /add rehearsal/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /pattern generator/i })).not.toBeInTheDocument()
+  })
+})
+
+describe('RehearsalSchedule — form toggles', () => {
+  it('toggles the rehearsal form when Add Rehearsal is clicked', async () => {
+    const user = userEvent.setup()
+    renderSchedule({ isAdmin: true })
+    expect(screen.queryByTestId('rehearsal-form')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /add rehearsal/i }))
+    expect(screen.getByTestId('rehearsal-form')).toBeInTheDocument()
+  })
+
+  it('hides the rehearsal form when it calls onCancel', async () => {
+    const user = userEvent.setup()
+    renderSchedule({ isAdmin: true })
+    await user.click(screen.getByRole('button', { name: /add rehearsal/i }))
+    await user.click(screen.getByRole('button', { name: /cancel form/i }))
+    expect(screen.queryByTestId('rehearsal-form')).not.toBeInTheDocument()
+  })
+
+  it('toggles the pattern creator when Pattern generator is clicked', async () => {
+    const user = userEvent.setup()
+    renderSchedule({ isAdmin: true })
+    expect(screen.queryByTestId('pattern-creator')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /pattern generator/i }))
+    expect(screen.getByTestId('pattern-creator')).toBeInTheDocument()
+  })
+
+  it('hides the pattern creator when it calls onClose', async () => {
+    const user = userEvent.setup()
+    renderSchedule({ isAdmin: true })
+    await user.click(screen.getByRole('button', { name: /pattern generator/i }))
+    await user.click(screen.getByRole('button', { name: /close pattern/i }))
+    expect(screen.queryByTestId('pattern-creator')).not.toBeInTheDocument()
+  })
+})
+
+describe('RehearsalSchedule — empty state', () => {
+  it('shows "No rehearsals this week" when there are none this week', () => {
+    renderSchedule()
+    expect(screen.getByText(/no rehearsals this week/i)).toBeInTheDocument()
+  })
+})
+
+describe('RehearsalSchedule — removed elements', () => {
+  it('does not render a "Rehearsal Schedule" heading', () => {
+    renderSchedule()
+    expect(screen.queryByRole('heading', { name: /rehearsal schedule/i })).not.toBeInTheDocument()
+    expect(screen.queryByText('Rehearsal Schedule')).not.toBeInTheDocument()
+  })
+
+  it('does not render inline production or theater links', () => {
+    renderSchedule()
+    // The old component showed "productionTitle at theaterName" — neither should appear
+    const links = screen.queryAllByRole('link')
+    expect(links).toHaveLength(0)
+  })
+})

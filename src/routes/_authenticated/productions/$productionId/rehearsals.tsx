@@ -14,9 +14,6 @@ export const Route = createFileRoute('/_authenticated/productions/$productionId/
       queryClient.ensureQueryData(
         productionJobsQueryOptions(Number(params.productionId))
       ),
-      queryClient.ensureQueryData(
-        productionSkeletonQueryOptions(Number(params.productionId))
-      ),
     ]),
   component: function RehearsalScheduleRoute() {
     const { productionId } = Route.useParams()
@@ -28,9 +25,7 @@ export const Route = createFileRoute('/_authenticated/productions/$productionId/
       <RehearsalSchedule
         productionId={pid}
         playId={production.play.id}
-        productionTitle={production.play.title}
         theaterId={production.theater.id}
-        theaterName={production.theater.name}
       />
     )
   },

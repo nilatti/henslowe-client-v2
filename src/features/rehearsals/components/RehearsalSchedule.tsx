@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import _ from "lodash";
 import {
   format,
@@ -25,23 +24,19 @@ import {
   useUserRoleForProduction,
   useIsSuperAdmin,
 } from "../../../hooks/useUserRole";
-import { Button, Card, PageHeader } from "../../../components/ui";
+import { Button, Card } from "../../../components/ui";
 import type { RehearsalUser } from "../types/rehearsal";
 
 interface RehearsalScheduleProps {
   productionId: number;
   playId: number;
-  productionTitle: string;
   theaterId: number;
-  theaterName: string;
 }
 
 export function RehearsalSchedule({
   productionId,
   playId,
-  productionTitle,
   theaterId,
-  theaterName,
 }: RehearsalScheduleProps) {
   const { data: rehearsals } = useSuspenseQuery(
     productionRehearsalsQueryOptions(productionId),
@@ -128,42 +123,19 @@ export function RehearsalSchedule({
 
   return (
     <div>
-      <PageHeader
-        title="Rehearsal Schedule"
-        action={
-          isAdmin ? (
-            <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                onClick={() => setShowPatternCreator(!showPatternCreator)}
-              >
-                Pattern generator
-              </Button>
-              <Button onClick={() => setShowForm(!showForm)}>
-                Add Rehearsal
-              </Button>
-            </div>
-          ) : undefined
-        }
-      />
-
-      <p className="text-sm text-gray-600 mb-4">
-        <Link
-          to="/productions/$productionId"
-          params={{ productionId: String(productionId) }}
-          className="text-blue-600 hover:text-blue-800"
-        >
-          {productionTitle}
-        </Link>
-        {" at "}
-        <Link
-          to="/theaters/$theaterId"
-          params={{ theaterId: String(theaterId) }}
-          className="text-blue-600 hover:text-blue-800"
-        >
-          {theaterName}
-        </Link>
-      </p>
+      {isAdmin && (
+        <div className="flex justify-end gap-2 mb-6">
+          <Button
+            variant="secondary"
+            onClick={() => setShowPatternCreator(!showPatternCreator)}
+          >
+            Pattern generator
+          </Button>
+          <Button onClick={() => setShowForm(!showForm)}>
+            Add Rehearsal
+          </Button>
+        </div>
+      )}
 
       {showPatternCreator && (
         <div className="mb-6">
