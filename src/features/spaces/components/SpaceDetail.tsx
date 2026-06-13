@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { spaceQueryOptions, useDeleteSpace } from '../api/spaces'
+import { spaceQueryOptions, spaceRehearsalsQueryOptions, useDeleteSpace } from '../api/spaces'
 import { SpaceForm } from './SpaceForm'
 import { useIsSuperAdmin, useUserRoleForSpace } from '../../../hooks/useUserRole'
 import { ConflictsManager } from '../../conflicts/components/ConflictsManager'
+import { upcomingRehearsalsList } from '../../../utils/rehearsalUtils'
 import {
   Button,
   Card,
@@ -12,6 +13,57 @@ import {
   PageHeader,
   Tabs,
 } from '../../../components/ui'
+
+function SpaceRehearsalsTab({ spaceId, spaceName }: { spaceId: number; spaceName: string }) {
+  const { data: rehearsals } = useSuspenseQuery(spaceRehearsalsQueryOptions(spaceId))
+
+  const playIdByProductionId = new Map(
+    rehearsals
+      .filter((r) => r.production?.play)
+      .map((r) => [r.production.id, r.production.play!.id])
+  )
+
+  const rows = upcomingRehearsalsList({
+    rehearsals: rehearsals.map((r) => ({
+      ...r,
+      title: r.title ?? undefined,
+      notes: r.notes ?? undefined,
+      space: { id: spaceId, name: spaceName },
+      users: [],
+    })),
+    playIdByProductionId,
+    dateRangeEnd: null,
+  })
+
+  if (rows.length === 0) {
+    return (
+      <Card>
+        <p className="px-4 py-3 text-sm text-gray-500">
+          No upcoming rehearsals scheduled at this space.
+        </p>
+      </Card>
+    )
+  }
+
+  return (
+    <Card>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="border-b border-gray-400 text-left">
+              <th className="p-[10px] font-medium text-gray-700 border-r border-gray-300">Time</th>
+              <th className="p-[10px] font-medium text-gray-700 border-r border-gray-300">Location</th>
+              <th className="p-[10px] font-medium text-gray-700 border-r border-gray-300">Title</th>
+              <th className="p-[10px] font-medium text-gray-700 border-r border-gray-300">Material</th>
+              <th className="p-[10px] font-medium text-gray-700">Notes</th>
+            </tr>
+          </thead>
+          <tbody>{rows}</tbody>
+        </table>
+      </div>
+    </Card>
+  )
+}
 
 interface SpaceDetailProps {
   spaceId: number
@@ -34,6 +86,7 @@ export function SpaceDetail({ spaceId }: SpaceDetailProps) {
     { id: 'info', label: 'Info' },
     { id: 'theaters', label: `Theaters (${space.theaters.length})` },
     { id: 'conflicts', label: `Conflicts (${space.conflicts.length})` },
+    { id: 'rehearsals', label: 'Rehearsals' },
   ]
 
   return (
@@ -170,6 +223,12 @@ export function SpaceDetail({ spaceId }: SpaceDetailProps) {
               spaceId={spaceId}
               canEdit={isAdmin}
             />
+          )}
+
+          {activeTab === 'rehearsals' && (
+            <Suspense fallback={<Card><p className="px-4 py-3 text-sm text-gray-400">Loading rehearsals…</p></Card>}>
+              <SpaceRehearsalsTab spaceId={spaceId} spaceName={space.name} />
+            </Suspense>
           )}
         </>
       )}

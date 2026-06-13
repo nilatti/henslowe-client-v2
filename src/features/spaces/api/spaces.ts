@@ -5,14 +5,18 @@ import {
   createMutationFn,
   updateMutationFn,
   deleteMutationFn,
+  nestedListQueryOptions,
 } from '../../../api/queryFactory'
-import type { Space, SpaceDetail } from '../types/space'
+import type { Space, SpaceDetail, SpaceRehearsal } from '../types/space'
 
 export const spacesQueryOptions = () =>
   listQueryOptions<Space>('spaces')
 
 export const spaceQueryOptions = (id: number) =>
   detailQueryOptions<SpaceDetail>('spaces', id)
+
+export const spaceRehearsalsQueryOptions = (id: number) =>
+  nestedListQueryOptions<SpaceRehearsal>('spaces', id, 'rehearsals')
 
 export function useCreateSpace() {
   const qc = useQueryClient()

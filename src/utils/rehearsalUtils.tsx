@@ -91,19 +91,21 @@ function rehearsalContent({ acts, frenchScenes, scenes }: {
   return content;
 }
 
-function upcomingRehearsalsList({ rehearsals, playIdByProductionId }: {
+function upcomingRehearsalsList({ rehearsals, playIdByProductionId, dateRangeEnd }: {
   rehearsals: Rehearsal[];
   playIdByProductionId: Map<number, number>;
+  dateRangeEnd?: Date | null;
 }): ReactElement[] {
   const dateRangeStart = new Date();
   dateRangeStart.setDate(dateRangeStart.getDate() - 1);
-  const dateRangeEnd = new Date();
-  dateRangeEnd.setDate(dateRangeEnd.getDate() + 7);
+  const defaultEnd = new Date();
+  defaultEnd.setDate(defaultEnd.getDate() + 7);
+  const endDate = dateRangeEnd === undefined ? defaultEnd : dateRangeEnd;
   return rehearsals
     .filter(
       (rehearsal) =>
         new Date(rehearsal.start_time) > dateRangeStart &&
-        new Date(rehearsal.start_time) < dateRangeEnd
+        (endDate === null || new Date(rehearsal.start_time) < endDate)
     )
     .sort((a, b) => (a.start_time > b.start_time ? 1 : -1))
     .map((rehearsal) => {
