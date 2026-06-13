@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { usePageTitle } from '../../../hooks/usePageTitle'
 import {
   useReactTable,
   getCoreRowModel,
@@ -16,6 +17,7 @@ import { useIsSuperAdmin } from '../../../hooks/useUserRole'
 import { Button, Card, ConfirmDialog, PageHeader } from '../../../components/ui'
 
 export function PlaysList() {
+  usePageTitle('Plays')
   const { data: plays } = useSuspenseQuery(playsQueryOptions())
   const deletePlay = useDeletePlay()
   const isSuperAdmin = useIsSuperAdmin()

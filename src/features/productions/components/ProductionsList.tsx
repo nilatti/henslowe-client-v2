@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { usePageTitle } from '../../../hooks/usePageTitle'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { productionsQueryOptions } from '../api/productions'
 import { ProductionForm } from './ProductionForm'
@@ -7,6 +8,7 @@ import { useIsAnyAdmin } from '../../../hooks/useUserRole'
 import { Button, Card, PageHeader } from '../../../components/ui'
 
 export function ProductionsList() {
+  usePageTitle('Productions')
   const { data: productions } = useSuspenseQuery(productionsQueryOptions())
   const isAdmin = useIsAnyAdmin()
   const navigate = useNavigate()

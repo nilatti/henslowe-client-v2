@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { usePageTitle } from '../../../hooks/usePageTitle'
 import {
   useReactTable,
   getCoreRowModel,
@@ -15,6 +16,7 @@ import { useIsSuperAdmin, useAdminTheaterIds } from '../../../hooks/useUserRole'
 import { Button, Card, ConfirmDialog, PageHeader } from '../../../components/ui'
 
 export function TheatersList() {
+  usePageTitle('Theaters')
   const { data: theaters } = useSuspenseQuery(theatersQueryOptions())
   const deleteTheater = useDeleteTheater()
   const navigate = useNavigate()

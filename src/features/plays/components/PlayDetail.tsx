@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { usePageTitle } from '../../../hooks/usePageTitle'
 import { playSkeletonQueryOptions, useDeletePlay } from '../api/plays'
 import { PlayForm } from './PlayForm'
 import CharactersBreakdown from '../../script/components/Characters/CharactersBreakdown'
@@ -21,6 +22,7 @@ interface PlayDetailProps {
 
 export function PlayDetail({ playId }: PlayDetailProps) {
   const { data: play } = useSuspenseQuery(playSkeletonQueryOptions(playId))
+  usePageTitle(play.title)
   const deletePlay = useDeletePlay()
   const isAdmin = useIsPlayAdmin(playId)
   const navigate = useNavigate()

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createFileRoute, Outlet, useNavigate, useRouterState, Link } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { usePageTitle } from '../../../hooks/usePageTitle'
 import {
   productionSkeletonQueryOptions,
   useDeleteProduction,
@@ -47,6 +48,8 @@ export const Route = createFileRoute('/_authenticated/productions/$productionId'
     const { location } = useRouterState()
 
     const title = production.play?.title ?? ''
+    const theaterName = production.theater?.name
+    usePageTitle(theaterName ? `${title} at ${theaterName}` : title || undefined)
 
     const path = location.pathname
     let activeTab = 'info'

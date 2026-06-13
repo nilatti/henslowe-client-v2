@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { usePageTitle } from '../../../hooks/usePageTitle'
 import { theaterSkeletonQueryOptions, useDeleteTheater } from '../api/theaters'
 import { TheaterForm } from './TheaterForm'
 import { StaffJobsList } from '../../jobs/components/StaffJobsList'
@@ -22,6 +23,7 @@ interface TheaterDetailProps {
 export function TheaterDetail({ theaterId }: TheaterDetailProps) {
   const navigate = useNavigate()
   const { data: theater } = useSuspenseQuery(theaterSkeletonQueryOptions(theaterId))
+  usePageTitle(theater.name)
   const deleteTheater = useDeleteTheater()
   const role = useUserRoleForTheater(theaterId)
   const isSuperAdmin = useIsSuperAdmin()
