@@ -34,10 +34,13 @@ export function AuthCallbackPage() {
     localStorage.setItem('auth_token', token)
     localStorage.setItem('auth_user', JSON.stringify(user))
 
+    const redirectTo = sessionStorage.getItem('redirect_after_login') ?? '/'
+    sessionStorage.removeItem('redirect_after_login')
+
     // Full reload so AuthProvider re-initializes from the freshly stored token.
     // Client-side navigate() won't work here because the storage event only
     // fires cross-tab, so AuthProvider's in-memory state is still null.
-    window.location.href = '/'
+    window.location.href = redirectTo
   }, [navigate])
 
   return (

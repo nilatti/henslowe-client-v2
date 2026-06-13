@@ -1,5 +1,13 @@
 export const AUDITIONER_SPECIALIZATION_ID = 3;
 export const ACTOR_SPECIALIZATION_ID = 2;
+
+// Phase IDs — seeded in order in db/seeds.rb
+export const PHASE_PREPRODUCTION_ID = 1;
+export const PHASE_AUDITIONS_ID = 2;
+export const PHASE_REHEARSAL_ID = 3;
+export const PHASE_TECHNICAL_REHEARSAL_ID = 4;
+export const PHASE_RUN_ID = 5;
+export const PHASE_POSTPRODUCTION_ID = 6;
 export const CHARACTER_AGE_DESCRIPTORS = [
   "age unclear or irrelevant",
   "baby",
