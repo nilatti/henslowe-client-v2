@@ -14,10 +14,12 @@ import { Button } from '../../../components/ui'
 import { downloadCsv, slugify } from '../../../utils/csvUtils'
 
 interface ChartOnStage {
-  character_id: number
+  character_id: number | null
+  character_group_id?: number | null
   nonspeaking: boolean
   offstage: boolean
   character?: { id: number; name: string } | null
+  character_group?: { id: number; name: string } | null
 }
 
 interface ChartFrenchScene {
@@ -174,14 +176,22 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
       .map(c => c.character_id)
       .filter((id): id is number => id !== null)
 
+    const actorCharacterGroupIds = castings
+      .filter(c => c.user_id === actor.id)
+      .map(c => c.character_group_id)
+      .filter((id): id is number => id !== null)
+
     return blocks.map(block => {
-      const uniqChars = _.uniqBy(
-        block.filter(os => _.includes(actorCharacterIds, os.character_id)),
-        os => os.character?.id,
+      const matching = block.filter(os =>
+        (os.character_id != null && _.includes(actorCharacterIds, os.character_id)) ||
+        (os.character_group_id != null && _.includes(actorCharacterGroupIds, os.character_group_id))
+      )
+      const uniqChars = _.uniqBy(matching, os =>
+        os.character?.id != null ? `char-${os.character.id}` : `group-${os.character_group?.id}`
       )
       return {
         characters: uniqChars.map(os => ({
-          name: os.character?.name ?? '',
+          name: os.character?.name ?? os.character_group?.name ?? '',
           id: os.character?.id,
           nonspeaking: os.nonspeaking,
           offstage: os.offstage,
@@ -249,15 +259,23 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
       .map(c => c.character_id)
       .filter((id): id is number => id !== null)
 
+    const uncastCharacterGroupIds = castings
+      .filter(c => c.character_group && !c.user_id)
+      .map(c => c.character_group_id)
+      .filter((id): id is number => id !== null)
+
     const rowData = blocks.map((block, i) => {
       const uniqChars = _.uniqBy(
-        block.filter(os => _.includes(uncastCharacterIds, os.character_id)),
-        os => os.character?.id,
+        block.filter(os =>
+          (os.character_id != null && _.includes(uncastCharacterIds, os.character_id)) ||
+          (os.character_group_id != null && _.includes(uncastCharacterGroupIds, os.character_group_id))
+        ),
+        os => os.character?.id != null ? `char-${os.character.id}` : `group-${os.character_group?.id}`,
       )
       return (
         <td key={i} className="border border-gray-400 px-2 py-1 text-xs break-words">
           {uniqChars.map((os, j) => (
-            <span key={os.character?.id ?? j}>
+            <span key={os.character?.id ?? os.character_group?.id ?? j}>
               {j > 0 && ', '}
               {os.character?.id ? (
                 <Link
@@ -267,7 +285,7 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
                 >
                   {os.character.name}
                 </Link>
-              ) : (os.character?.name ?? '')}
+              ) : (os.character?.name ?? os.character_group?.name ?? '')}
             </span>
           ))}
         </td>
@@ -310,12 +328,20 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
       .map(c => c.character_id)
       .filter((id): id is number => id !== null)
 
+    const uncastCharacterGroupIds = castings
+      .filter(c => c.character_group && !c.user_id)
+      .map(c => c.character_group_id)
+      .filter((id): id is number => id !== null)
+
     const uncastCells = blocks.map(block => {
       const uniqChars = _.uniqBy(
-        block.filter(os => _.includes(uncastCharacterIds, os.character_id)),
-        os => os.character?.id,
+        block.filter(os =>
+          (os.character_id != null && _.includes(uncastCharacterIds, os.character_id)) ||
+          (os.character_group_id != null && _.includes(uncastCharacterGroupIds, os.character_group_id))
+        ),
+        os => os.character?.id != null ? `char-${os.character.id}` : `group-${os.character_group?.id}`,
       )
-      return _.join(uniqChars.map(os => os.character?.name ?? ''), ', ')
+      return _.join(uniqChars.map(os => os.character?.name ?? os.character_group?.name ?? ''), ', ')
     })
 
     return [header, ...actorRows, ['Still to cast', ...uncastCells]]

@@ -11,7 +11,8 @@ interface Line {
 }
 
 interface OnStage {
-  character_id: number;
+  character_id: number | null;
+  character_group_id?: number | null;
   nonspeaking: boolean;
   offstage: boolean;
 }
@@ -209,11 +210,15 @@ function getLinesFromCharacters(characters: Character[]): Line[] {
   return _.flattenDeep(lines);
 }
 
+function onStageKey(os: OnStage): string {
+  return os.character_id != null ? String(os.character_id) : `group-${os.character_group_id}`;
+}
+
 function getOnStagesFromAct(act: Act): OnStage[] {
   const frenchScenes = getFrenchScenesFromAct(act);
   const flat = _.compact(_.flattenDeep(frenchScenes.map(fs => fs.on_stages ?? [])));
   return _.map(
-    _.groupBy(flat, "character_id"),
+    _.groupBy(flat, onStageKey),
     entries => ({ ...entries[0], nonspeaking: entries.every(e => e.nonspeaking), offstage: entries.every(e => e.offstage) })
   );
 }
@@ -221,7 +226,7 @@ function getOnStagesFromAct(act: Act): OnStage[] {
 function getOnStagesFromScene(scene: Scene): OnStage[] {
   const flat = _.flattenDeep(scene.french_scenes.map(fs => fs.on_stages ?? []));
   return _.map(
-    _.groupBy(flat, "character_id"),
+    _.groupBy(flat, onStageKey),
     entries => ({ ...entries[0], nonspeaking: entries.every(e => e.nonspeaking), offstage: entries.every(e => e.offstage) })
   );
 }

@@ -210,3 +210,136 @@ describe('DoublingChartShow CSV download filename by level', () => {
     expect(rows[0]).toEqual(['Actor', '1.1.1', '2.1.1'])
   })
 })
+
+// ─── character groups ─────────────────────────────────────────────────────────
+
+// Act 1: Hamlet (char) + Ensemble (group) both on-stage → Alice has a doubling problem
+// Act 2: Townspeople (group) on-stage, uncast
+const playWithGroups: ChartPlay = {
+  id: 2,
+  title: 'Test Play',
+  acts: [
+    {
+      id: 1,
+      number: 1,
+      scenes: [{
+        id: 1,
+        pretty_name: '1.1',
+        french_scenes: [{
+          id: 1,
+          pretty_name: '1.1.1',
+          on_stages: [
+            { character_id: 1, character_group_id: null, nonspeaking: false, offstage: false, character: { id: 1, name: 'Hamlet' }, character_group: null },
+            { character_id: null, character_group_id: 10, nonspeaking: false, offstage: false, character: null, character_group: { id: 10, name: 'Ensemble' } },
+          ],
+        }],
+      }],
+    },
+    {
+      id: 2,
+      number: 2,
+      scenes: [{
+        id: 2,
+        pretty_name: '2.1',
+        french_scenes: [{
+          id: 2,
+          pretty_name: '2.1.1',
+          on_stages: [
+            { character_id: null, character_group_id: 20, nonspeaking: false, offstage: false, character: null, character_group: { id: 20, name: 'Townspeople' } },
+          ],
+        }],
+      }],
+    },
+  ],
+} as unknown as ChartPlay
+
+// Alice (id 10) plays Hamlet AND is in Ensemble; Townspeople is uncast
+const castingsWithGroups: any[] = [
+  { id: 1, user_id: 10, character_id: 1, character: { id: 1, name: 'Hamlet', new_line_count: null, original_line_count: null }, production_id: 1, theater_id: null, specialization_id: null, character_group_id: null, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: null, production: null, user: null },
+  { id: 2, user_id: 10, character_id: null, character: null, production_id: 1, theater_id: null, specialization_id: null, character_group_id: 10, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: { id: 10, name: 'Ensemble' }, production: null, user: null },
+  { id: 3, user_id: null, character_id: null, character: null, production_id: 1, theater_id: null, specialization_id: null, character_group_id: 20, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: { id: 20, name: 'Townspeople' }, production: null, user: null },
+]
+
+describe('DoublingChartShow character group rendering', () => {
+  it('shows character group name in the actor row', () => {
+    render(<DoublingChartShow level="act" play={playWithGroups} castings={castingsWithGroups} actors={actors} />)
+    expect(screen.getByText('Alice Smith').closest('tr')).toHaveTextContent('Ensemble')
+  })
+
+  it('shows the character alongside the character group in the same cell', () => {
+    render(<DoublingChartShow level="act" play={playWithGroups} castings={castingsWithGroups} actors={actors} />)
+    const aliceRow = screen.getByText('Alice Smith').closest('tr')!
+    expect(aliceRow).toHaveTextContent('Hamlet')
+    expect(aliceRow).toHaveTextContent('Ensemble')
+  })
+
+  it('flags the doubling problem when actor has both a character and a character group in the same block', () => {
+    render(<DoublingChartShow level="act" play={playWithGroups} castings={castingsWithGroups} actors={actors} />)
+    const aliceRow = screen.getByText('Alice Smith').closest('tr')!
+    // first td is name, second is Act 1 (where both Hamlet and Ensemble are on-stage)
+    const cells = aliceRow.querySelectorAll('td')
+    expect(cells[1].className).toContain('bg-orange-400')
+  })
+
+  it('does not flag doubling when actor only has a character group in a block', () => {
+    // Only Ensemble (character group) is on-stage in Act 1 for this casting
+    const singleGroupCastings: any[] = [
+      { id: 2, user_id: 10, character_id: null, character: null, production_id: 1, theater_id: null, specialization_id: null, character_group_id: 10, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: { id: 10, name: 'Ensemble' }, production: null, user: null },
+    ]
+    render(<DoublingChartShow level="act" play={playWithGroups} castings={singleGroupCastings} actors={actors} />)
+    const aliceRow = screen.getByText('Alice Smith').closest('tr')!
+    const cells = aliceRow.querySelectorAll('td')
+    expect(cells[1].className).not.toContain('bg-orange-400')
+  })
+
+  it('shows uncast character group in the Still to cast row', () => {
+    render(<DoublingChartShow level="act" play={playWithGroups} castings={castingsWithGroups} actors={actors} />)
+    const uncastRow = screen.getByText('Still to cast').closest('tr')!
+    expect(uncastRow).toHaveTextContent('Townspeople')
+  })
+
+  it('does not show cast character group in the Still to cast row', () => {
+    render(<DoublingChartShow level="act" play={playWithGroups} castings={castingsWithGroups} actors={actors} />)
+    const uncastRow = screen.getByText('Still to cast').closest('tr')!
+    expect(uncastRow).not.toHaveTextContent('Ensemble')
+  })
+})
+
+describe('DoublingChartShow character group CSV', () => {
+  it('includes character group name in the actor CSV row', async () => {
+    const user = userEvent.setup()
+    render(<DoublingChartShow level="act" play={playWithGroups} castings={castingsWithGroups} actors={actors} />)
+    await user.click(screen.getByRole('button', { name: /download csv/i }))
+    const [rows] = mockDownloadCsv.mock.calls[0]
+    const aliceRow = rows.find((r: string[]) => r[0] === 'Alice Smith')
+    expect(aliceRow[1]).toContain('Ensemble')
+  })
+
+  it('includes the regular character alongside the character group in the actor CSV row', async () => {
+    const user = userEvent.setup()
+    render(<DoublingChartShow level="act" play={playWithGroups} castings={castingsWithGroups} actors={actors} />)
+    await user.click(screen.getByRole('button', { name: /download csv/i }))
+    const [rows] = mockDownloadCsv.mock.calls[0]
+    const aliceRow = rows.find((r: string[]) => r[0] === 'Alice Smith')
+    expect(aliceRow[1]).toContain('Hamlet')
+    expect(aliceRow[1]).toContain('Ensemble')
+  })
+
+  it('includes uncast character group in the Still to cast CSV row', async () => {
+    const user = userEvent.setup()
+    render(<DoublingChartShow level="act" play={playWithGroups} castings={castingsWithGroups} actors={actors} />)
+    await user.click(screen.getByRole('button', { name: /download csv/i }))
+    const [rows] = mockDownloadCsv.mock.calls[0]
+    const uncastRow = rows.find((r: string[]) => r[0] === 'Still to cast')
+    expect(uncastRow[2]).toBe('Townspeople')
+  })
+
+  it('does not include cast character group in the Still to cast CSV row', async () => {
+    const user = userEvent.setup()
+    render(<DoublingChartShow level="act" play={playWithGroups} castings={castingsWithGroups} actors={actors} />)
+    await user.click(screen.getByRole('button', { name: /download csv/i }))
+    const [rows] = mockDownloadCsv.mock.calls[0]
+    const uncastRow = rows.find((r: string[]) => r[0] === 'Still to cast')
+    expect(uncastRow[1]).not.toContain('Ensemble')
+  })
+})

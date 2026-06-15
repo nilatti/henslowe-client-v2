@@ -4,7 +4,8 @@ import { Link } from "@tanstack/react-router";
 import { productionSkeletonQueryOptions } from "../api/productions";
 import { productionJobsQueryOptions } from "../../jobs/api/jobs";
 import { playScriptQueryOptions } from "../../script/api/script";
-import { getCastings, getActors } from "../../jobs/utils/jobUtils";
+import { getActors } from "../../jobs/utils/jobUtils";
+import { ACTOR_SPECIALIZATION_ID } from "../../../utils/constants";
 import { DoublingChartShow } from "./DoublingChartShow";
 import type { ChartPlay } from "./DoublingChartShow";
 import { ProductionJobs } from "../../jobs/components/ProductionJobs";
@@ -40,7 +41,11 @@ export function DoublingChartContainer({
   });
 
   const actors = getActors(jobs);
-  const castings = getCastings(jobs);
+  const castings = jobs.filter(
+    j =>
+      j.specialization_id === ACTOR_SPECIALIZATION_ID &&
+      (j.character_id != null || j.character_group_id != null),
+  );
 
   const chartPlay: ChartPlay | null =
     script && script.acts.length > 0
