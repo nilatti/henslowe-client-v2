@@ -25,7 +25,47 @@ import {
   useIsSuperAdmin,
 } from "../../../hooks/useUserRole";
 import { Button, Card } from "../../../components/ui";
-import type { RehearsalUser } from "../types/rehearsal";
+import type { RehearsalUser, RehearsalWithDetails } from "../types/rehearsal";
+import { buildUserName } from "../../../utils/actorUtils";
+
+function tsvEscape(val: string): string {
+  return val.replace(/\t/g, " ").replace(/\n/g, " ");
+}
+
+function downloadRehearsalTSV(rehearsals: RehearsalWithDetails[]) {
+  const headers = ["Date", "Start Time", "End Time", "Location", "Title", "Notes", "Content", "Call List"];
+
+  const sorted = [...rehearsals].sort((a, b) => a.start_time.localeCompare(b.start_time));
+
+  const rows = sorted.map((r) => {
+    const date = format(parseISO(r.start_time), "yyyy-MM-dd");
+    const startTime = format(parseISO(r.start_time), "h:mm a");
+    const endTime = format(parseISO(r.end_time), "h:mm a");
+    const location = r.space?.name ?? "";
+    const title = r.title ?? "";
+    const notes = r.notes ?? "";
+    const content = [
+      ...r.acts.map((a) => a.heading ?? ""),
+      ...r.scenes.map((s) => s.pretty_name ?? ""),
+      ...r.french_scenes.map((fs) => fs.pretty_name ?? ""),
+    ].filter(Boolean).join(", ");
+    const callList = r.users.map((u) => buildUserName(u)).join(", ");
+    return [date, startTime, endTime, location, title, notes, content, callList];
+  });
+
+  const lines = [
+    headers.map(tsvEscape).join("\t"),
+    ...rows.map((row) => row.map(tsvEscape).join("\t")),
+  ];
+
+  const blob = new Blob([lines.join("\n")], { type: "text/tab-separated-values" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "rehearsal-schedule.tsv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 interface RehearsalScheduleProps {
   productionId: number;
@@ -170,13 +210,21 @@ export function RehearsalSchedule({
           ← Last week
         </Button>
         <span className="text-sm font-medium text-gray-700">{weekLabel}</span>
-        <Button
-          variant="secondary"
-          onClick={() => setCurrentWeekStart(addWeeks(currentWeekStart, 1))}
-          disabled={!hasNextWeek}
-        >
-          Next week →
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            onClick={() => downloadRehearsalTSV(rehearsals)}
+          >
+            Download TSV
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setCurrentWeekStart(addWeeks(currentWeekStart, 1))}
+            disabled={!hasNextWeek}
+          >
+            Next week →
+          </Button>
+        </div>
       </div>
 
       {Object.keys(groupedRehearsals).length === 0 ? (
@@ -195,7 +243,7 @@ export function RehearsalSchedule({
                   </h3>
                 </div>
                 <div className="px-4 pb-2">
-                  {groupedRehearsals[date].map((rehearsal) => (
+                  {[...groupedRehearsals[date]].sort((a, b) => a.start_time.localeCompare(b.start_time)).map((rehearsal) => (
                     <div key={rehearsal.id} id={`rehearsal-${rehearsal.id}`}>
                       <RehearsalShow
                         rehearsal={rehearsal}
