@@ -42,12 +42,8 @@ export function RehearsalPeopleManager({
     );
   };
 
-  const handleSave = async () => {
-    const payload: { id: number; user_ids: number[] } = {
-      id: rehearsal.id,
-      user_ids: selectedIds,
-    };
-    await update.mutateAsync(payload);
+  const handleSave = () => {
+    update.mutate({ id: rehearsal.id, user_ids: selectedIds });
     setShowPeopleManager(false);
   };
 

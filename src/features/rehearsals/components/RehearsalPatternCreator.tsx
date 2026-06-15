@@ -1,26 +1,35 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useBuildRehearsalSchedule } from "../api/rehearsals";
 import { Button, Card } from "../../../components/ui";
 import { DAYS_OF_WEEK } from "../../../utils/constants";
 import type { RehearsalUser } from "../types/rehearsal";
 import RehearsalCallSelector from "./people/RehearsalCallSelector";
+import { theaterSkeletonQueryOptions } from "../../theaters/api/theaters";
 
 interface RehearsalPatternCreatorProps {
   productionId: number;
+  theaterId: number;
   actors: RehearsalUser[];
   productionStaff: RehearsalUser[];
   onClose: () => void;
   actorCharacterNames?: Map<number, string[]>;
+  defaultSpaceId?: number | null;
+  defaultCallUserIds?: number[];
 }
 
 export function RehearsalPatternCreator({
   productionId,
+  theaterId,
   actors,
   productionStaff,
   onClose,
   actorCharacterNames,
+  defaultSpaceId,
+  defaultCallUserIds,
 }: RehearsalPatternCreatorProps) {
   const buildSchedule = useBuildRehearsalSchedule(productionId);
+  const { data: theater } = useQuery(theaterSkeletonQueryOptions(theaterId));
   const [submitted, setSubmitted] = useState(false);
 
   const [startDate, setStartDate] = useState("");
@@ -30,7 +39,8 @@ export function RehearsalPatternCreator({
   const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
   const [breakLength, setBreakLength] = useState("");
   const [timeBetweenBreaks, setTimeBetweenBreaks] = useState("");
-  const [defaultUserIds, setDefaultUserIds] = useState<number[]>([]);
+  const [defaultUserIds, setDefaultUserIds] = useState<number[]>(defaultCallUserIds ?? []);
+  const [spaceId, setSpaceId] = useState<number | null>(defaultSpaceId ?? null);
 
   const blockLength =
     (parseInt(timeBetweenBreaks) || 0) + (parseInt(breakLength) || 0);
@@ -67,6 +77,7 @@ export function RehearsalPatternCreator({
       break_length: parseInt(breakLength) || 0,
       time_between_breaks: parseInt(timeBetweenBreaks) || 0,
       default_user_ids: defaultUserIds,
+      space_id: spaceId,
     });
     setSubmitted(true);
   };
@@ -205,6 +216,28 @@ export function RehearsalPatternCreator({
             />
           </div>
         </div>
+
+        {theater && theater.spaces.length > 0 && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Location
+            </label>
+            <select
+              value={spaceId ?? ""}
+              onChange={(e) =>
+                setSpaceId(e.target.value ? Number(e.target.value) : null)
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">No location</option>
+              {theater.spaces.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {actors.length > 0 ||
           (productionStaff.length > 0 && (

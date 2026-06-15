@@ -248,9 +248,9 @@ export function RehearsalShow({
           message="Delete this rehearsal?"
           isDestructive
           confirmLabel="Delete"
-          onConfirm={async () => {
-            await deleteRehearsal.mutateAsync(rehearsal.id);
+          onConfirm={() => {
             setConfirmDelete(false);
+            deleteRehearsal.mutate(rehearsal.id);
           }}
           onCancel={() => setConfirmDelete(false)}
         />

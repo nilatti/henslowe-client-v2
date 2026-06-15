@@ -128,8 +128,8 @@ export function RehearsalContentManager({
     );
   };
 
-  const handleReset = async () => {
-    await updateRehearsal.mutateAsync({
+  const handleReset = () => {
+    updateRehearsal.mutate({
       id: rehearsal.id,
       text_unit: null,
       act_ids: [],
@@ -155,7 +155,7 @@ export function RehearsalContentManager({
     }
   };
 
-  const submitContent = async (confirmedExtraUsers: RehearsalUser[]) => {
+  const submitContent = (confirmedExtraUsers: RehearsalUser[]) => {
     const selected = playContent.filter((item) => item.isScheduled);
     const calledActors = getCalledActors(selected, actors, characterToUserMap);
     const calledStaff = productionStaff.filter((s) =>
@@ -174,7 +174,7 @@ export function RehearsalContentManager({
       [singularKey]: selected.map((item) => item.id),
     };
 
-    await updateRehearsal.mutateAsync(
+    updateRehearsal.mutate(
       payload as Parameters<typeof updateRehearsal.mutateAsync>[0],
     );
     onClose();

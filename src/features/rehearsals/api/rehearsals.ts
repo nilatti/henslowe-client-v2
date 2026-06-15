@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query";
 import api from "../../../api/client";
 import { customQueryOptions } from "../../../api/queryFactory";
-import type { Rehearsal, RehearsalWithDetails } from "../types/rehearsal";
+import type { Rehearsal, RehearsalUser, RehearsalWithDetails } from "../types/rehearsal";
 import type { Conflict } from "../../conflicts/types/conflict";
 
 export interface ProductionUserConflict {
@@ -67,41 +67,137 @@ export const productionUserConflictsQueryOptions = (productionId: number) =>
     staleTime: 0,
   });
 
+type UpdateRehearsalPayload = Partial<Rehearsal> & {
+  id: number;
+  user_ids?: number[];
+  act_ids?: number[];
+  scene_ids?: number[];
+  french_scene_ids?: number[];
+};
+
 export function useCreateRehearsal(productionId: number) {
   const qc = useQueryClient();
+  const key = ["rehearsals", { productionId }] as const;
   return useMutation({
     mutationFn: (data: Partial<Rehearsal>) =>
       api
         .post(`/api/v1/productions/${productionId}/rehearsals`, {
           rehearsal: data,
         })
-        .then((r) => r.data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["rehearsals", { productionId }] });
+        .then((r) => r.data as RehearsalWithDetails),
+    onMutate: async (data) => {
+      await qc.cancelQueries({ queryKey: key });
+      const previous = qc.getQueryData<RehearsalWithDetails[]>(key);
+      const existing = previous ?? [];
+      const space = data.space_id
+        ? existing.find((r) => r.space?.id === data.space_id)?.space ?? null
+        : null;
+      const optimistic: RehearsalWithDetails = {
+        id: -Date.now(),
+        production_id: productionId,
+        space_id: data.space_id ?? null,
+        space,
+        start_time: data.start_time ?? "",
+        end_time: data.end_time ?? "",
+        title: data.title ?? null,
+        notes: data.notes ?? null,
+        text_unit: data.text_unit ?? null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        users: [],
+        acts: [],
+        scenes: [],
+        french_scenes: [],
+      };
+      qc.setQueryData<RehearsalWithDetails[]>(key, [...existing, optimistic]);
+      return { previous };
+    },
+    onError: (_err, _data, ctx) => {
+      if (ctx?.previous !== undefined) {
+        qc.setQueryData(key, ctx.previous);
+      }
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: key });
     },
   });
 }
 
 export function useUpdateRehearsal(productionId: number) {
   const qc = useQueryClient();
+  const key = ["rehearsals", { productionId }] as const;
   return useMutation({
-    mutationFn: (data: Partial<Rehearsal> & { id: number }) =>
+    mutationFn: (data: UpdateRehearsalPayload) =>
       api
         .put(`/api/v1/rehearsals/${data.id}`, { rehearsal: data })
         .then((r) => r.data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["rehearsals", { productionId }] });
+    onMutate: async (data) => {
+      await qc.cancelQueries({ queryKey: key });
+      const previous = qc.getQueryData<RehearsalWithDetails[]>(key);
+
+      // Build a user lookup pool from all rehearsals currently in cache
+      const userPool = new Map<number, RehearsalUser>();
+      previous?.forEach((r) => r.users.forEach((u) => userPool.set(u.id, u)));
+
+      qc.setQueryData<RehearsalWithDetails[]>(
+        key,
+        previous?.map((r) => {
+          if (r.id !== data.id) return r;
+          const updated: RehearsalWithDetails = { ...r };
+          if (data.start_time !== undefined) updated.start_time = data.start_time;
+          if (data.end_time !== undefined) updated.end_time = data.end_time;
+          if ("title" in data) updated.title = data.title ?? null;
+          if ("notes" in data) updated.notes = data.notes ?? null;
+          if ("text_unit" in data) updated.text_unit = data.text_unit ?? null;
+          if ("space_id" in data) {
+            updated.space_id = data.space_id ?? null;
+            updated.space = data.space_id
+              ? previous?.find((pr) => pr.space?.id === data.space_id)?.space ?? null
+              : null;
+          }
+          if (data.user_ids !== undefined) {
+            updated.users = data.user_ids
+              .map((id) => userPool.get(id))
+              .filter((u): u is RehearsalUser => u !== undefined);
+          }
+          return updated;
+        }) ?? [],
+      );
+      return { previous };
+    },
+    onError: (_err, _data, ctx) => {
+      if (ctx?.previous !== undefined) {
+        qc.setQueryData(key, ctx.previous);
+      }
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: key });
     },
   });
 }
 
 export function useDeleteRehearsal(productionId: number) {
   const qc = useQueryClient();
+  const key = ["rehearsals", { productionId }] as const;
   return useMutation({
     mutationFn: (id: number) =>
       api.delete(`/api/v1/rehearsals/${id}`).then((r) => r.data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["rehearsals", { productionId }] });
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: key });
+      const previous = qc.getQueryData<RehearsalWithDetails[]>(key);
+      qc.setQueryData<RehearsalWithDetails[]>(
+        key,
+        previous?.filter((r) => r.id !== id) ?? [],
+      );
+      return { previous };
+    },
+    onError: (_err, _id, ctx) => {
+      if (ctx?.previous !== undefined) {
+        qc.setQueryData(key, ctx.previous);
+      }
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: key });
     },
   });
 }

@@ -181,9 +181,12 @@ export function RehearsalSchedule({
         <div className="mb-6">
           <RehearsalPatternCreator
             productionId={productionId}
+            theaterId={theaterId}
             actors={actors}
             productionStaff={productionStaff}
             actorCharacterNames={actorCharacterNames}
+            defaultSpaceId={productionSkeleton?.default_space_id}
+            defaultCallUserIds={productionSkeleton?.default_call_user_ids}
             onClose={() => setShowPatternCreator(false)}
           />
         </div>
