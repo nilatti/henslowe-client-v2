@@ -4,7 +4,7 @@ import { usePageTitle } from '../../hooks/usePageTitle'
 import { OpenAuditionsList } from '../../features/auditions/components/OpenAuditionsList'
 import { LoadingSpinner, PageHeader } from '../../components/ui'
 
-export const Route = createFileRoute('/_public/auditions')({
+export const Route = createFileRoute('/_public/auditions_')({
   component: function AuditionsRoute() {
     usePageTitle('Open Auditions')
     return (

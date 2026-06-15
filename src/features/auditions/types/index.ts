@@ -1,3 +1,9 @@
+export interface AuditionSubmission {
+  id: number
+  video_url: string | null
+  notes: string | null
+}
+
 export interface OpenAudition {
   production_id: number
   play_title: string | null

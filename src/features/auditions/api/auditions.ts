@@ -2,7 +2,6 @@ import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query
 import api from '../../../api/client'
 import type { OpenAudition } from '../types'
 import type { UserEditableFields } from '../../users/types/user'
-import { AUDITIONER_SPECIALIZATION_ID } from '../../../utils/constants'
 
 export const openAuditionsQueryOptions = () =>
   queryOptions({
@@ -12,16 +11,17 @@ export const openAuditionsQueryOptions = () =>
     staleTime: 1000 * 60 * 5,
   })
 
+export interface SubmissionData {
+  video_url?: string
+  notes?: string
+}
+
 export function useCreateAuditionerJob(productionId: number) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (userId: number) =>
-      api.post('/api/v1/jobs', {
-        job: {
-          production_id: productionId,
-          user_id: userId,
-          specialization_id: AUDITIONER_SPECIALIZATION_ID,
-        },
+    mutationFn: (submission: SubmissionData = {}) =>
+      api.post(`/api/v1/productions/${productionId}/auditions`, {
+        audition_submission: submission,
       }).then(r => r.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['jobs', { productionId }] })

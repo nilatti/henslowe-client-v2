@@ -58,6 +58,7 @@ export interface UserJob {
   }
   character?: { name: string } | null
   character_group?: { name: string } | null
+  audition_submission?: { id: number; video_url: string | null; notes: string | null } | null
 }
 
 export interface UserConflict {
