@@ -8,7 +8,6 @@ import { getActors } from "../../jobs/utils/jobUtils";
 import { ACTOR_SPECIALIZATION_ID } from "../../../utils/constants";
 import { DoublingChartShow } from "./DoublingChartShow";
 import type { ChartPlay } from "./DoublingChartShow";
-import { ProductionJobs } from "../../jobs/components/ProductionJobs";
 import { Tabs } from "../../../components/ui";
 
 interface DoublingChartContainerProps {
@@ -42,7 +41,7 @@ export function DoublingChartContainer({
 
   const actors = getActors(jobs);
   const castings = jobs.filter(
-    j =>
+    (j) =>
       j.specialization_id === ACTOR_SPECIALIZATION_ID &&
       (j.character_id != null || j.character_group_id != null),
   );
@@ -58,14 +57,6 @@ export function DoublingChartContainer({
 
   return (
     <div className="space-y-6">
-      <ProductionJobs
-        productionId={productionId}
-        theaterId={production.theater.id}
-        productionStartDate={production.start_date}
-        productionEndDate={production.end_date}
-        playId={playId ?? 0}
-      />
-
       <div>
         {chartPlay && (
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
