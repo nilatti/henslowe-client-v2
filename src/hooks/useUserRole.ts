@@ -24,7 +24,7 @@ const userTheaterJobsQueryOptions = (userId: number, theaterId: number) =>
     staleTime: 1000 * 60 * 10,
   })
 
-const userProductionJobsQueryOptions = (userId: number, productionId: number) =>
+export const userProductionJobsQueryOptions = (userId: number, productionId: number) =>
   queryOptions({
     queryKey: ['jobs', { userId, productionId }],
     queryFn: () =>

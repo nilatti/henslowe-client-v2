@@ -1,37 +1,29 @@
 import _ from 'lodash'
 import type { JobWithDetails, FakeActorCount } from '../types/job'
-import {
-  ACTOR_SPECIALIZATION_ID,
-  AUDITIONER_SPECIALIZATION_ID,
-} from '../../../utils/constants'
 
 export function getCastings(jobs: JobWithDetails[]) {
   return jobs.filter(
     j =>
-      j.specialization_id === ACTOR_SPECIALIZATION_ID &&
+      j.specialization?.title === 'Actor' &&
       j.character_id != null &&
       !j.character?.name?.match(/Could Not Find Character/)
   )
 }
 
 export function getAuditionerJobs(jobs: JobWithDetails[]) {
-  return jobs.filter(
-    j => j.specialization_id === AUDITIONER_SPECIALIZATION_ID
-  )
+  return jobs.filter(j => j.specialization?.title === 'Auditioner')
 }
 
 export function getStaffJobs(jobs: JobWithDetails[]) {
   return jobs.filter(
     j =>
-      j.specialization_id !== ACTOR_SPECIALIZATION_ID &&
-      j.specialization_id !== AUDITIONER_SPECIALIZATION_ID
+      j.specialization?.title !== 'Actor' &&
+      j.specialization?.title !== 'Auditioner'
   )
 }
 
 export function getActors(jobs: JobWithDetails[]) {
-  const actingJobs = jobs.filter(
-    j => j.specialization_id === ACTOR_SPECIALIZATION_ID
-  )
+  const actingJobs = jobs.filter(j => j.specialization?.title === 'Actor')
   return _.uniqBy(_.compact(actingJobs.map(j => j.user)), 'id')
 }
 

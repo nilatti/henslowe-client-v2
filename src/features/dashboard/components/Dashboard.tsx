@@ -13,7 +13,10 @@ export function Dashboard() {
 
   const now = new Date()
 
-  const currentProductions = data.jobs
+  const auditionerJobs = data.jobs.filter((j) => j.specialization?.title === 'Auditioner')
+  const otherJobs = data.jobs.filter((j) => j.specialization?.title !== 'Auditioner')
+
+  const currentProductions = otherJobs
     // TODO: date filter also available for jobs list — see commented filter below
     .filter(
       (job) =>
@@ -26,7 +29,7 @@ export function Dashboard() {
     .map((job) => job.production!)
 
   const playIdByProductionId = new Map(
-    data.jobs
+    otherJobs
       .filter((j) => j.production?.play)
       .map((j) => [j.production!.id, j.production!.play!.id])
   )
@@ -42,9 +45,9 @@ export function Dashboard() {
 
       <div>
         <h4 className="pt-4 text-lg font-medium">Current Jobs &amp; Productions</h4>
-        {data.jobs.length > 0 ? (
+        {otherJobs.length > 0 ? (
           <ul className="list-disc list-inside space-y-1">
-            {data.jobs
+            {otherJobs
               // TODO: filter by date range:
               // .filter(job =>
               //   job.start_date && job.end_date &&
@@ -85,6 +88,28 @@ export function Dashboard() {
           <div className="text-gray-500">You don't have any jobs listed.</div>
         )}
       </div>
+
+      {auditionerJobs.length > 0 && (
+        <div>
+          <h4 className="pt-4 text-lg font-medium">Your Auditions</h4>
+          <ul className="list-disc list-inside space-y-1">
+            {auditionerJobs.map((job) => (
+              <li key={job.id}>
+                <Link
+                  to="/auditions/$jobId"
+                  params={{ jobId: String(job.id) }}
+                  className="text-blue-600 hover:underline"
+                >
+                  {job.production?.play?.title ?? 'Audition'}
+                </Link>
+                {job.theater && (
+                  <span className="text-gray-600"> at {job.theater.name}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <hr className="my-4" />
 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { createFileRoute, Outlet, useNavigate, useRouterState, Link } from '@tanstack/react-router'
+import { createFileRoute, Outlet, useNavigate, useRouterState, Link, redirect } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { usePageTitle } from '../../../hooks/usePageTitle'
 import {
@@ -13,6 +13,7 @@ import {
   useIsSuperAdmin,
   useUserRoleForProduction,
   useUserRoleForTheater,
+  userProductionJobsQueryOptions,
 } from '../../../hooks/useUserRole'
 import { Button, Card, ConfirmDialog, PageHeader, Tabs } from '../../../components/ui'
 
@@ -26,12 +27,25 @@ const TABS = [
 ]
 
 export const Route = createFileRoute('/_authenticated/productions/$productionId')({
-  loader: ({ params, context: { queryClient } }) =>
-    Promise.all([
-      queryClient.ensureQueryData(productionSkeletonQueryOptions(Number(params.productionId))),
+  loader: async ({ params, context: { queryClient, auth } }) => {
+    const pid = Number(params.productionId)
+    await Promise.all([
+      queryClient.ensureQueryData(productionSkeletonQueryOptions(pid)),
       queryClient.ensureQueryData(playsQueryOptions()),
       queryClient.ensureQueryData(theatersQueryOptions()),
-    ]),
+    ])
+    if (auth.user && !auth.user.is_superadmin) {
+      const jobs: any[] = await queryClient.ensureQueryData(
+        userProductionJobsQueryOptions(auth.user.id, pid)
+      )
+      if (jobs.length > 0 && jobs.every((j) => j.specialization?.title === 'Auditioner')) {
+        throw redirect({
+          to: '/auditions/$jobId',
+          params: { jobId: String(jobs[0].id) },
+        })
+      }
+    }
+  },
   component: function ProductionDetailLayout() {
     const { productionId } = Route.useParams()
     const pid = Number(productionId)
