@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { format, parseISO } from 'date-fns'
 import { useAuth } from '../../../hooks/useAuth'
 import { userQueryOptions } from '../../users/api/users'
 import { useCreateAuditionerJob, useUpdateAuditionerContact } from '../api/auditions'
+import { ConflictsManager } from '../../conflicts/components/ConflictsManager'
 import { Button } from '../../../components/ui'
 import { US_STATES_ARRAY, USER_GENDER_DESCRIPTORS } from '../../../utils/constants'
 
@@ -12,11 +14,18 @@ interface Props {
   productionId: number
   playTitle: string | null
   theaterName: string | null
+  rehearsalStartDate: string | null
+  runEndDate: string | null
 }
 
 const inputClass = 'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
 
-export function AuditionForm({ productionId, playTitle, theaterName }: Props) {
+function formatPhaseDate(d: string | null) {
+  if (!d) return null
+  try { return format(parseISO(d), 'MMM d, yyyy') } catch { return null }
+}
+
+export function AuditionForm({ productionId, playTitle, theaterName, rehearsalStartDate, runEndDate }: Props) {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [submitted, setSubmitted] = useState(false)
@@ -227,6 +236,20 @@ export function AuditionForm({ productionId, playTitle, theaterName }: Props) {
           {textField('emergency_contact_name', 'Name')}
           {textField('emergency_contact_number', 'Phone')}
         </div>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-gray-900 mb-1">Scheduling conflicts</h3>
+        <p className="text-xs text-gray-500 mb-3">
+          {(() => {
+            const start = formatPhaseDate(rehearsalStartDate)
+            const end = formatPhaseDate(runEndDate)
+            return start && end
+              ? `Let the production team know when you're unavailable — add one-off dates or recurring weekly patterns between ${start} and ${end}.`
+              : "Let the production team know when you're unavailable — add one-off dates or recurring weekly patterns."
+          })()}
+        </p>
+        <ConflictsManager userId={user!.id} canEdit={true} />
       </div>
 
       {error && <p className="text-sm text-red-600">Something went wrong. Please try again.</p>}

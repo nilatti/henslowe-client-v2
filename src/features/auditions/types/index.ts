@@ -12,4 +12,6 @@ export interface OpenAudition {
   theater_state: string | null
   audition_start_date: string | null
   audition_end_date: string | null
+  rehearsal_start_date: string | null
+  run_end_date: string | null
 }

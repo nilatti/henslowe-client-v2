@@ -62,6 +62,8 @@ function AuditionFormLoader({ productionId }: { productionId: number }) {
       productionId={productionId}
       playTitle={match.play_title}
       theaterName={match.theater_name}
+      rehearsalStartDate={match.rehearsal_start_date}
+      runEndDate={match.run_end_date}
     />
   )
 }
