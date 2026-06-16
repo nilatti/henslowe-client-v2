@@ -24,6 +24,7 @@ import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as PublicHelpRouteImport } from './routes/_public/help'
 import { Route as PublicGettingStartedRouteImport } from './routes/_public/getting-started'
 import { Route as PublicFaqRouteImport } from './routes/_public/faq'
+import { Route as PublicAuditionsRouteImport } from './routes/_public/auditions_'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedTheatersIndexRouteImport } from './routes/_authenticated/theaters/index'
@@ -33,6 +34,7 @@ import { Route as AuthenticatedProductionsIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedPlaysIndexRouteImport } from './routes/_authenticated/plays/index'
 import { Route as AuthenticatedPhasesIndexRouteImport } from './routes/_authenticated/phases/index'
 import { Route as AuthenticatedAuthorsIndexRouteImport } from './routes/_authenticated/authors/index'
+import { Route as PublicAuditionsProductionIdRouteImport } from './routes/_public/auditions.$productionId'
 import { Route as AuthenticatedUsersNewRouteImport } from './routes/_authenticated/users/new'
 import { Route as AuthenticatedTheatersNewRouteImport } from './routes/_authenticated/theaters/new'
 import { Route as AuthenticatedSpecializationsNewRouteImport } from './routes/_authenticated/specializations/new'
@@ -134,6 +136,11 @@ const PublicFaqRoute = PublicFaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => PublicRoute,
 } as any)
+const PublicAuditionsRoute = PublicAuditionsRouteImport.update({
+  id: '/auditions_',
+  path: '/auditions',
+  getParentRoute: () => PublicRoute,
+} as any)
 const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -184,6 +191,12 @@ const AuthenticatedAuthorsIndexRoute =
     id: '/authors/',
     path: '/authors/',
     getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const PublicAuditionsProductionIdRoute =
+  PublicAuditionsProductionIdRouteImport.update({
+    id: '/auditions/$productionId',
+    path: '/auditions/$productionId',
+    getParentRoute: () => PublicRoute,
   } as any)
 const AuthenticatedUsersNewRoute = AuthenticatedUsersNewRouteImport.update({
   id: '/users/new',
@@ -355,6 +368,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/free': typeof FreeRouteWithChildren
   '/account': typeof AuthenticatedAccountRoute
+  '/auditions': typeof PublicAuditionsRoute
   '/faq': typeof PublicFaqRoute
   '/getting-started': typeof PublicGettingStartedRoute
   '/help': typeof PublicHelpRoute
@@ -372,6 +386,7 @@ export interface FileRoutesByFullPath {
   '/specializations/new': typeof AuthenticatedSpecializationsNewRoute
   '/theaters/new': typeof AuthenticatedTheatersNewRoute
   '/users/new': typeof AuthenticatedUsersNewRoute
+  '/auditions/$productionId': typeof PublicAuditionsProductionIdRoute
   '/authors/': typeof AuthenticatedAuthorsIndexRoute
   '/phases/': typeof AuthenticatedPhasesIndexRoute
   '/plays/': typeof AuthenticatedPlaysIndexRoute
@@ -405,6 +420,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/auditions': typeof PublicAuditionsRoute
   '/faq': typeof PublicFaqRoute
   '/getting-started': typeof PublicGettingStartedRoute
   '/help': typeof PublicHelpRoute
@@ -421,6 +437,7 @@ export interface FileRoutesByTo {
   '/specializations/new': typeof AuthenticatedSpecializationsNewRoute
   '/theaters/new': typeof AuthenticatedTheatersNewRoute
   '/users/new': typeof AuthenticatedUsersNewRoute
+  '/auditions/$productionId': typeof PublicAuditionsProductionIdRoute
   '/authors': typeof AuthenticatedAuthorsIndexRoute
   '/phases': typeof AuthenticatedPhasesIndexRoute
   '/plays': typeof AuthenticatedPlaysIndexRoute
@@ -458,6 +475,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/free': typeof FreeRouteWithChildren
   '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/_public/auditions_': typeof PublicAuditionsRoute
   '/_public/faq': typeof PublicFaqRoute
   '/_public/getting-started': typeof PublicGettingStartedRoute
   '/_public/help': typeof PublicHelpRoute
@@ -475,6 +493,7 @@ export interface FileRoutesById {
   '/_authenticated/specializations/new': typeof AuthenticatedSpecializationsNewRoute
   '/_authenticated/theaters/new': typeof AuthenticatedTheatersNewRoute
   '/_authenticated/users/new': typeof AuthenticatedUsersNewRoute
+  '/_public/auditions/$productionId': typeof PublicAuditionsProductionIdRoute
   '/_authenticated/authors/': typeof AuthenticatedAuthorsIndexRoute
   '/_authenticated/phases/': typeof AuthenticatedPhasesIndexRoute
   '/_authenticated/plays/': typeof AuthenticatedPlaysIndexRoute
@@ -511,6 +530,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/free'
     | '/account'
+    | '/auditions'
     | '/faq'
     | '/getting-started'
     | '/help'
@@ -528,6 +548,7 @@ export interface FileRouteTypes {
     | '/specializations/new'
     | '/theaters/new'
     | '/users/new'
+    | '/auditions/$productionId'
     | '/authors/'
     | '/phases/'
     | '/plays/'
@@ -561,6 +582,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/auditions'
     | '/faq'
     | '/getting-started'
     | '/help'
@@ -577,6 +599,7 @@ export interface FileRouteTypes {
     | '/specializations/new'
     | '/theaters/new'
     | '/users/new'
+    | '/auditions/$productionId'
     | '/authors'
     | '/phases'
     | '/plays'
@@ -613,6 +636,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/free'
     | '/_authenticated/account'
+    | '/_public/auditions_'
     | '/_public/faq'
     | '/_public/getting-started'
     | '/_public/help'
@@ -630,6 +654,7 @@ export interface FileRouteTypes {
     | '/_authenticated/specializations/new'
     | '/_authenticated/theaters/new'
     | '/_authenticated/users/new'
+    | '/_public/auditions/$productionId'
     | '/_authenticated/authors/'
     | '/_authenticated/phases/'
     | '/_authenticated/plays/'
@@ -776,6 +801,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicFaqRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/_public/auditions_': {
+      id: '/_public/auditions_'
+      path: '/auditions'
+      fullPath: '/auditions'
+      preLoaderRoute: typeof PublicAuditionsRouteImport
+      parentRoute: typeof PublicRoute
+    }
     '/_authenticated/account': {
       id: '/_authenticated/account'
       path: '/account'
@@ -838,6 +870,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/authors/'
       preLoaderRoute: typeof AuthenticatedAuthorsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_public/auditions/$productionId': {
+      id: '/_public/auditions/$productionId'
+      path: '/auditions/$productionId'
+      fullPath: '/auditions/$productionId'
+      preLoaderRoute: typeof PublicAuditionsProductionIdRouteImport
+      parentRoute: typeof PublicRoute
     }
     '/_authenticated/users/new': {
       id: '/_authenticated/users/new'
@@ -1145,15 +1184,19 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 interface PublicRouteChildren {
+  PublicAuditionsRoute: typeof PublicAuditionsRoute
   PublicFaqRoute: typeof PublicFaqRoute
   PublicGettingStartedRoute: typeof PublicGettingStartedRoute
   PublicHelpRoute: typeof PublicHelpRoute
+  PublicAuditionsProductionIdRoute: typeof PublicAuditionsProductionIdRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
+  PublicAuditionsRoute: PublicAuditionsRoute,
   PublicFaqRoute: PublicFaqRoute,
   PublicGettingStartedRoute: PublicGettingStartedRoute,
   PublicHelpRoute: PublicHelpRoute,
+  PublicAuditionsProductionIdRoute: PublicAuditionsProductionIdRoute,
 }
 
 const PublicRouteWithChildren =

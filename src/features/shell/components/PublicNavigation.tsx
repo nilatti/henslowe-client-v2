@@ -72,6 +72,9 @@ function NavLinks() {
       <Link to="/free/part-scripts" className={linkClass} activeProps={{ className: activeClass }}>
         Part scripts
       </Link>
+      <Link to="/auditions" className={linkClass} activeProps={{ className: activeClass }}>
+        Open auditions
+      </Link>
       <Link to="/help" className={linkClass} activeProps={{ className: activeClass }}>
         Help
       </Link>

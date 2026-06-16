@@ -45,3 +45,16 @@ export interface SpaceDetail extends Space {
   conflicts: SpaceConflict[]
   conflict_patterns: SpaceConflictPattern[]
 }
+
+export interface SpaceRehearsal {
+  id: number
+  production_id: number
+  start_time: string
+  end_time: string
+  title: string | null
+  notes: string | null
+  acts: { id: number; play_id: number; heading: string }[]
+  scenes: { id: number; act_id: number; pretty_name: string }[]
+  french_scenes: { id: number; scene_id: number; pretty_name: string; scene: { id: number; act_id: number } }[]
+  production: { id: number; play: { id: number } | null }
+}

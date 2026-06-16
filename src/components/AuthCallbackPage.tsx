@@ -1,11 +1,15 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import type { AuthUser } from '../types/auth'
 
 export function AuthCallbackPage() {
   const navigate = useNavigate()
+  const handled = useRef(false)
 
   useEffect(() => {
+    if (handled.current) return
+    handled.current = true
+
     const params = new URLSearchParams(window.location.search)
     const token = params.get('token')
     const error = params.get('error')
@@ -34,10 +38,13 @@ export function AuthCallbackPage() {
     localStorage.setItem('auth_token', token)
     localStorage.setItem('auth_user', JSON.stringify(user))
 
+    const redirectTo = localStorage.getItem('redirect_after_login') ?? '/'
+    localStorage.removeItem('redirect_after_login')
+
     // Full reload so AuthProvider re-initializes from the freshly stored token.
     // Client-side navigate() won't work here because the storage event only
     // fires cross-tab, so AuthProvider's in-memory state is still null.
-    window.location.href = '/'
+    window.location.href = redirectTo
   }, [navigate])
 
   return (
