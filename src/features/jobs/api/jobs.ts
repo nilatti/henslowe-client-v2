@@ -83,6 +83,13 @@ export function useDeleteJob(invalidateKey: unknown[]) {
   })
 }
 
+export const jobQueryOptions = (jobId: number) =>
+  queryOptions({
+    queryKey: ['jobs', jobId],
+    queryFn: (): Promise<JobWithDetails> =>
+      api.get(`/api/v1/jobs/${jobId}`).then(r => r.data),
+  })
+
 // Fake actors endpoint — hits the dedicated /users/fake route
 export const fakeUsersQueryOptions = () =>
   queryOptions({

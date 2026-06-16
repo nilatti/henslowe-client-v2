@@ -1,4 +1,5 @@
 import type { UserSummary } from '../../users/types/user'
+import type { AuditionSubmission } from '../../auditions/types'
 
 export interface Job {
   id: number
@@ -33,9 +34,21 @@ export interface JobWithDetails extends Job {
   user: (UserSummary & {
     fake: boolean
     gender: string | null
+    middle_name?: string | null
+    phone_number?: string | null
+    timezone?: string | null
+    bio?: string | null
+    street_address?: string | null
+    city?: string | null
+    state?: string | null
+    zip?: string | null
+    website?: string | null
+    emergency_contact_name?: string | null
+    emergency_contact_number?: string | null
     conflicts?: unknown[]
     jobs?: unknown[]
   }) | null
+  audition_submission: AuditionSubmission | null
 }
 
 export interface FakeActorCount {

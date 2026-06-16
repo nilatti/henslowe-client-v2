@@ -1,15 +1,13 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import _ from "lodash";
+import { useQuery } from "@tanstack/react-query";
 import { useDeleteJob } from "../api/jobs";
 import type { JobWithDetails } from "../types/job";
 import { JobForm } from "./JobForm";
 import { Button, Card, ConfirmDialog } from "../../../components/ui";
 import { buildUserName } from "../../../utils/actorUtils";
-import {
-  AUDITIONER_SPECIALIZATION_ID,
-  ACTOR_SPECIALIZATION_ID,
-} from "../../../utils/constants";
+import { specializationsQueryOptions } from "../../specializations/queries";
 
 interface AuditionersListProps {
   jobs: JobWithDetails[];
@@ -29,6 +27,8 @@ export function AuditionersList({
   invalidateKey,
 }: AuditionersListProps) {
   const deleteJob = useDeleteJob(invalidateKey);
+  const { data: specializations = [] } = useQuery(specializationsQueryOptions());
+  const auditionerSpecId = specializations.find(s => s.title === 'Auditioner')?.id;
 
   const [showAuditioners, setShowAuditioners] = useState(false);
   const [hideCast, setHideCast] = useState(false);
@@ -36,13 +36,11 @@ export function AuditionersList({
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
 
   const auditionerJobs = jobs.filter(
-    (j) => j.specialization_id === AUDITIONER_SPECIALIZATION_ID,
+    (j) => j.specialization?.title === 'Auditioner',
   );
   const actorUserIds = new Set(
     jobs
-      .filter(
-        (j) => j.specialization_id === ACTOR_SPECIALIZATION_ID && j.user_id,
-      )
+      .filter((j) => j.specialization?.title === 'Actor' && j.user_id)
       .map((j) => j.user_id!),
   );
 
@@ -85,7 +83,7 @@ export function AuditionersList({
           <JobForm
             productionId={productionId}
             theaterId={theaterId}
-            specializationId={AUDITIONER_SPECIALIZATION_ID}
+            specializationId={auditionerSpecId}
             invalidateKey={invalidateKey}
             onSuccess={() => setShowForm(false)}
             onCancel={() => setShowForm(false)}
@@ -106,19 +104,30 @@ export function AuditionersList({
                 key={job.id}
                 className="flex items-center justify-between px-4 py-3 text-sm"
               >
-                {job.user?.fake ? (
-                  <span className="text-amber-600 italic">
-                    {buildUserName(job.user)}
-                  </span>
-                ) : (
-                  <Link
-                    to="/users/$userId"
-                    params={{ userId: String(job.user_id) }}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    {job.user ? buildUserName(job.user) : "Unknown"}
-                  </Link>
-                )}
+                <div className="flex items-center gap-3">
+                  {job.user?.fake ? (
+                    <span className="text-amber-600 italic">
+                      {buildUserName(job.user)}
+                    </span>
+                  ) : (
+                    <Link
+                      to="/users/$userId"
+                      params={{ userId: String(job.user_id) }}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      {job.user ? buildUserName(job.user) : "Unknown"}
+                    </Link>
+                  )}
+                  {isAdmin && !job.user?.fake && (
+                    <Link
+                      to="/auditions/$jobId"
+                      params={{ jobId: String(job.id) }}
+                      className="text-xs text-blue-600 hover:text-blue-800 underline"
+                    >
+                      See audition materials
+                    </Link>
+                  )}
+                </div>
                 {isAdmin && (
                   <Button
                     variant="danger"

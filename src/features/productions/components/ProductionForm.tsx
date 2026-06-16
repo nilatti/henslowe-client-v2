@@ -42,6 +42,7 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
           : '',
       start_date: production?.start_date ?? '',
       end_date: production?.end_date ?? '',
+      audition_information: production?.audition_information ?? '',
       lines_per_minute: production?.lines_per_minute
         ? String(production.lines_per_minute)
         : '',
@@ -52,6 +53,7 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
       const data: Record<string, unknown> = {
         start_date: value.start_date || null,
         end_date: value.end_date || null,
+        audition_information: value.audition_information || null,
         lines_per_minute: value.lines_per_minute ? Number(value.lines_per_minute) : null,
       }
       if (!isEditing) {
@@ -168,6 +170,24 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
           )}
         </form.Field>
       </div>
+
+      <form.Field name="audition_information">
+        {field => (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Audition information
+            </label>
+            <textarea
+              value={field.state.value}
+              onChange={e => field.handleChange(e.target.value)}
+              onBlur={field.handleBlur}
+              rows={4}
+              placeholder="What should auditioners know? (requirements, what to prepare, dates, etc.)"
+              className={inputClass}
+            />
+          </div>
+        )}
+      </form.Field>
 
       <form.Field name="lines_per_minute">
         {field => (

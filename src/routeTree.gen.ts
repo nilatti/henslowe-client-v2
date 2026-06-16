@@ -42,6 +42,7 @@ import { Route as AuthenticatedSpecializationsSpecializationIdRouteImport } from
 import { Route as AuthenticatedProductionsProductionIdRouteImport } from './routes/_authenticated/productions/$productionId'
 import { Route as AuthenticatedPhasesNewRouteImport } from './routes/_authenticated/phases/new'
 import { Route as AuthenticatedPhasesPhaseIdRouteImport } from './routes/_authenticated/phases/$phaseId'
+import { Route as AuthenticatedAuditionsJobIdRouteImport } from './routes/_authenticated/auditions/$jobId'
 import { Route as AuthenticatedUsersUserIdIndexRouteImport } from './routes/_authenticated/users/$userId/index'
 import { Route as AuthenticatedTheatersTheaterIdIndexRouteImport } from './routes/_authenticated/theaters/$theaterId/index'
 import { Route as AuthenticatedSpacesSpaceIdIndexRouteImport } from './routes/_authenticated/spaces/$spaceId/index'
@@ -238,6 +239,12 @@ const AuthenticatedPhasesPhaseIdRoute =
     path: '/phases/$phaseId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAuditionsJobIdRoute =
+  AuthenticatedAuditionsJobIdRouteImport.update({
+    id: '/auditions/$jobId',
+    path: '/auditions/$jobId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedUsersUserIdIndexRoute =
   AuthenticatedUsersUserIdIndexRouteImport.update({
     id: '/users/$userId/',
@@ -379,6 +386,7 @@ export interface FileRoutesByFullPath {
   '/free/part-scripts': typeof FreePartScriptsRoute
   '/free/word-cloud': typeof FreeWordCloudRoute
   '/free/': typeof FreeIndexRoute
+  '/auditions/$jobId': typeof AuthenticatedAuditionsJobIdRoute
   '/phases/$phaseId': typeof AuthenticatedPhasesPhaseIdRoute
   '/phases/new': typeof AuthenticatedPhasesNewRoute
   '/productions/$productionId': typeof AuthenticatedProductionsProductionIdRouteWithChildren
@@ -431,6 +439,7 @@ export interface FileRoutesByTo {
   '/free/part-scripts': typeof FreePartScriptsRoute
   '/free/word-cloud': typeof FreeWordCloudRoute
   '/free': typeof FreeIndexRoute
+  '/auditions/$jobId': typeof AuthenticatedAuditionsJobIdRoute
   '/phases/$phaseId': typeof AuthenticatedPhasesPhaseIdRoute
   '/phases/new': typeof AuthenticatedPhasesNewRoute
   '/specializations/$specializationId': typeof AuthenticatedSpecializationsSpecializationIdRoute
@@ -486,6 +495,7 @@ export interface FileRoutesById {
   '/free/part-scripts': typeof FreePartScriptsRoute
   '/free/word-cloud': typeof FreeWordCloudRoute
   '/free/': typeof FreeIndexRoute
+  '/_authenticated/auditions/$jobId': typeof AuthenticatedAuditionsJobIdRoute
   '/_authenticated/phases/$phaseId': typeof AuthenticatedPhasesPhaseIdRoute
   '/_authenticated/phases/new': typeof AuthenticatedPhasesNewRoute
   '/_authenticated/productions/$productionId': typeof AuthenticatedProductionsProductionIdRouteWithChildren
@@ -541,6 +551,7 @@ export interface FileRouteTypes {
     | '/free/part-scripts'
     | '/free/word-cloud'
     | '/free/'
+    | '/auditions/$jobId'
     | '/phases/$phaseId'
     | '/phases/new'
     | '/productions/$productionId'
@@ -593,6 +604,7 @@ export interface FileRouteTypes {
     | '/free/part-scripts'
     | '/free/word-cloud'
     | '/free'
+    | '/auditions/$jobId'
     | '/phases/$phaseId'
     | '/phases/new'
     | '/specializations/$specializationId'
@@ -647,6 +659,7 @@ export interface FileRouteTypes {
     | '/free/part-scripts'
     | '/free/word-cloud'
     | '/free/'
+    | '/_authenticated/auditions/$jobId'
     | '/_authenticated/phases/$phaseId'
     | '/_authenticated/phases/new'
     | '/_authenticated/productions/$productionId'
@@ -927,6 +940,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPhasesPhaseIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/auditions/$jobId': {
+      id: '/_authenticated/auditions/$jobId'
+      path: '/auditions/$jobId'
+      fullPath: '/auditions/$jobId'
+      preLoaderRoute: typeof AuthenticatedAuditionsJobIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/users/$userId/': {
       id: '/_authenticated/users/$userId/'
       path: '/users/$userId'
@@ -1102,6 +1122,7 @@ const AuthenticatedProductionsProductionIdRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedAuditionsJobIdRoute: typeof AuthenticatedAuditionsJobIdRoute
   AuthenticatedPhasesPhaseIdRoute: typeof AuthenticatedPhasesPhaseIdRoute
   AuthenticatedPhasesNewRoute: typeof AuthenticatedPhasesNewRoute
   AuthenticatedProductionsProductionIdRoute: typeof AuthenticatedProductionsProductionIdRouteWithChildren
@@ -1135,6 +1156,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedAuditionsJobIdRoute: AuthenticatedAuditionsJobIdRoute,
   AuthenticatedPhasesPhaseIdRoute: AuthenticatedPhasesPhaseIdRoute,
   AuthenticatedPhasesNewRoute: AuthenticatedPhasesNewRoute,
   AuthenticatedProductionsProductionIdRoute:

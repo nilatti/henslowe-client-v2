@@ -30,6 +30,7 @@ export interface Production {
   start_date: string | null
   end_date: string | null
   lines_per_minute: number | null
+  audition_information: string | null
   created_at: string
   updated_at: string
   play: { id: number; title: string }
