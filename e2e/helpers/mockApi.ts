@@ -168,4 +168,8 @@ export async function mockStandardEndpoints(page: Page) {
   await page.route('**/api/v1/plays/play_titles**', route =>
     route.fulfill({ json: [] })
   )
+  // Phases — used by ProductionPhasesSection via useSuspenseQuery
+  await page.route('**/api/v1/phases**', route =>
+    route.fulfill({ json: [] })
+  )
 }
