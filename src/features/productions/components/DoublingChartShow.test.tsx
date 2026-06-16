@@ -23,10 +23,13 @@ const play: ChartPlay = {
   title: 'Hamlet',
   acts: [
     {
+      id: 1,
       number: 1,
       scenes: [{
+        id: 1,
         pretty_name: '1.1',
         french_scenes: [{
+          id: 1,
           pretty_name: '1.1.1',
           on_stages: [
             { character_id: 1, nonspeaking: false, offstage: false, character: { id: 1, name: 'Hamlet' } },
@@ -37,10 +40,13 @@ const play: ChartPlay = {
       }],
     },
     {
+      id: 2,
       number: 2,
       scenes: [{
+        id: 2,
         pretty_name: '2.1',
         french_scenes: [{
+          id: 2,
           pretty_name: '2.1.1',
           on_stages: [
             { character_id: 1, nonspeaking: false, offstage: false, character: { id: 1, name: 'Hamlet' } },

@@ -60,6 +60,7 @@ interface DoublingChartShowProps {
 }
 
 interface CharacterCell {
+  cellKey: string
   name: string
   id?: number
   nonspeaking: boolean
@@ -191,6 +192,7 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
       )
       return {
         characters: uniqChars.map(os => ({
+          cellKey: os.character?.id != null ? `char-${os.character.id}` : `group-${os.character_group?.id}`,
           name: os.character?.name ?? os.character_group?.name ?? '',
           id: os.character?.id,
           nonspeaking: os.nonspeaking,
@@ -241,7 +243,7 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
             }`}
           >
             {characters.map((ch, j) => (
-              <span key={ch.id ?? j}>
+              <span key={ch.cellKey ?? j}>
                 {j > 0 && ', '}
                 {renderCharacterLink(ch)}
               </span>
@@ -275,7 +277,7 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
       return (
         <td key={i} className="border border-gray-400 px-2 py-1 text-xs break-words">
           {uniqChars.map((os, j) => (
-            <span key={os.character?.id ?? os.character_group?.id ?? j}>
+            <span key={os.character?.id != null ? `char-${os.character.id}` : `group-${os.character_group?.id ?? j}`}>
               {j > 0 && ', '}
               {os.character?.id ? (
                 <Link
