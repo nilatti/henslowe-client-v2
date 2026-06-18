@@ -4,6 +4,7 @@ import { parseISO, format } from "date-fns";
 import {
   useDeleteRehearsal,
   type ProductionUserConflict,
+  type ProductionSpaceConflict,
 } from "../api/rehearsals";
 import type { RehearsalWithDetails, RehearsalUser } from "../types/rehearsal";
 import { RehearsalForm } from "./RehearsalForm";
@@ -22,6 +23,7 @@ interface RehearsalShowProps {
   productionStaff: RehearsalUser[];
   isAdmin: boolean;
   productionUserConflicts: ProductionUserConflict[];
+  productionSpaceConflicts: ProductionSpaceConflict[];
   actorCharacterNames?: Map<number, string[]>;
 }
 
@@ -34,6 +36,7 @@ export function RehearsalShow({
   productionStaff,
   isAdmin,
   productionUserConflicts,
+  productionSpaceConflicts,
   actorCharacterNames,
 }: RehearsalShowProps) {
   const deleteRehearsal = useDeleteRehearsal(productionId);
@@ -48,6 +51,16 @@ export function RehearsalShow({
   const startTime = format(rehearsalStartDate, "h:mm a");
   const endTime = format(rehearsalEndDate, "h:mm a");
 
+  const spaceDoubleBooked = (() => {
+    if (!rehearsal.space) return false;
+    const entry = productionSpaceConflicts.find((s) => s.space.id === rehearsal.space!.id);
+    if (!entry) return false;
+    return entry.conflicts.some((c) => {
+      if (c.rehearsal_id === rehearsal.id) return false;
+      return parseISO(c.start_time) < rehearsalEndDate && parseISO(c.end_time) > rehearsalStartDate;
+    });
+  })();
+
   const conflictedUserIds = getConflictedUserIds(
     rehearsal.users,
     productionUserConflicts,
@@ -56,30 +69,37 @@ export function RehearsalShow({
     rehearsal.id,
   );
 
+  const pageRange = (item: { start_page?: number | null; end_page?: number | null }) => {
+    if (item.start_page == null || item.end_page == null) return null;
+    return item.start_page === item.end_page
+      ? ` (p. ${item.start_page})`
+      : ` (pp. ${item.start_page}–${item.end_page})`;
+  };
+
   const contentLinks = [
     ...rehearsal.acts.map((act) => ({
       key: `act-${act.id}`,
       node: act.play_id ? (
-        <Link to="/plays/$playId/acts/$actId" params={{ playId: String(act.play_id), actId: String(act.id) }} className="text-blue-600 hover:underline">
+        <><Link to="/plays/$playId/acts/$actId" params={{ playId: String(act.play_id), actId: String(act.id) }} className="text-blue-600 hover:underline">
           {act.heading}
-        </Link>
-      ) : <span>{act.heading}</span>,
+        </Link>{pageRange(act)}</>
+      ) : <span>{act.heading}{pageRange(act)}</span>,
     })),
     ...rehearsal.scenes.map((scene) => ({
       key: `scene-${scene.id}`,
       node: scene.act_id ? (
-        <Link to="/plays/$playId/acts/$actId/scenes/$sceneId" params={{ playId: String(playId), actId: String(scene.act_id), sceneId: String(scene.id) }} className="text-blue-600 hover:underline">
+        <><Link to="/plays/$playId/acts/$actId/scenes/$sceneId" params={{ playId: String(playId), actId: String(scene.act_id), sceneId: String(scene.id) }} className="text-blue-600 hover:underline">
           {scene.pretty_name}
-        </Link>
-      ) : <span>{scene.pretty_name}</span>,
+        </Link>{pageRange(scene)}</>
+      ) : <span>{scene.pretty_name}{pageRange(scene)}</span>,
     })),
     ...rehearsal.french_scenes.map((fs) => ({
       key: `fs-${fs.id}`,
       node: fs.scene ? (
-        <Link to="/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId" params={{ playId: String(playId), actId: String(fs.scene.act_id), sceneId: String(fs.scene_id ?? fs.scene.id), frenchSceneId: String(fs.id) }} className="text-blue-600 hover:underline">
+        <><Link to="/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId" params={{ playId: String(playId), actId: String(fs.scene.act_id), sceneId: String(fs.scene_id ?? fs.scene.id), frenchSceneId: String(fs.id) }} className="text-blue-600 hover:underline">
           {fs.pretty_name}
-        </Link>
-      ) : <span>{fs.pretty_name}</span>,
+        </Link>{pageRange(fs)}</>
+      ) : <span>{fs.pretty_name}{pageRange(fs)}</span>,
     })),
   ];
 
@@ -110,7 +130,7 @@ export function RehearsalShow({
             )}
           </div>
           {rehearsal.space && (
-            <div className="mb-1">
+            <div className="mb-1 flex items-center gap-2">
               <Link
                 to="/spaces/$spaceId"
                 params={{ spaceId: String(rehearsal.space.id) }}
@@ -118,6 +138,9 @@ export function RehearsalShow({
               >
                 {rehearsal.space.name}
               </Link>
+              {spaceDoubleBooked && (
+                <span className="text-xs text-red-600">Warning: Space is double booked</span>
+              )}
             </div>
           )}
 

@@ -108,10 +108,7 @@ export function RehearsalContentManager({
   const playContent = useMemo(() => {
     if (!rawPlayContent) return [];
 
-    let processed: TextUnitWithOnStages[] = rawPlayContent.map((item) => ({
-      ...item,
-      heading: item.pretty_name ?? `Act ${item.number}`,
-    }));
+    let processed: TextUnitWithOnStages[] = rawPlayContent.map((item) => ({ ...item }));
     processed = markContentRecommended(processed, unavailableActors, characterToUserMap);
     processed = processed.map((item) => ({
       ...item,

@@ -32,7 +32,7 @@ export function PlayContentCheckboxes({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-900">
-                {item.heading ?? item.pretty_name ?? `${item.number}`}
+                {item.pretty_name ?? `${item.number}`}
               </span>
               {item.isRecommended === false && (
                 <span className="text-xs text-amber-600 font-medium">
@@ -40,6 +40,21 @@ export function PlayContentCheckboxes({
                 </span>
               )}
             </div>
+            {item.heading && (
+              <div className="text-xs text-gray-700 mt-0.5 italic">
+                {item.heading}
+              </div>
+            )}
+            {item.summary && (
+              <div className="text-xs text-gray-500 mt-0.5">
+                {item.summary}
+              </div>
+            )}
+            {item.start_page != null && item.end_page != null && (
+              <div className="text-xs text-gray-400 mt-0.5">
+                pp. {item.start_page}–{item.end_page}
+              </div>
+            )}
             {item.furtherInfo && (
               <div className="text-xs text-gray-500 mt-0.5 truncate">
                 Called: {item.furtherInfo}

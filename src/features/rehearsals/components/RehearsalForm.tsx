@@ -11,6 +11,8 @@ interface RehearsalFormProps {
   theaterId: number;
   rehearsal?: RehearsalWithDetails;
   defaultSpaceId?: number | null;
+  defaultStartTime?: string;
+  defaultEndTime?: string;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -24,6 +26,8 @@ export function RehearsalForm({
   theaterId,
   rehearsal,
   defaultSpaceId,
+  defaultStartTime,
+  defaultEndTime,
   onSuccess,
   onCancel,
 }: RehearsalFormProps) {
@@ -38,8 +42,10 @@ export function RehearsalForm({
     defaultValues: {
       start_time: rehearsal?.start_time
         ? toLocalInput(rehearsal.start_time)
-        : now,
-      end_time: rehearsal?.end_time ? toLocalInput(rehearsal.end_time) : now,
+        : defaultStartTime ? toLocalInput(defaultStartTime) : now,
+      end_time: rehearsal?.end_time
+        ? toLocalInput(rehearsal.end_time)
+        : defaultEndTime ? toLocalInput(defaultEndTime) : now,
       title: rehearsal?.title ?? "",
       notes: rehearsal?.notes ?? "",
       space_id: rehearsal?.space_id ?? defaultSpaceId ?? null as number | null,

@@ -26,6 +26,8 @@ export interface RehearsalTextUnit {
   number: number | string
   pretty_name?: string
   heading?: string
+  start_page?: number | null
+  end_page?: number | null
   play_id?: number
   act_id?: number
   scene_id?: number

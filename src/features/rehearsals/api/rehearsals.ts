@@ -13,11 +13,17 @@ export interface ProductionUserConflict {
   conflicts: Conflict[];
 }
 
+export interface ProductionSpaceConflict {
+  space: { id: number; name: string };
+  conflicts: Conflict[];
+}
+
 export interface TextUnitWithOnStages {
   id: number;
   number: number | string;
   pretty_name?: string;
-  heading?: string;
+  heading?: string | null;
+  summary?: string | null;
   start_page?: number | null;
   end_page?: number | null;
   find_on_stages: { user_id: number | null; character_id: number | null }[];
@@ -63,6 +69,16 @@ export const productionUserConflictsQueryOptions = (productionId: number) =>
     queryFn: (): Promise<ProductionUserConflict[]> =>
       api
         .get(`/api/v1/productions/${productionId}/user_conflicts`)
+        .then((r) => r.data),
+    staleTime: 0,
+  });
+
+export const productionSpaceConflictsQueryOptions = (productionId: number) =>
+  queryOptions({
+    queryKey: ["productions", productionId, "space_conflicts"],
+    queryFn: (): Promise<ProductionSpaceConflict[]> =>
+      api
+        .get(`/api/v1/productions/${productionId}/space_conflicts`)
         .then((r) => r.data),
     staleTime: 0,
   });

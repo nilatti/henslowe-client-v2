@@ -13,6 +13,7 @@ import {
 import {
   productionRehearsalsQueryOptions,
   productionUserConflictsQueryOptions,
+  productionSpaceConflictsQueryOptions,
 } from "../api/rehearsals";
 import { productionJobsQueryOptions } from "../../jobs/api/jobs";
 import { productionSkeletonQueryOptions } from "../../productions/api/productions";
@@ -44,10 +45,16 @@ function downloadRehearsalTSV(rehearsals: RehearsalWithDetails[]) {
     const location = r.space?.name ?? "";
     const title = r.title ?? "";
     const notes = r.notes ?? "";
+    const withPages = (name: string, item: { start_page?: number | null; end_page?: number | null }) => {
+      if (!name || item.start_page == null || item.end_page == null) return name;
+      return item.start_page === item.end_page
+        ? `${name} (p. ${item.start_page})`
+        : `${name} (pp. ${item.start_page}–${item.end_page})`;
+    };
     const content = [
-      ...r.acts.map((a) => a.heading ?? ""),
-      ...r.scenes.map((s) => s.pretty_name ?? ""),
-      ...r.french_scenes.map((fs) => fs.pretty_name ?? ""),
+      ...r.acts.map((a) => withPages(a.heading ?? "", a)),
+      ...r.scenes.map((s) => withPages(s.pretty_name ?? "", s)),
+      ...r.french_scenes.map((fs) => withPages(fs.pretty_name ?? "", fs)),
     ].filter(Boolean).join(", ");
     const callList = r.users.map((u) => buildUserName(u)).join(", ");
     return [date, startTime, endTime, location, title, notes, content, callList];
@@ -66,6 +73,18 @@ function downloadRehearsalTSV(rehearsals: RehearsalWithDetails[]) {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+// Sunday → red, Monday → orange, Tuesday → yellow, Wednesday → green,
+// Thursday → blue, Friday → indigo, Saturday → violet
+const DAY_BORDER_CLASSES = [
+  "border-l-4 border-l-red-500",
+  "border-l-4 border-l-orange-500",
+  "border-l-4 border-l-yellow-500",
+  "border-l-4 border-l-green-500",
+  "border-l-4 border-l-blue-500",
+  "border-l-4 border-l-indigo-500",
+  "border-l-4 border-l-violet-500",
+];
 
 interface RehearsalScheduleProps {
   productionId: number;
@@ -87,6 +106,9 @@ export function RehearsalSchedule({
   const { data: productionUserConflicts } = useSuspenseQuery(
     productionUserConflictsQueryOptions(productionId),
   );
+  const { data: productionSpaceConflicts } = useSuspenseQuery(
+    productionSpaceConflictsQueryOptions(productionId),
+  );
   const { data: productionSkeleton } = useSuspenseQuery(
     productionSkeletonQueryOptions(productionId),
   );
@@ -99,6 +121,7 @@ export function RehearsalSchedule({
   );
   const [showForm, setShowForm] = useState(false);
   const [showPatternCreator, setShowPatternCreator] = useState(false);
+  const [addFormDate, setAddFormDate] = useState<string | null>(null);
 
   const currentWeekEnd = endOfWeek(currentWeekStart);
 
@@ -239,7 +262,7 @@ export function RehearsalSchedule({
           {Object.keys(groupedRehearsals)
             .sort()
             .map((date) => (
-              <Card key={date}>
+              <Card key={date} className={DAY_BORDER_CLASSES[parseISO(date).getDay()]}>
                 <div className="px-4 py-2 border-b border-gray-100 bg-gray-50">
                   <h3 className="text-sm font-semibold text-gray-900">
                     {format(parseISO(date), "EEEE, MMMM d")}
@@ -257,10 +280,38 @@ export function RehearsalSchedule({
                         productionStaff={productionStaff}
                         isAdmin={isAdmin}
                         productionUserConflicts={productionUserConflicts}
+                        productionSpaceConflicts={productionSpaceConflicts}
                         actorCharacterNames={actorCharacterNames}
                       />
                     </div>
                   ))}
+                  {isAdmin && addFormDate === date && (() => {
+                    const sorted = [...groupedRehearsals[date]].sort((a, b) => a.start_time.localeCompare(b.start_time));
+                    const last = sorted[sorted.length - 1];
+                    return (
+                      <div className="pt-2 border-t border-gray-100 mt-2">
+                        <RehearsalForm
+                          productionId={productionId}
+                          theaterId={theaterId}
+                          defaultSpaceId={productionSkeleton?.default_space_id}
+                          defaultStartTime={last.start_time}
+                          defaultEndTime={last.end_time}
+                          onSuccess={() => setAddFormDate(null)}
+                          onCancel={() => setAddFormDate(null)}
+                        />
+                      </div>
+                    );
+                  })()}
+                  {isAdmin && addFormDate !== date && (
+                    <div className="pt-2 mt-1">
+                      <Button
+                        variant="secondary"
+                        onClick={() => setAddFormDate(date)}
+                      >
+                        + Add rehearsal
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </Card>
             ))}
