@@ -59,8 +59,8 @@ function unavailableUsers(users: RehearsalUser[], rehearsal: Rehearsal): Rehears
     let conflicts_with_this_rehearsal = 0;
     user.conflicts!.map((conflict) => {
       if (
-        conflict.start_time <= rehearsal.end_time &&
-        rehearsal.start_time <= conflict.end_time
+        conflict.start_time < rehearsal.end_time &&
+        rehearsal.start_time < conflict.end_time
       ) {
         conflicts_with_this_rehearsal += 1;
       }
