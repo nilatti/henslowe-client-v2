@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { Mock } from 'vitest'
@@ -15,6 +15,7 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
 vi.mock('../api/rehearsals', () => ({
   productionRehearsalsQueryOptions: (id: number) => ({ queryKey: ['rehearsals', { productionId: id }] }),
   productionUserConflictsQueryOptions: (id: number) => ({ queryKey: ['productions', id, 'user_conflicts'] }),
+  productionSpaceConflictsQueryOptions: (id: number) => ({ queryKey: ['productions', id, 'space_conflicts'] }),
 }))
 
 vi.mock('../../jobs/api/jobs', () => ({
@@ -61,6 +62,7 @@ function setupQueries(rehearsals: any[] = []) {
     if (queryKey[0] === 'rehearsals') return { data: rehearsals }
     if (queryKey[0] === 'jobs') return { data: [] }
     if (queryKey[0] === 'productions' && queryKey[2] === 'user_conflicts') return { data: [] }
+    if (queryKey[0] === 'productions' && queryKey[2] === 'space_conflicts') return { data: [] }
     if (queryKey[0] === 'productions' && queryKey[2] === 'skeleton') return { data: { default_space_id: null } }
     throw new Error(`Unexpected queryKey: ${JSON.stringify(queryKey)}`)
   })
@@ -147,5 +149,69 @@ describe('RehearsalSchedule — removed elements', () => {
     // The old component showed "productionTitle at theaterName" — neither should appear
     const links = screen.queryAllByRole('link')
     expect(links).toHaveLength(0)
+  })
+})
+
+// Monday 2026-06-15 — used to pin `new Date()` so weekRehearsals filtering is deterministic
+const FAKE_NOW = new Date('2026-06-15T10:00:00Z')
+
+function makeWeekRehearsal(id: number): object {
+  return {
+    id,
+    production_id: 1,
+    space_id: null,
+    space: null,
+    start_time: '2026-06-15T19:00:00Z',
+    end_time: '2026-06-15T22:00:00Z',
+    title: null,
+    notes: null,
+    text_unit: null,
+    acts: [],
+    scenes: [],
+    french_scenes: [],
+    users: [],
+    created_at: '',
+    updated_at: '',
+  }
+}
+
+describe('RehearsalSchedule — per-day add rehearsal', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    vi.setSystemTime(FAKE_NOW)
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    mockUseSuspenseQuery.mockReset()
+    ;(useUserRoleForProduction as Mock).mockReset()
+    ;(useIsSuperAdmin as Mock).mockReset()
+  })
+
+  it('shows the per-day "+ Add rehearsal" button for admins when rehearsals exist this week', () => {
+    renderSchedule({ isAdmin: true, rehearsals: [makeWeekRehearsal(99)] })
+    expect(screen.getByRole('button', { name: /\+ add rehearsal/i })).toBeInTheDocument()
+  })
+
+  it('hides the per-day "+ Add rehearsal" button from non-admins', () => {
+    renderSchedule({ isAdmin: false, rehearsals: [makeWeekRehearsal(99)] })
+    expect(screen.queryByRole('button', { name: /\+ add rehearsal/i })).not.toBeInTheDocument()
+  })
+
+  it('shows a rehearsal form when the per-day "+ Add rehearsal" button is clicked', async () => {
+    const user = userEvent.setup({ delay: null, advanceTimers: vi.advanceTimersByTime })
+    renderSchedule({ isAdmin: true, rehearsals: [makeWeekRehearsal(99)] })
+    expect(screen.queryByTestId('rehearsal-form')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /\+ add rehearsal/i }))
+    expect(screen.getByTestId('rehearsal-form')).toBeInTheDocument()
+  })
+
+  it('hides the per-day rehearsal form when Cancel is clicked', async () => {
+    const user = userEvent.setup({ delay: null, advanceTimers: vi.advanceTimersByTime })
+    renderSchedule({ isAdmin: true, rehearsals: [makeWeekRehearsal(99)] })
+    await user.click(screen.getByRole('button', { name: /\+ add rehearsal/i }))
+    expect(screen.getByTestId('rehearsal-form')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /cancel form/i }))
+    expect(screen.queryByTestId('rehearsal-form')).not.toBeInTheDocument()
   })
 })
