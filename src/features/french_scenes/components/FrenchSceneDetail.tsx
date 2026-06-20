@@ -116,7 +116,7 @@ export function FrenchSceneDetail({
         }
       />
 
-      {isEditing ? (
+      {isEditing && (
         <Card className="p-6 mb-6">
           <FrenchSceneForm
             playId={playId}
@@ -126,83 +126,83 @@ export function FrenchSceneDetail({
             onCancel={() => setIsEditing(false)}
           />
         </Card>
-      ) : (
-        <div className="space-y-6">
-          {(frenchScene.summary || frenchScene.start_page) && (
-            <Card className="p-6">
-              <dl className="space-y-3 text-sm">
-                {frenchScene.summary && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Summary</dt>
-                    <dd className="text-gray-600 mt-1 leading-relaxed whitespace-pre-wrap">
-                      {frenchScene.summary}
-                    </dd>
-                  </div>
-                )}
-                {frenchScene.start_page && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Pages</dt>
-                    <dd className="text-gray-600 mt-1">
-                      {frenchScene.start_page}
-                      {frenchScene.end_page ? ` – ${frenchScene.end_page}` : ''}
-                    </dd>
-                  </div>
-                )}
-                {frenchScene.original_line_count != null && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Lines</dt>
-                    <dd className="text-gray-600 mt-1">
-                      {frenchScene.new_line_count ?? frenchScene.original_line_count}
-                      {frenchScene.new_line_count != null &&
-                        frenchScene.new_line_count !== frenchScene.original_line_count && (
-                          <span className="text-gray-400 ml-1">
-                            (originally {frenchScene.original_line_count})
-                          </span>
-                        )}
-                    </dd>
-                  </div>
-                )}
-              </dl>
-            </Card>
-          )}
-
-          <OnStagesManager
-            frenchScene={frenchScene}
-            playSkeleton={playSkeleton}
-            sceneId={sceneId}
-          />
-
-          <SongsManager
-            frenchScene={frenchScene}
-            playSkeleton={playSkeleton}
-            sceneId={sceneId}
-          />
-
-          {playSkeleton.production_id != null && (
-            <Card className="p-4">
-              <EntranceExitsList
-                frenchSceneId={frenchSceneId}
-                productionId={playSkeleton.production_id}
-                theaterId={productionSkeleton?.theater.id}
-                characters={playSkeleton.characters}
-              />
-            </Card>
-          )}
-
-          <Card className="p-4">
-            <p className="text-sm text-gray-400 italic">
-              Script content (lines, sound cues, stage directions) coming in a future update.
-            </p>
-            <Link
-              to="/plays/$playId/script"
-              params={{ playId: String(playId) }}
-              className="text-sm text-blue-600 hover:text-blue-800 mt-2 inline-block"
-            >
-              View full script →
-            </Link>
-          </Card>
-        </div>
       )}
+
+      <div className="space-y-6">
+        {(frenchScene.summary || frenchScene.start_page) && (
+          <Card className="p-6">
+            <dl className="space-y-3 text-sm">
+              {frenchScene.summary && (
+                <div>
+                  <dt className="font-medium text-gray-700">Summary</dt>
+                  <dd className="text-gray-600 mt-1 leading-relaxed whitespace-pre-wrap">
+                    {frenchScene.summary}
+                  </dd>
+                </div>
+              )}
+              {frenchScene.start_page && (
+                <div>
+                  <dt className="font-medium text-gray-700">Pages</dt>
+                  <dd className="text-gray-600 mt-1">
+                    {frenchScene.start_page}
+                    {frenchScene.end_page ? ` – ${frenchScene.end_page}` : ''}
+                  </dd>
+                </div>
+              )}
+              {frenchScene.original_line_count != null && (
+                <div>
+                  <dt className="font-medium text-gray-700">Lines</dt>
+                  <dd className="text-gray-600 mt-1">
+                    {frenchScene.new_line_count ?? frenchScene.original_line_count}
+                    {frenchScene.new_line_count != null &&
+                      frenchScene.new_line_count !== frenchScene.original_line_count && (
+                        <span className="text-gray-400 ml-1">
+                          (originally {frenchScene.original_line_count})
+                        </span>
+                      )}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </Card>
+        )}
+
+        <OnStagesManager
+          frenchScene={frenchScene}
+          playSkeleton={playSkeleton}
+          sceneId={sceneId}
+        />
+
+        <SongsManager
+          frenchScene={frenchScene}
+          playSkeleton={playSkeleton}
+          sceneId={sceneId}
+        />
+
+        {playSkeleton.production_id != null && (
+          <Card className="p-4">
+            <EntranceExitsList
+              frenchSceneId={frenchSceneId}
+              productionId={playSkeleton.production_id}
+              theaterId={productionSkeleton?.theater.id}
+              characters={playSkeleton.characters}
+            />
+          </Card>
+        )}
+
+        <Card className="p-4">
+          <p className="text-sm text-gray-400 italic">
+            Script content (lines, sound cues, stage directions) coming in a future update.
+          </p>
+          <Link
+            to="/plays/$playId/script"
+            params={{ playId: String(playId) }}
+            className="text-sm text-blue-600 hover:text-blue-800 mt-2 inline-block"
+          >
+            View full script →
+          </Link>
+        </Card>
+      </div>
 
       {(prevFs || nextFs) && (
         <div className="flex justify-between mt-6 pt-4 border-t border-gray-100">

@@ -68,7 +68,7 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
         }
       />
 
-      {isEditing ? (
+      {isEditing && (
         <Card className="p-6 mb-6">
           <ActForm
             playId={playId}
@@ -77,109 +77,109 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
             onCancel={() => setIsEditing(false)}
           />
         </Card>
-      ) : (
-        <div className="space-y-6">
-          {(act.summary || act.start_page || act.heading) && (
-            <Card className="p-6">
-              <dl className="space-y-3 text-sm">
-                {act.heading && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Heading</dt>
-                    <dd className="text-gray-600 mt-1 leading-relaxed">
-                      {act.heading}
-                    </dd>
-                  </div>
-                )}
-                {act.summary && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Summary</dt>
-                    <dd className="text-gray-600 mt-1 leading-relaxed">
-                      {act.summary}
-                    </dd>
-                  </div>
-                )}
-                {act.start_page && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Pages</dt>
-                    <dd className="text-gray-600 mt-1">
-                      {act.start_page}
-                      {act.end_page ? ` – ${act.end_page}` : ""}
-                    </dd>
-                  </div>
-                )}
-                {act.original_line_count != null && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Lines</dt>
-                    <dd className="text-gray-600 mt-1">
-                      {act.new_line_count ?? act.original_line_count}
-                      {act.new_line_count != null &&
-                        act.new_line_count !== act.original_line_count && (
-                          <span className="text-gray-400 ml-1">
-                            (originally {act.original_line_count})
-                          </span>
-                        )}
-                    </dd>
-                  </div>
-                )}
-              </dl>
+      )}
+
+      <div className="space-y-6">
+        {(act.summary || act.start_page || act.heading) && (
+          <Card className="p-6">
+            <dl className="space-y-3 text-sm">
+              {act.heading && (
+                <div>
+                  <dt className="font-medium text-gray-700">Heading</dt>
+                  <dd className="text-gray-600 mt-1 leading-relaxed">
+                    {act.heading}
+                  </dd>
+                </div>
+              )}
+              {act.summary && (
+                <div>
+                  <dt className="font-medium text-gray-700">Summary</dt>
+                  <dd className="text-gray-600 mt-1 leading-relaxed">
+                    {act.summary}
+                  </dd>
+                </div>
+              )}
+              {act.start_page && (
+                <div>
+                  <dt className="font-medium text-gray-700">Pages</dt>
+                  <dd className="text-gray-600 mt-1">
+                    {act.start_page}
+                    {act.end_page ? ` – ${act.end_page}` : ""}
+                  </dd>
+                </div>
+              )}
+              {act.original_line_count != null && (
+                <div>
+                  <dt className="font-medium text-gray-700">Lines</dt>
+                  <dd className="text-gray-600 mt-1">
+                    {act.new_line_count ?? act.original_line_count}
+                    {act.new_line_count != null &&
+                      act.new_line_count !== act.original_line_count && (
+                        <span className="text-gray-400 ml-1">
+                          (originally {act.original_line_count})
+                        </span>
+                      )}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </Card>
+        )}
+
+        <div>
+          <h2 className="text-lg font-medium text-gray-900 mb-3">Scenes</h2>
+
+          <Card>
+            {act.scenes.length === 0 ? (
+              <p className="px-4 py-3 text-sm text-gray-500">
+                No scenes yet.
+              </p>
+            ) : (
+              <ul className="divide-y divide-gray-100">
+                {act.scenes.map((scene) => {
+                  const songs = scene.french_scenes?.flatMap(fs => fs.songs) ?? []
+                  return (
+                    <li key={scene.id}>
+                      <Link
+                        to="/plays/$playId/acts/$actId/scenes/$sceneId"
+                        params={{
+                          playId: String(playId),
+                          actId: String(actId),
+                          sceneId: String(scene.id),
+                        }}
+                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
+                      >
+                        <div>
+                          <span className="text-gray-900">Scene {scene.number}</span>
+                          {songs.length > 0 && (
+                            <p className="text-xs text-gray-400 mt-0.5">{songs.map(s => s.title).join(' · ')}</p>
+                          )}
+                        </div>
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </Card>
+          {isAdmin && !showForm && (
+            <Button className="mt-3" onClick={() => setShowForm(true)}>
+              Add Scene
+            </Button>
+          )}
+          {showForm && (
+            <Card className="p-6 mt-3">
+              <SceneForm
+                playId={playId}
+                actId={actId}
+                nextNumber={nextSceneNumber}
+                onSuccess={() => setShowForm(false)}
+                onCancel={() => setShowForm(false)}
+              />
             </Card>
           )}
-
-          <div>
-            <h2 className="text-lg font-medium text-gray-900 mb-3">Scenes</h2>
-
-            <Card>
-              {act.scenes.length === 0 ? (
-                <p className="px-4 py-3 text-sm text-gray-500">
-                  No scenes yet.
-                </p>
-              ) : (
-                <ul className="divide-y divide-gray-100">
-                  {act.scenes.map((scene) => {
-                    const songs = scene.french_scenes?.flatMap(fs => fs.songs) ?? []
-                    return (
-                      <li key={scene.id}>
-                        <Link
-                          to="/plays/$playId/acts/$actId/scenes/$sceneId"
-                          params={{
-                            playId: String(playId),
-                            actId: String(actId),
-                            sceneId: String(scene.id),
-                          }}
-                          className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
-                        >
-                          <div>
-                            <span className="text-gray-900">Scene {scene.number}</span>
-                            {songs.length > 0 && (
-                              <p className="text-xs text-gray-400 mt-0.5">{songs.map(s => s.title).join(' · ')}</p>
-                            )}
-                          </div>
-                        </Link>
-                      </li>
-                    )
-                  })}
-                </ul>
-              )}
-            </Card>
-            {isAdmin && !showForm && (
-              <Button className="mt-3" onClick={() => setShowForm(true)}>
-                Add Scene
-              </Button>
-            )}
-            {showForm && (
-              <Card className="p-6 mt-3">
-                <SceneForm
-                  playId={playId}
-                  actId={actId}
-                  nextNumber={nextSceneNumber}
-                  onSuccess={() => setShowForm(false)}
-                  onCancel={() => setShowForm(false)}
-                />
-              </Card>
-            )}
-          </div>
         </div>
-      )}
+      </div>
 
       {(prevAct || nextAct) && (
         <div className="flex justify-between mt-6 pt-4 border-t border-gray-100">

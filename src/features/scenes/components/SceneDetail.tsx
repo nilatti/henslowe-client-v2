@@ -88,7 +88,7 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
         }
       />
 
-      {isEditing ? (
+      {isEditing && (
         <Card className="p-6 mb-6">
           <SceneForm
             playId={playId}
@@ -98,108 +98,108 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
             onCancel={() => setIsEditing(false)}
           />
         </Card>
-      ) : (
-        <div className="space-y-6">
-          {(scene.summary || scene.start_page || scene.heading) && (
-            <Card className="p-6">
-              <dl className="space-y-3 text-sm">
-                {scene.heading && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Heading</dt>
-                    <dd className="text-gray-600 mt-1 leading-relaxed">
-                      {scene.heading}
-                    </dd>
-                  </div>
-                )}
-                {scene.summary && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Summary</dt>
-                    <dd className="text-gray-600 mt-1 leading-relaxed whitespace-pre-wrap">
-                      {scene.summary}
-                    </dd>
-                  </div>
-                )}
-                {scene.start_page && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Pages</dt>
-                    <dd className="text-gray-600 mt-1">
-                      {scene.start_page}
-                      {scene.end_page ? ` – ${scene.end_page}` : ""}
-                    </dd>
-                  </div>
-                )}
-                {scene.original_line_count != null && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Lines</dt>
-                    <dd className="text-gray-600 mt-1">
-                      {scene.new_line_count ?? scene.original_line_count}
-                      {scene.new_line_count != null &&
-                        scene.new_line_count !== scene.original_line_count && (
-                          <span className="text-gray-400 ml-1">
-                            (originally {scene.original_line_count})
-                          </span>
-                        )}
-                    </dd>
-                  </div>
-                )}
-              </dl>
-            </Card>
-          )}
-
-          <div>
-            <h2 className="text-lg font-medium text-gray-900 mb-3">
-              French Scenes
-            </h2>
-
-            <Card>
-              {scene.french_scenes.length === 0 ? (
-                <p className="px-4 py-3 text-sm text-gray-500">
-                  No french scenes yet.
-                </p>
-              ) : (
-                <ul className="divide-y divide-gray-100">
-                  {scene.french_scenes.map((fs) => (
-                    <li key={fs.id}>
-                      <Link
-                        to="/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId"
-                        params={{
-                          playId: String(playId),
-                          actId: String(actId),
-                          sceneId: String(sceneId),
-                          frenchSceneId: String(fs.id),
-                        }}
-                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
-                      >
-                        <div>
-                          <span className="text-gray-900">
-                            French Scene {prettyName}.{fs.number}
-                          </span>
-                          {fs.summary && (
-                            <p className="text-xs text-gray-500 mt-0.5 whitespace-pre-wrap">{fs.summary}</p>
-                          )}
-                          {fs.songs.length > 0 && (
-                            <p className="text-xs text-gray-400 mt-0.5">{fs.songs.map(s => s.title).join(' · ')}</p>
-                          )}
-                        </div>
-                        <div className="text-right shrink-0 ml-4">
-                          {fs.start_page && (
-                            <p className="text-xs text-gray-400">
-                              p. {fs.start_page}{fs.end_page ? `–${fs.end_page}` : ''}
-                            </p>
-                          )}
-                          <p className="text-xs text-gray-400">
-                            {fs.on_stages.length} on stage{fs.on_stages.length !== 1 ? "s" : ""}
-                          </p>
-                        </div>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-          </div>
-        </div>
       )}
+
+      <div className="space-y-6">
+        {(scene.summary || scene.start_page || scene.heading) && (
+          <Card className="p-6">
+            <dl className="space-y-3 text-sm">
+              {scene.heading && (
+                <div>
+                  <dt className="font-medium text-gray-700">Heading</dt>
+                  <dd className="text-gray-600 mt-1 leading-relaxed">
+                    {scene.heading}
+                  </dd>
+                </div>
+              )}
+              {scene.summary && (
+                <div>
+                  <dt className="font-medium text-gray-700">Summary</dt>
+                  <dd className="text-gray-600 mt-1 leading-relaxed whitespace-pre-wrap">
+                    {scene.summary}
+                  </dd>
+                </div>
+              )}
+              {scene.start_page && (
+                <div>
+                  <dt className="font-medium text-gray-700">Pages</dt>
+                  <dd className="text-gray-600 mt-1">
+                    {scene.start_page}
+                    {scene.end_page ? ` – ${scene.end_page}` : ""}
+                  </dd>
+                </div>
+              )}
+              {scene.original_line_count != null && (
+                <div>
+                  <dt className="font-medium text-gray-700">Lines</dt>
+                  <dd className="text-gray-600 mt-1">
+                    {scene.new_line_count ?? scene.original_line_count}
+                    {scene.new_line_count != null &&
+                      scene.new_line_count !== scene.original_line_count && (
+                        <span className="text-gray-400 ml-1">
+                          (originally {scene.original_line_count})
+                        </span>
+                      )}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </Card>
+        )}
+
+        <div>
+          <h2 className="text-lg font-medium text-gray-900 mb-3">
+            French Scenes
+          </h2>
+
+          <Card>
+            {scene.french_scenes.length === 0 ? (
+              <p className="px-4 py-3 text-sm text-gray-500">
+                No french scenes yet.
+              </p>
+            ) : (
+              <ul className="divide-y divide-gray-100">
+                {scene.french_scenes.map((fs) => (
+                  <li key={fs.id}>
+                    <Link
+                      to="/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId"
+                      params={{
+                        playId: String(playId),
+                        actId: String(actId),
+                        sceneId: String(sceneId),
+                        frenchSceneId: String(fs.id),
+                      }}
+                      className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
+                    >
+                      <div>
+                        <span className="text-gray-900">
+                          French Scene {prettyName}.{fs.number}
+                        </span>
+                        {fs.summary && (
+                          <p className="text-xs text-gray-500 mt-0.5 whitespace-pre-wrap">{fs.summary}</p>
+                        )}
+                        {fs.songs.length > 0 && (
+                          <p className="text-xs text-gray-400 mt-0.5">{fs.songs.map(s => s.title).join(' · ')}</p>
+                        )}
+                      </div>
+                      <div className="text-right shrink-0 ml-4">
+                        {fs.start_page && (
+                          <p className="text-xs text-gray-400">
+                            p. {fs.start_page}{fs.end_page ? `–${fs.end_page}` : ''}
+                          </p>
+                        )}
+                        <p className="text-xs text-gray-400">
+                          {fs.on_stages.length} on stage{fs.on_stages.length !== 1 ? "s" : ""}
+                        </p>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+        </div>
+      </div>
       {isAdmin && !showForm && (
         <Button className="mb-3" onClick={() => setShowForm(true)}>
           Add French Scene
