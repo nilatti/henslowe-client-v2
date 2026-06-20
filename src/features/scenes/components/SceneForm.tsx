@@ -8,6 +8,7 @@ interface SceneFormProps {
   actId: number
   scene?: Scene
   nextNumber?: number
+  defaultSummary?: string
   onSuccess: () => void
   onCancel: () => void
 }
@@ -17,6 +18,7 @@ export function SceneForm({
   actId,
   scene,
   nextNumber = 1,
+  defaultSummary,
   onSuccess,
   onCancel,
 }: SceneFormProps) {
@@ -28,7 +30,7 @@ export function SceneForm({
     defaultValues: {
       number: scene?.number ?? nextNumber,
       heading: scene?.heading ?? '',
-      summary: scene?.summary ?? '',
+      summary: scene?.summary ?? defaultSummary ?? '',
       start_page: scene?.start_page ?? '',
       end_page: scene?.end_page ?? '',
     },

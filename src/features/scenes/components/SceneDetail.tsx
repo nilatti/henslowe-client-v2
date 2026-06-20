@@ -94,6 +94,11 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
             playId={playId}
             actId={actId}
             scene={scene}
+            defaultSummary={
+              scene.summary
+                ? undefined
+                : scene.french_scenes.map(fs => fs.summary).filter(Boolean).join('\n\n') || undefined
+            }
             onSuccess={() => setIsEditing(false)}
             onCancel={() => setIsEditing(false)}
           />

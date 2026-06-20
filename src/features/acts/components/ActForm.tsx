@@ -7,6 +7,7 @@ interface ActFormProps {
   playId: number
   act?: Act
   nextNumber?: number
+  defaultSummary?: string
   onSuccess: () => void
   onCancel: () => void
 }
@@ -15,6 +16,7 @@ export function ActForm({
   playId,
   act,
   nextNumber = 1,
+  defaultSummary,
   onSuccess,
   onCancel,
 }: ActFormProps) {
@@ -26,7 +28,7 @@ export function ActForm({
     defaultValues: {
       number: act?.number ?? nextNumber,
       heading: act?.heading ?? '',
-      summary: act?.summary ?? '',
+      summary: act?.summary ?? defaultSummary ?? '',
       start_page: act?.start_page ?? '',
       end_page: act?.end_page ?? '',
     },

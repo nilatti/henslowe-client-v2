@@ -73,6 +73,11 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
           <ActForm
             playId={playId}
             act={act}
+            defaultSummary={
+              act.summary
+                ? undefined
+                : act.scenes.map(s => s.summary).filter(Boolean).join('\n\n') || undefined
+            }
             onSuccess={() => setIsEditing(false)}
             onCancel={() => setIsEditing(false)}
           />
