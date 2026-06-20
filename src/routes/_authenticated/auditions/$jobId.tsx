@@ -5,6 +5,7 @@ import { format, parseISO } from 'date-fns'
 import { jobQueryOptions } from '../../../features/jobs/api/jobs'
 import { productionSkeletonQueryOptions } from '../../../features/productions/api/productions'
 import { useCreateAuditionerJob } from '../../../features/auditions/api/auditions'
+import { ConflictsManager } from '../../../features/conflicts/components/ConflictsManager'
 import { useAuth } from '../../../hooks/useAuth'
 import { buildUserName } from '../../../utils/actorUtils'
 import { Button, PageHeader } from '../../../components/ui'
@@ -17,6 +18,16 @@ export const Route = createFileRoute('/_authenticated/auditions/$jobId')({
     if (job.production_id) {
       await queryClient.ensureQueryData(productionSkeletonQueryOptions(job.production_id))
     }
+  },
+  errorComponent: function AuditionDetailError({ error }) {
+    const status = (error as { response?: { status?: number } })?.response?.status
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8 text-sm text-gray-600">
+        {status === 403 || status === 401
+          ? "You don't have permission to view this audition."
+          : 'Something went wrong loading this audition.'}
+      </div>
+    )
   },
   component: function AuditionDetailRoute() {
     const { jobId } = Route.useParams()
@@ -314,6 +325,15 @@ export const Route = createFileRoute('/_authenticated/auditions/$jobId')({
                   </div>
                 )}
               </dl>
+            </section>
+          )}
+
+          {job.user_id && (
+            <section>
+              <h2 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+                Scheduling conflicts
+              </h2>
+              <ConflictsManager userId={job.user_id} canEdit={isOwner} />
             </section>
           )}
         </div>

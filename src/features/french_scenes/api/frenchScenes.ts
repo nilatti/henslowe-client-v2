@@ -50,7 +50,7 @@ export function useDeleteFrenchScene(playId: number, sceneId: number) {
   })
 }
 
-export function useCreateOnStage(frenchSceneId: number) {
+export function useCreateOnStage(frenchSceneId: number, playId: number, sceneId: number) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: {
@@ -63,51 +63,61 @@ export function useCreateOnStage(frenchSceneId: number) {
     }) =>
       api.post(`/api/v1/french_scenes/${frenchSceneId}/on_stages`, { on_stage: data }).then(r => r.data),
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['plays', playId, 'skeleton'] })
+      qc.invalidateQueries({ queryKey: ['scenes', sceneId] })
       qc.invalidateQueries({ queryKey: ['french_scenes', frenchSceneId] })
     },
   })
 }
 
-export function useUpdateOnStage(frenchSceneId: number) {
+export function useUpdateOnStage(frenchSceneId: number, playId: number, sceneId: number) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: Partial<OnStage> & { id: number }) =>
       api.put(`/api/v1/on_stages/${data.id}`, { on_stage: data })
         .then(r => r.data),
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['plays', playId, 'skeleton'] })
+      qc.invalidateQueries({ queryKey: ['scenes', sceneId] })
       qc.invalidateQueries({ queryKey: ['french_scenes', frenchSceneId] })
     },
   })
 }
 
-export function useDeleteOnStage(frenchSceneId: number) {
+export function useDeleteOnStage(frenchSceneId: number, playId: number, sceneId: number) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: number) =>
       api.delete(`/api/v1/on_stages/${id}`).then(r => r.data),
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['plays', playId, 'skeleton'] })
+      qc.invalidateQueries({ queryKey: ['scenes', sceneId] })
       qc.invalidateQueries({ queryKey: ['french_scenes', frenchSceneId] })
     },
   })
 }
 
-export function useCreateSong(frenchSceneId: number) {
+export function useCreateSong(frenchSceneId: number, playId: number, sceneId: number) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: { title: string; character_ids?: number[] }): Promise<Song> =>
       api.post(`/api/v1/french_scenes/${frenchSceneId}/songs`, { song: data }).then(r => r.data),
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['plays', playId, 'skeleton'] })
+      qc.invalidateQueries({ queryKey: ['scenes', sceneId] })
       qc.invalidateQueries({ queryKey: ['french_scenes', frenchSceneId] })
     },
   })
 }
 
-export function useUpdateSong(frenchSceneId: number) {
+export function useUpdateSong(frenchSceneId: number, playId: number, sceneId: number) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: { id: number; title?: string; character_ids?: number[]; character_group_ids?: number[] }): Promise<Song> =>
       api.put(`/api/v1/songs/${data.id}`, { song: data }).then(r => r.data),
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['plays', playId, 'skeleton'] })
+      qc.invalidateQueries({ queryKey: ['scenes', sceneId] })
       qc.invalidateQueries({ queryKey: ['french_scenes', frenchSceneId] })
     },
   })
@@ -126,12 +136,14 @@ export function useMoveSong(frenchSceneId: number) {
   })
 }
 
-export function useDeleteSong(frenchSceneId: number) {
+export function useDeleteSong(frenchSceneId: number, playId: number, sceneId: number) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: number) =>
       api.delete(`/api/v1/songs/${id}`).then(r => r.data),
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['plays', playId, 'skeleton'] })
+      qc.invalidateQueries({ queryKey: ['scenes', sceneId] })
       qc.invalidateQueries({ queryKey: ['french_scenes', frenchSceneId] })
     },
   })

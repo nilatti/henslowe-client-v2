@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useUpdateLine } from '../api/script'
 import { buildDiff, isLineCut } from '../utils/scriptUtils'
 import type { ScriptLine } from '../types/script'
+import { CharacterCombobox } from '../../french_scenes/components/CharacterCombobox'
 
 interface LineEditableProps {
   line: ScriptLine
@@ -24,9 +25,6 @@ export function LineEditable({
   // Initialize to the editable version: new_content if non-cut, else original
   const [editValue, setEditValue] = useState(
     line.new_content?.trim() ? line.new_content : line.original_content
-  )
-  const [pendingCharId, setPendingCharId] = useState<number | null>(
-    line.character_id
   )
 
   const isCut = isLineCut(line)
@@ -55,21 +53,6 @@ export function LineEditable({
     }
   }
 
-  const handleCharSelectBlur = () => {
-    if (pendingCharId !== line.character_id) {
-      const character = characters.find(c => c.id === pendingCharId) ?? null
-      updateLine.mutate({ ...line, character_id: pendingCharId, character })
-    }
-    setCharSelectOpen(false)
-  }
-
-  const handleCharSelectKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      setPendingCharId(line.character_id)
-      setCharSelectOpen(false)
-    }
-  }
-
   if (isCut && !showCut) return null
 
   return (
@@ -85,29 +68,40 @@ export function LineEditable({
       {/* Character name / selector */}
       <div className="relative w-40 shrink-0 text-left pl-2">
         {charSelectOpen ? (
-          <select
-            autoFocus
-            size={Math.min(characters.length + 1, 6)}
-            className="text-xs border border-gray-300 rounded shadow-lg absolute right-0 top-0 z-10 bg-white min-w-max"
-            value={pendingCharId ?? ''}
-            onChange={e => setPendingCharId(Number(e.target.value) || null)}
-            onBlur={handleCharSelectBlur}
-            onKeyDown={handleCharSelectKeyDown}
+          <div
+            className="absolute left-0 top-0 z-10 w-48"
+            onKeyDown={e => { if (e.key === 'Escape') setCharSelectOpen(false) }}
           >
-            <option value="">None</option>
-            {characters.map(c => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+            <CharacterCombobox
+              characters={characters}
+              characterGroups={[]}
+              excludeCharacterIds={new Set()}
+              excludeGroupIds={new Set()}
+              playId={playId}
+              onSelect={(_type, id) => {
+                const character = characters.find(c => c.id === id) ?? null
+                updateLine.mutate({ ...line, character_id: id, character })
+                setCharSelectOpen(false)
+              }}
+              disabled={updateLine.isPending}
+            />
+            {line.character_id !== null && (
+              <button
+                className="mt-1 text-xs text-gray-400 hover:text-red-500"
+                onMouseDown={e => {
+                  e.preventDefault()
+                  updateLine.mutate({ ...line, character_id: null, character: null })
+                  setCharSelectOpen(false)
+                }}
+              >
+                Clear character
+              </button>
+            )}
+          </div>
         ) : showCharacter && line.character ? (
           <span
             className="font-semibold text-gray-700 cursor-pointer hover:text-blue-600 text-xs"
-            onDoubleClick={() => {
-              setPendingCharId(line.character_id)
-              setCharSelectOpen(true)
-            }}
+            onDoubleClick={() => setCharSelectOpen(true)}
             title="Double-click to reassign"
           >
             {line.character.name}
@@ -115,19 +109,13 @@ export function LineEditable({
         ) : line.character_id ? (
           <span
             className="text-gray-300 text-xs cursor-pointer hover:text-blue-400 select-none"
-            onDoubleClick={() => {
-              setPendingCharId(line.character_id)
-              setCharSelectOpen(true)
-            }}
+            onDoubleClick={() => setCharSelectOpen(true)}
             title="Double-click to reassign"
           >·</span>
         ) : (
           <span
             className="text-gray-400 text-xs cursor-pointer hover:text-blue-500 select-none italic"
-            onDoubleClick={() => {
-              setPendingCharId(null)
-              setCharSelectOpen(true)
-            }}
+            onDoubleClick={() => setCharSelectOpen(true)}
             title="Double-click to set character"
           >
             Set character

@@ -16,16 +16,16 @@ export function Dashboard() {
   const auditionerJobs = data.jobs.filter((j) => j.specialization?.title === 'Auditioner')
   const otherJobs = data.jobs.filter((j) => j.specialization?.title !== 'Auditioner')
 
-  const currentProductions = otherJobs
-    // TODO: date filter also available for jobs list — see commented filter below
-    .filter(
-      (job) =>
-        job.production &&
-        job.start_date &&
-        job.end_date &&
-        isBefore(parseISO(job.start_date), now) &&
-        isAfter(parseISO(job.end_date), now),
-    )
+  const currentJobs = otherJobs.filter(
+    (job) =>
+      job.start_date &&
+      job.end_date &&
+      isBefore(parseISO(job.start_date), now) &&
+      isAfter(parseISO(job.end_date), now),
+  )
+
+  const currentProductions = currentJobs
+    .filter((job) => job.production)
     .map((job) => job.production!)
 
   const playIdByProductionId = new Map(
@@ -45,17 +45,10 @@ export function Dashboard() {
 
       <div>
         <h4 className="pt-4 text-lg font-medium">Current Jobs &amp; Productions</h4>
-        {otherJobs.length > 0 ? (
+        {currentJobs.length > 0 ? (
           <ul className="list-disc list-inside space-y-1">
-            {otherJobs
-              // TODO: filter by date range:
-              // .filter(job =>
-              //   job.start_date && job.end_date &&
-              //   isBefore(parseISO(job.start_date), now) &&
-              //   isAfter(parseISO(job.end_date), now)
-              // )
-              .map((job) => (
-                <li key={job.id}>
+            {currentJobs.map((job) => (
+              <li key={job.id}>
                   {job.specialization?.title}{' '}
                   {job.production && (
                     <span>
@@ -85,7 +78,7 @@ export function Dashboard() {
               ))}
           </ul>
         ) : (
-          <div className="text-gray-500">You don't have any jobs listed.</div>
+          <div className="text-gray-500">No current jobs or productions.</div>
         )}
       </div>
 

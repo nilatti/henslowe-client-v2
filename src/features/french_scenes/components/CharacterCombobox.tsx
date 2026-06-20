@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useCreateCharacter } from '../../plays/api/characters'
-import type { PlayCharacter, PlayCharacterGroup } from '../../plays/types/play'
 
 type OptionType = 'character' | 'character_group'
 
@@ -19,8 +18,8 @@ interface CreateOption {
 type Option = ItemOption | CreateOption
 
 interface CharacterComboboxProps {
-  characters: PlayCharacter[]
-  characterGroups: PlayCharacterGroup[]
+  characters: { id: number; name: string }[]
+  characterGroups: { id: number; name: string }[]
   excludeCharacterIds: Set<number>
   excludeGroupIds: Set<number>
   playId: number
@@ -158,6 +157,7 @@ export function CharacterCombobox({
         onKeyDown={handleKeyDown}
         placeholder={isCreating ? 'Creating…' : 'Search characters…'}
         disabled={isDisabled}
+        autoFocus
         autoComplete="off"
         className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
       />
@@ -200,7 +200,7 @@ export function CharacterCombobox({
 
       {isOpen && options.length === 0 && !trimmed && (
         <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg px-3 py-2 text-sm text-gray-400 italic">
-          All characters already on stage
+          All characters already added
         </div>
       )}
     </div>

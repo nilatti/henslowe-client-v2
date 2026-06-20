@@ -6,16 +6,20 @@ import { Button, ConfirmDialog } from '../../../components/ui'
 interface OnStageItemProps {
   onStage: OnStage
   frenchSceneId: number
+  playId: number
+  sceneId: number
   isAdmin: boolean
 }
 
 export function OnStageItem({
   onStage,
   frenchSceneId,
+  playId,
+  sceneId,
   isAdmin,
 }: OnStageItemProps) {
-  const updateOnStage = useUpdateOnStage(frenchSceneId)
-  const deleteOnStage = useDeleteOnStage(frenchSceneId)
+  const updateOnStage = useUpdateOnStage(frenchSceneId, playId, sceneId)
+  const deleteOnStage = useDeleteOnStage(frenchSceneId, playId, sceneId)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   const name =

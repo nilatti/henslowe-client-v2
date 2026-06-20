@@ -7,6 +7,8 @@ import { useAuth } from '../../../hooks/useAuth'
 import { useIsSuperAdmin } from '../../../hooks/useUserRole'
 import { buildUserName } from '../../../utils/actorUtils'
 import { ConflictsManager } from '../../conflicts/components/ConflictsManager'
+import { HeadshotUpload } from './HeadshotUpload'
+import { AddJobToUserForm } from './AddJobToUserForm'
 import {
   Button,
   Card,
@@ -28,11 +30,13 @@ export function UserDetail({ userId }: UserDetailProps) {
   const navigate = useNavigate()
 
   const isSelf = currentUser?.id === userId
-  const canEdit = isSelf || isSuperAdmin
+  const isAdmin = user.overlap === 'theater admin' || user.overlap === 'production admin'
+  const canEdit = isSelf || isSuperAdmin || isAdmin
   const canDelete = isSuperAdmin
 
   const [activeTab, setActiveTab] = useState('info')
   const [isEditing, setIsEditing] = useState(false)
+  const [addingJob, setAddingJob] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   const tabs = [
@@ -77,6 +81,19 @@ export function UserDetail({ userId }: UserDetailProps) {
 
           {activeTab === 'info' && (
             <Card className="p-6">
+              {(canEdit || user.headshot_url) && (
+                <div className="flex justify-center mb-6">
+                  {canEdit ? (
+                    <HeadshotUpload userId={userId} currentUrl={user.headshot_url} />
+                  ) : (
+                    <img
+                      src={user.headshot_url!}
+                      alt={`${fullName}'s headshot`}
+                      className="w-32 h-32 rounded-full object-cover ring-2 ring-gray-200"
+                    />
+                  )}
+                </div>
+              )}
               <dl className="space-y-3 text-sm">
                 {user.preferred_name && (
                   <div>
@@ -188,10 +205,26 @@ export function UserDetail({ userId }: UserDetailProps) {
 
           {activeTab === 'jobs' && user.jobs && (
             <Card>
+              {(isSuperAdmin || isAdmin) && (
+                <div className="px-4 pt-3">
+                  {addingJob ? (
+                    <AddJobToUserForm
+                      userId={userId}
+                      invalidateKey={['users', userId]}
+                      onSuccess={() => setAddingJob(false)}
+                      onCancel={() => setAddingJob(false)}
+                    />
+                  ) : (
+                    <Button variant="secondary" onClick={() => setAddingJob(true)}>
+                      Add job
+                    </Button>
+                  )}
+                </div>
+              )}
               {user.jobs.length === 0 ? (
                 <p className="px-4 py-3 text-sm text-gray-500">No jobs yet.</p>
               ) : (
-                <ul className="divide-y divide-gray-100">
+                <ul className="divide-y divide-gray-100 mt-3">
                   {user.jobs.map(job => (
                     <li
                       key={job.id}

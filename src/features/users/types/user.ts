@@ -36,6 +36,9 @@ export interface UserDetail {
   subscription_end_date?: string | null
   created_at?: string
   updated_at?: string
+  headshot_url?: string | null
+  // Relationship level between the viewer and this user
+  overlap?: string
   // Included when overlap level is sufficient
   jobs?: UserJob[]
   conflicts?: UserConflict[]

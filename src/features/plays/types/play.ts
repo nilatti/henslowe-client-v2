@@ -42,7 +42,7 @@ export interface Character {
 export interface FrenchSceneSkeleton {
   id: number
   number: string
-  songs: { id: number; title: string }[]
+  songs: { id: number; title: string; characters: { id: number }[]; character_groups: { id: number }[] }[]
 }
 
 export interface SceneSkeleton {

@@ -10,13 +10,16 @@ import { useIsPlayAdmin } from "../../../hooks/useUserRole";
 interface OnStagesManagerProps {
   frenchScene: FrenchSceneDetail;
   playSkeleton: PlaySkeleton;
+  sceneId: number;
 }
 
 export function OnStagesManager({
   frenchScene,
   playSkeleton,
+  sceneId,
 }: OnStagesManagerProps) {
-  const createOnStage = useCreateOnStage(frenchScene.id);
+  const playId = playSkeleton.id;
+  const createOnStage = useCreateOnStage(frenchScene.id, playId, sceneId);
   const isAdmin = useIsPlayAdmin(playSkeleton.id);
 
   const [showForm, setShowForm] = useState(false);
@@ -119,6 +122,8 @@ export function OnStagesManager({
                 key={os.id}
                 onStage={os}
                 frenchSceneId={frenchScene.id}
+                playId={playId}
+                sceneId={sceneId}
                 isAdmin={isAdmin}
               />
             ))}

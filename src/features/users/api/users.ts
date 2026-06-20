@@ -37,6 +37,21 @@ export function useUpdateUser() {
   })
 }
 
+export function useUploadHeadshot(userId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (formData: FormData) =>
+      import('../../../api/client').then(m =>
+        m.default.put(`/api/v1/users/${userId}/upload_headshot`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }).then(r => r.data)
+      ),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['users', userId] })
+    },
+  })
+}
+
 export function useDeleteUser() {
   const qc = useQueryClient()
   return useMutation({

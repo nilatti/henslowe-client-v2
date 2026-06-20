@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { calculateLineCount } from '../../../../utils/playScriptUtils'
 import { isLineCut } from '../../utils/scriptUtils'
 import {
@@ -8,6 +9,7 @@ import {
   useDeleteCharacter,
   useDeleteCharacterGroup,
 } from '../../../plays/api/characters'
+import { playSkeletonQueryOptions } from '../../../plays/api/plays'
 import { CharacterLine } from './CharacterLine'
 import { Button, ConfirmDialog } from '../../../../components/ui'
 import type { CharacterWithLines, CharacterGroupWithLines } from '../../../plays/types/play'
@@ -29,6 +31,31 @@ const labelClass = 'text-xs font-medium text-gray-500 mb-0.5'
 
 export default function CharacterInfoTab({ character, playId }: Props) {
   const charData = character.type === 'character' ? character : null
+  const { data: skeleton } = useSuspenseQuery(playSkeletonQueryOptions(playId))
+
+  const characterSongs = (() => {
+    const fsLabelMap = new Map<number, string>()
+    skeleton.acts.forEach(act => {
+      act.scenes.forEach(scene => {
+        scene.french_scenes.forEach(fs => {
+          fsLabelMap.set(fs.id, `${act.number}.${scene.number}.${fs.number}`)
+        })
+      })
+    })
+    return skeleton.acts.flatMap(act =>
+      act.scenes.flatMap(scene =>
+        scene.french_scenes.flatMap(fs =>
+          fs.songs
+            .filter(song =>
+              character.type === 'character'
+                ? song.characters.some(c => c.id === character.id)
+                : song.character_groups.some(g => g.id === character.id)
+            )
+            .map(song => ({ id: song.id, title: song.title, fsLabel: fsLabelMap.get(fs.id) ?? '' }))
+        )
+      )
+    )
+  })()
 
   const [editingField, setEditingField] = useState<string | null>(null)
   const [name, setName] = useState(character.name ?? '')
@@ -246,6 +273,20 @@ export default function CharacterInfoTab({ character, playId }: Props) {
             )}
           </div>
         </>
+      )}
+
+      {characterSongs.length > 0 && (
+        <div className="mb-4">
+          <div className={labelClass}>Songs</div>
+          <ul className="mt-1 space-y-0.5">
+            {characterSongs.map(song => (
+              <li key={song.id} className="text-sm text-gray-700">
+                {song.title}
+                <span className="text-gray-400 ml-1 text-xs">({song.fsLabel})</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {/* Stats and controls */}

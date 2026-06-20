@@ -11,7 +11,9 @@ interface ConflictPatternItemProps {
 
 function formatTimeStr(timeStr: string): string {
   try {
-    const [h, m] = timeStr.split(':').map(Number)
+    // Strip timezone offset suffix if present (e.g. "10:00-04:00" → "10:00")
+    const bare = timeStr.replace(/[+-]\d{2}:\d{2}$/, '')
+    const [h, m] = bare.split(':').map(Number)
     const ampm = h >= 12 ? 'pm' : 'am'
     const hour = h % 12 || 12
     return `${hour}:${String(m).padStart(2, '0')} ${ampm}`

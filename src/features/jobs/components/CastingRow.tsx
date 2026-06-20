@@ -4,6 +4,7 @@ import { useUpdateJob, useDeleteJob } from '../api/jobs'
 import type { JobWithDetails } from '../types/job'
 import { Button, ConfirmDialog } from '../../../components/ui'
 import { buildUserName } from '../../../utils/actorUtils'
+import { UserCombobox } from './UserCombobox'
 
 interface CastingRowProps {
   casting: JobWithDetails
@@ -22,22 +23,15 @@ export function CastingRow({
   const deleteJob = useDeleteJob(invalidateKey)
   const [isEditing, setIsEditing] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const [selectedUserId, setSelectedUserId] = useState<number | ''>(
-    casting.user_id ?? ''
-  )
 
   const lineCount =
     casting.character?.new_line_count ?? casting.character?.original_line_count
 
-  const handleCast = () => {
-    if (!selectedUserId) return
-    const user = actorsAndAuditioners.find(a => a.id === Number(selectedUserId)) ?? null
+  const handleCast = (userId: number) => {
+    if (!userId) return
+    const user = actorsAndAuditioners.find(a => a.id === userId) ?? null
     setIsEditing(false)
-    updateJob.mutate({
-      id: casting.id,
-      user_id: Number(selectedUserId),
-      _user: user,
-    })
+    updateJob.mutate({ id: casting.id, user_id: userId, _user: user })
   }
 
   const actorName = casting.user ? buildUserName(casting.user) : null
@@ -71,23 +65,14 @@ export function CastingRow({
       <div className="flex items-center gap-2 ml-4 shrink-0">
         {isEditing ? (
           <div className="flex items-center gap-2">
-            <select
-              value={selectedUserId}
-              onChange={e => setSelectedUserId(Number(e.target.value))}
-              className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              autoFocus
-            >
-              <option value="">Select actor</option>
-              {actorsAndAuditioners.map(actor => (
-                <option key={actor.id} value={actor.id}>
-                  {buildUserName(actor)}
-                  {actor.fake ? ' (placeholder)' : ''}
-                </option>
-              ))}
-            </select>
-            <Button onClick={handleCast} disabled={!selectedUserId}>
-              Cast
-            </Button>
+            <div className="w-48">
+              <UserCombobox
+                users={actorsAndAuditioners}
+                value={casting.user_id ?? 0}
+                onChange={handleCast}
+                disabled={updateJob.isPending}
+              />
+            </div>
             <Button variant="secondary" onClick={() => setIsEditing(false)}>
               Cancel
             </Button>

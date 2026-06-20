@@ -8,6 +8,8 @@ import { CharacterCombobox } from './CharacterCombobox'
 interface SongItemProps {
   song: Song
   frenchSceneId: number
+  playId: number
+  sceneId: number
   playSkeleton: PlaySkeleton
   isAdmin: boolean
   isFirst?: boolean
@@ -15,9 +17,9 @@ interface SongItemProps {
   onMove?: (direction: 'up' | 'down') => void
 }
 
-export function SongItem({ song, frenchSceneId, playSkeleton, isAdmin, isFirst, isLast, onMove }: SongItemProps) {
-  const updateSong = useUpdateSong(frenchSceneId)
-  const deleteSong = useDeleteSong(frenchSceneId)
+export function SongItem({ song, frenchSceneId, playId, sceneId, playSkeleton, isAdmin, isFirst, isLast, onMove }: SongItemProps) {
+  const updateSong = useUpdateSong(frenchSceneId, playId, sceneId)
+  const deleteSong = useDeleteSong(frenchSceneId, playId, sceneId)
   const [editingTitle, setEditingTitle] = useState(false)
   const [titleValue, setTitleValue] = useState(song.title)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -94,7 +96,7 @@ export function SongItem({ song, frenchSceneId, playSkeleton, isAdmin, isFirst, 
           {(song.characters.length > 0 || (song.character_groups?.length ?? 0) > 0) && (
             <ul className="mt-1.5 flex flex-wrap gap-1.5">
               {song.characters.map(c => (
-                <li key={`c-${c.id}`} className="flex items-center gap-1 text-xs bg-gray-100 rounded-full px-2 py-0.5 text-gray-700">
+                <li key={`c-${c.id}`} className="flex items-center gap-1 text-sm bg-gray-100 rounded-full px-2 py-0.5 text-gray-700">
                   {c.name}
                   {isAdmin && (
                     <button
@@ -108,7 +110,7 @@ export function SongItem({ song, frenchSceneId, playSkeleton, isAdmin, isFirst, 
                 </li>
               ))}
               {(song.character_groups ?? []).map(g => (
-                <li key={`g-${g.id}`} className="flex items-center gap-1 text-xs bg-blue-50 rounded-full px-2 py-0.5 text-blue-700">
+                <li key={`g-${g.id}`} className="flex items-center gap-1 text-sm bg-blue-50 rounded-full px-2 py-0.5 text-blue-700">
                   {g.name}
                   <span className="text-blue-400">(group)</span>
                   {isAdmin && (

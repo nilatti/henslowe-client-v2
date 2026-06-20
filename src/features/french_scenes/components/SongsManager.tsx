@@ -9,10 +9,12 @@ import { useIsPlayAdmin } from '../../../hooks/useUserRole'
 interface SongsManagerProps {
   frenchScene: FrenchSceneDetail
   playSkeleton: PlaySkeleton
+  sceneId: number
 }
 
-export function SongsManager({ frenchScene, playSkeleton }: SongsManagerProps) {
-  const createSong = useCreateSong(frenchScene.id)
+export function SongsManager({ frenchScene, playSkeleton, sceneId }: SongsManagerProps) {
+  const playId = playSkeleton.id
+  const createSong = useCreateSong(frenchScene.id, playId, sceneId)
   const moveSong = useMoveSong(frenchScene.id)
   const isAdmin = useIsPlayAdmin(playSkeleton.id)
   const [showForm, setShowForm] = useState(false)
@@ -75,6 +77,8 @@ export function SongsManager({ frenchScene, playSkeleton }: SongsManagerProps) {
                 key={song.id}
                 song={song}
                 frenchSceneId={frenchScene.id}
+                playId={playId}
+                sceneId={sceneId}
                 playSkeleton={playSkeleton}
                 isAdmin={isAdmin}
                 isFirst={i === 0}

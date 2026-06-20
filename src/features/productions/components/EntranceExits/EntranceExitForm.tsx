@@ -3,6 +3,7 @@ import { Button } from '../../../../components/ui'
 import type { PlayCharacter } from '../../../plays/types/play'
 import type { StageExit } from '../../types/stageExit'
 import type { EntranceExit } from '../../types/entranceExit'
+import { CharacterCombobox } from '../../../french_scenes/components/CharacterCombobox'
 
 export interface EntranceExitFormData {
   category: 'Enter' | 'Exit' | ''
@@ -85,27 +86,39 @@ export function EntranceExitForm({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Characters <span className="text-red-500">*</span>
             </label>
-            <select
-              multiple
-              value={field.state.value.map(String)}
-              onChange={e => {
-                const selected = Array.from(e.target.selectedOptions).map(o =>
-                  Number(o.value)
-                )
-                field.handleChange(selected)
+            {field.state.value.length > 0 && (
+              <ul className="mb-2 flex flex-wrap gap-1.5">
+                {field.state.value.map(id => {
+                  const char = characters.find(c => c.id === id)
+                  if (!char) return null
+                  return (
+                    <li key={id} className="flex items-center gap-1 text-sm bg-gray-100 rounded-full px-2 py-0.5 text-gray-700">
+                      {char.name}
+                      <button
+                        type="button"
+                        onClick={() => field.handleChange(field.state.value.filter(cid => cid !== id))}
+                        className="text-gray-400 hover:text-red-500 ml-0.5 leading-none"
+                      >
+                        ×
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+            <CharacterCombobox
+              characters={characters}
+              characterGroups={[]}
+              excludeCharacterIds={new Set(field.state.value)}
+              excludeGroupIds={new Set()}
+              playId={characters[0]?.play_id ?? 0}
+              onSelect={(type, id) => {
+                if (type === 'character') {
+                  field.handleChange([...field.state.value, id])
+                }
               }}
-              onBlur={field.handleBlur}
-              required
-              size={Math.min(characters.length, 6)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {characters.map(c => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-400 mt-1">Ctrl/Cmd+click to select multiple</p>
+              disabled={isPending}
+            />
           </div>
         )}
       </form.Field>

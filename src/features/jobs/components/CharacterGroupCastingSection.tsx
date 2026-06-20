@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useCreateJob, useDeleteJob } from '../api/jobs'
 import type { JobWithDetails } from '../types/job'
 import type { PlayCharacterGroup } from '../../plays/types/play'
-import { Button, Card, ConfirmDialog } from '../../../components/ui'
+import { Card, ConfirmDialog } from '../../../components/ui'
 import { buildUserName } from '../../../utils/actorUtils'
 import { ACTOR_SPECIALIZATION_ID } from '../../../utils/constants'
+import { UserCombobox } from './UserCombobox'
 
 interface CharacterGroupCastingSectionProps {
   characterGroups: PlayCharacterGroup[]
@@ -40,23 +41,21 @@ function CharacterGroupRow({
 }: GroupRowProps) {
   const createJob = useCreateJob(invalidateKey)
   const deleteJob = useDeleteJob(invalidateKey)
-  const [selectedUserId, setSelectedUserId] = useState<number | ''>('')
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
 
   const assignedUserIds = new Set(groupJobs.map(j => j.user_id).filter(id => id != null))
   const availableAuditioners = auditioners.filter(a => !assignedUserIds.has(a.id))
 
-  const handleAdd = async () => {
-    if (!selectedUserId) return
+  const handleAdd = async (userId: number) => {
+    if (!userId) return
     await createJob.mutateAsync({
       character_group_id: group.id,
-      user_id: Number(selectedUserId),
+      user_id: userId,
       production_id: productionId,
       specialization_id: ACTOR_SPECIALIZATION_ID,
       start_date: productionStartDate ?? undefined,
       end_date: productionEndDate ?? undefined,
     })
-    setSelectedUserId('')
   }
 
   return (
@@ -88,25 +87,13 @@ function CharacterGroupRow({
             </div>
           ))}
           {isAdmin && availableAuditioners.length > 0 && (
-            <div className="flex items-center gap-2 mt-0.5">
-              <select
-                value={selectedUserId}
-                onChange={e => setSelectedUserId(Number(e.target.value))}
-                className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Add actor…</option>
-                {availableAuditioners.map(a => (
-                  <option key={a.id} value={a.id}>
-                    {buildUserName(a)}{a.fake ? ' (placeholder)' : ''}
-                  </option>
-                ))}
-              </select>
-              <Button
-                onClick={handleAdd}
-                disabled={!selectedUserId || createJob.isPending}
-              >
-                Add
-              </Button>
+            <div className="mt-0.5 w-52">
+              <UserCombobox
+                users={availableAuditioners}
+                value={0}
+                onChange={handleAdd}
+                disabled={createJob.isPending}
+              />
             </div>
           )}
           {isAdmin && availableAuditioners.length === 0 && groupJobs.length === 0 && (

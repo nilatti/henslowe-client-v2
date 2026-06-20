@@ -14,28 +14,8 @@ vi.mock('../../plays/api/characters', () => ({
 }))
 
 const characters = [
-  {
-    id: 1,
-    name: 'Hamlet',
-    age: null,
-    gender: null,
-    description: null,
-    original_line_count: null,
-    new_line_count: null,
-    character_group_id: null,
-    play_id: 1,
-  },
-  {
-    id: 2,
-    name: 'Ophelia',
-    age: null,
-    gender: null,
-    description: null,
-    original_line_count: null,
-    new_line_count: null,
-    character_group_id: null,
-    play_id: 1,
-  },
+  { id: 1, name: 'Hamlet' },
+  { id: 2, name: 'Ophelia' },
 ]
 
 const groups = [{ id: 10, name: 'Guards' }]
@@ -172,7 +152,7 @@ describe('CharacterCombobox', () => {
     expect(screen.queryByText('Hamlet')).not.toBeInTheDocument()
   })
 
-  it('shows "All characters already on stage" when all characters are excluded and query is empty', async () => {
+  it('shows "All characters already added" when all characters are excluded and query is empty', async () => {
     const user = userEvent.setup()
     const { input } = renderCombobox({
       excludeCharacterIds: new Set([1, 2]),
@@ -181,6 +161,6 @@ describe('CharacterCombobox', () => {
 
     await user.click(input)
 
-    expect(screen.getByText('All characters already on stage')).toBeInTheDocument()
+    expect(screen.getByText('All characters already added')).toBeInTheDocument()
   })
 })

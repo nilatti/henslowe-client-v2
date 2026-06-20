@@ -169,11 +169,13 @@ export function FrenchSceneDetail({
           <OnStagesManager
             frenchScene={frenchScene}
             playSkeleton={playSkeleton}
+            sceneId={sceneId}
           />
 
           <SongsManager
             frenchScene={frenchScene}
             playSkeleton={playSkeleton}
+            sceneId={sceneId}
           />
 
           {playSkeleton.production_id != null && (
