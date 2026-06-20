@@ -211,6 +211,7 @@ export function UserDetail({ userId }: UserDetailProps) {
                     <AddJobToUserForm
                       userId={userId}
                       invalidateKey={['users', userId]}
+                      targetUserJobs={user.jobs ?? []}
                       onSuccess={() => setAddingJob(false)}
                       onCancel={() => setAddingJob(false)}
                     />

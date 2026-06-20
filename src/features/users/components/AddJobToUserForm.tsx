@@ -15,9 +15,12 @@ interface Props {
   invalidateKey: unknown[]
   onSuccess: () => void
   onCancel: () => void
+  // When provided, restricts available theaters/productions to the overlap context.
+  // Admins may only assign jobs within theaters/productions the target user is already part of.
+  targetUserJobs?: { theater_id: number; production_id?: number | null }[]
 }
 
-export function AddJobToUserForm({ userId, invalidateKey, onSuccess, onCancel }: Props) {
+export function AddJobToUserForm({ userId, invalidateKey, onSuccess, onCancel, targetUserJobs }: Props) {
   const { user: currentUser } = useAuth()
   const create = useCreateJob(invalidateKey)
 
@@ -51,6 +54,26 @@ export function AddJobToUserForm({ userId, invalidateKey, onSuccess, onCancel }:
   const adminProductions = isSuperAdmin
     ? productions
     : productions.filter(p => adminProductionIds.has(p.id))
+
+  // Non-superadmins are restricted to the overlap context: theaters where the target
+  // already has a job, and productions at those theaters or where the target has a
+  // direct production job. Superadmins may assign to any theater or production.
+  const applyOverlapFilter = !!targetUserJobs && !isSuperAdmin
+  const theaterIds = new Set(targetUserJobs?.map(j => j.theater_id) ?? [])
+  const productionIds = new Set(
+    targetUserJobs?.map(j => j.production_id).filter((id): id is number => id != null) ?? []
+  )
+  const overlapTheaters = applyOverlapFilter
+    ? adminTheaters.filter(t => theaterIds.has(t.id))
+    : adminTheaters
+  const overlapTheaterIds = new Set(overlapTheaters.map(t => t.id))
+  const overlapProductions = applyOverlapFilter
+    ? adminProductions.filter(p => {
+        const theaterIdForProd = productionsWithTheaterId.find(pt => pt.id === p.id)?.theater_id
+        return (theaterIdForProd != null && overlapTheaterIds.has(theaterIdForProd)) ||
+          productionIds.has(p.id)
+      })
+    : adminProductions
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -89,16 +112,16 @@ export function AddJobToUserForm({ userId, invalidateKey, onSuccess, onCancel }:
           className={inputClass}
         >
           <option value="">Select...</option>
-          {adminTheaters.length > 0 && (
+          {overlapTheaters.length > 0 && (
             <optgroup label="Theaters">
-              {adminTheaters.map(t => (
+              {overlapTheaters.map(t => (
                 <option key={t.id} value={`theater:${t.id}`}>{t.name}</option>
               ))}
             </optgroup>
           )}
-          {adminProductions.length > 0 && (
+          {overlapProductions.length > 0 && (
             <optgroup label="Productions">
-              {adminProductions.map(p => (
+              {overlapProductions.map(p => (
                 <option key={p.id} value={`production:${p.id}`}>
                   {p.play?.title ?? `Production ${p.id}`}
                 </option>

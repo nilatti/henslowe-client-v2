@@ -25,6 +25,7 @@ export function UsersList() {
     { id: 'last_name', desc: false },
   ])
   const [confirmDelete, setConfirmDelete] = useState<UserSummary | null>(null)
+  const [search, setSearch] = useState('')
 
   const columnHelper = createColumnHelper<UserSummary>()
   const columns = [
@@ -73,8 +74,20 @@ export function UsersList() {
     ] : []),
   ]
 
+  const filteredUsers = (users as Array<UserSummary & { fake?: boolean }>).filter(u => {
+    if (u.fake) return false
+    if (!search) return true
+    const q = search.toLowerCase()
+    return (
+      u.first_name?.toLowerCase().includes(q) ||
+      u.last_name?.toLowerCase().includes(q) ||
+      u.preferred_name?.toLowerCase().includes(q) ||
+      u.email?.toLowerCase().includes(q)
+    )
+  })
+
   const table = useReactTable({
-    data: (users as Array<UserSummary & { fake?: boolean }>).filter(u => !u.fake),
+    data: filteredUsers,
     columns,
     state: { sorting },
     onSortingChange: setSorting,
@@ -92,6 +105,15 @@ export function UsersList() {
           </Button>
         ) : undefined}
       />
+      <div className="mb-4">
+        <input
+          type="search"
+          placeholder="Search by name or email…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="w-full max-w-sm rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        />
+      </div>
       <Card>
         <table className="w-full text-sm">
           <thead className="border-b border-gray-200">
@@ -134,7 +156,7 @@ export function UsersList() {
         </table>
         {table.getRowModel().rows.length === 0 && (
           <p className="px-4 py-6 text-sm text-gray-500 text-center">
-            No users found.
+            {search ? 'No users match your search.' : 'No users found.'}
           </p>
         )}
       </Card>
