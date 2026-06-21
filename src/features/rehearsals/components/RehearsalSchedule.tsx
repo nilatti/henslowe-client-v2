@@ -175,11 +175,23 @@ export function RehearsalSchedule({
   );
 
   const actorCharacterNames = new Map<number, string[]>();
-  getCastings(jobs).forEach((j) => {
+  const castings = getCastings(jobs);
+  castings.forEach((j) => {
     if (j.user && j.character) {
       const existing = actorCharacterNames.get(j.user.id) ?? [];
       actorCharacterNames.set(j.user.id, [...existing, j.character.name]);
     }
+  });
+  const seenGroups = new Map<number, Set<string>>();
+  castings.forEach((j) => {
+    if (!j.user || !j.character_group) return;
+    const groups = seenGroups.get(j.user.id) ?? new Set<string>();
+    if (!groups.has(j.character_group.name)) {
+      groups.add(j.character_group.name);
+      const existing = actorCharacterNames.get(j.user.id) ?? [];
+      actorCharacterNames.set(j.user.id, [...existing, j.character_group.name]);
+    }
+    seenGroups.set(j.user.id, groups);
   });
 
   const weekLabel = `${format(currentWeekStart, "MMMM d")} – ${format(currentWeekEnd, "MMMM d, yyyy")}`;
