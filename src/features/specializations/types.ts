@@ -1,11 +1,14 @@
 import type { Phase } from '../phases/types'
 
+export type SpecializationContext = 'theater' | 'production' | 'both'
+
 export interface Specialization {
   id: number
   title: string
   description?: string | null
   production_admin: boolean
   theater_admin: boolean
+  context: SpecializationContext
   default_start_phase_id: number | null
   default_end_phase_id: number | null
   default_start_phase: Phase | null

@@ -144,6 +144,18 @@ export function ScriptPage({ playId }: ScriptPageProps) {
           {!script.canonical && (
             <span className="ml-3 text-xs text-amber-600 italic">
               Production copy
+              {isProductionCopy && script.production_id && (
+                <>
+                  {' · '}
+                  <Link
+                    to="/productions/$productionId"
+                    params={{ productionId: String(script.production_id) }}
+                    className="text-blue-600 hover:text-blue-800 not-italic"
+                  >
+                    {productionSkeleton?.theater.name ?? 'View production'}
+                  </Link>
+                </>
+              )}
             </span>
           )}
         </div>

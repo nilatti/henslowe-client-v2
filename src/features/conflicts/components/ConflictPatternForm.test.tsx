@@ -76,6 +76,68 @@ async function fillAndSubmitForm(
   await user.click(screen.getByRole('button', { name: /save pattern/i }))
 }
 
+describe('ConflictPatternForm — time validation', () => {
+  beforeEach(() => {
+    mockMutateAsync.mockClear()
+    mockUseBuildConflictSchedule.mockClear()
+  })
+
+  it('auto-sets end time to match start time when end time is empty', () => {
+    const { container } = render(<ConflictPatternForm {...defaultProps} />)
+    const [startTimeInput, endTimeInput] = container.querySelectorAll<HTMLInputElement>('input[type="time"]')
+
+    fireEvent.change(startTimeInput, { target: { value: '19:00' } })
+
+    expect(endTimeInput.value).toBe('19:00')
+  })
+
+  it('auto-bumps end time when start time moves later than end time', () => {
+    const { container } = render(<ConflictPatternForm {...defaultProps} />)
+    const [startTimeInput, endTimeInput] = container.querySelectorAll<HTMLInputElement>('input[type="time"]')
+
+    fireEvent.change(startTimeInput, { target: { value: '19:00' } })
+    fireEvent.change(endTimeInput, { target: { value: '21:00' } })
+    fireEvent.change(startTimeInput, { target: { value: '22:00' } })
+
+    expect(endTimeInput.value).toBe('22:00')
+  })
+
+  it('does not bump end time when start time moves earlier than end time', () => {
+    const { container } = render(<ConflictPatternForm {...defaultProps} />)
+    const [startTimeInput, endTimeInput] = container.querySelectorAll<HTMLInputElement>('input[type="time"]')
+
+    fireEvent.change(startTimeInput, { target: { value: '19:00' } })
+    fireEvent.change(endTimeInput, { target: { value: '21:00' } })
+    fireEvent.change(startTimeInput, { target: { value: '18:00' } })
+
+    expect(endTimeInput.value).toBe('21:00')
+  })
+
+  it('shows an error when end time is manually set before start time', () => {
+    const { container } = render(<ConflictPatternForm {...defaultProps} />)
+    const [startTimeInput, endTimeInput] = container.querySelectorAll<HTMLInputElement>('input[type="time"]')
+
+    fireEvent.change(startTimeInput, { target: { value: '19:00' } })
+    fireEvent.change(endTimeInput, { target: { value: '18:00' } })
+
+    expect(screen.getByText(/end time must be after start time/i)).toBeInTheDocument()
+  })
+
+  it('disables the submit button when end time is before start time', () => {
+    const { container } = render(<ConflictPatternForm {...defaultProps} />)
+    const [startDateInput, endDateInput] = container.querySelectorAll<HTMLInputElement>('input[type="date"]')
+    const [startTimeInput, endTimeInput] = container.querySelectorAll<HTMLInputElement>('input[type="time"]')
+    const user = userEvent.setup()
+
+    fireEvent.change(startDateInput, { target: { value: '2026-08-01' } })
+    fireEvent.change(endDateInput, { target: { value: '2026-12-31' } })
+    fireEvent.change(startTimeInput, { target: { value: '19:00' } })
+    fireEvent.change(endTimeInput, { target: { value: '18:00' } })
+
+    expect(screen.getByRole('button', { name: /save pattern/i })).toBeDisabled()
+  })
+})
+
 describe('ConflictPatternForm', () => {
   beforeEach(() => {
     mockMutateAsync.mockClear()

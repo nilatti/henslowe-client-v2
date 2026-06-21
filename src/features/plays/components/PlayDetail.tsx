@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { usePageTitle } from '../../../hooks/usePageTitle'
 import { playSkeletonQueryOptions, useDeletePlay } from '../api/plays'
+import { productionSkeletonQueryOptions } from '../../productions/api/productions'
 import { PlayForm } from './PlayForm'
 import CharactersBreakdown from '../../script/components/Characters/CharactersBreakdown'
 import { ActsTab } from '../../acts/components/ActsTab'
@@ -30,6 +31,12 @@ export function PlayDetail({ playId }: PlayDetailProps) {
   const [activeTab, setActiveTab] = useState('info')
   const [isEditing, setIsEditing] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+
+  const isProductionCopy = !play.canonical && !!play.production_id
+  const { data: productionSkeleton } = useQuery({
+    ...productionSkeletonQueryOptions(play.production_id ?? 0),
+    enabled: isProductionCopy,
+  })
 
   const scenes = getScenes(play)
   const allCharacters = getAllCharacters(play)
@@ -107,6 +114,20 @@ export function PlayDetail({ playId }: PlayDetailProps) {
                     {play.canonical ? 'Canonical' : 'Production copy'}
                   </dd>
                 </div>
+                {isProductionCopy && play.production_id && (
+                  <div>
+                    <dt className="font-medium text-gray-700">Production</dt>
+                    <dd className="mt-1">
+                      <Link
+                        to="/productions/$productionId"
+                        params={{ productionId: String(play.production_id) }}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        {productionSkeleton?.theater.name ?? 'View production'}
+                      </Link>
+                    </dd>
+                  </div>
+                )}
                 <div className="pt-2 flex gap-3 flex-wrap">
                   <Link
                     to="/plays/$playId/script"

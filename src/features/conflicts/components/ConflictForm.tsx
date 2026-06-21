@@ -71,7 +71,13 @@ export function ConflictForm({
               <input
                 type="datetime-local"
                 value={field.state.value}
-                onChange={e => field.handleChange(e.target.value)}
+                onChange={e => {
+                  const val = e.target.value
+                  field.handleChange(val)
+                  if (val > form.getFieldValue('end_time')) {
+                    form.setFieldValue('end_time', val)
+                  }
+                }}
                 onBlur={field.handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -79,7 +85,16 @@ export function ConflictForm({
           )}
         </form.Field>
 
-        <form.Field name="end_time">
+        <form.Field
+          name="end_time"
+          validators={{
+            onChange: ({ value }) =>
+              value < form.getFieldValue('start_time')
+                ? 'End time must be after start time'
+                : undefined,
+            onChangeListenTo: ['start_time'],
+          }}
+        >
           {field => (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -90,8 +105,11 @@ export function ConflictForm({
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${field.state.meta.errors.length ? 'border-red-500' : 'border-gray-300'}`}
               />
+              {field.state.meta.errors.length > 0 && (
+                <p className="text-xs text-red-600 mt-1">{field.state.meta.errors[0]}</p>
+              )}
             </div>
           )}
         </form.Field>

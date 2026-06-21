@@ -32,6 +32,10 @@ export function ConflictPatternForm({
   const [endDate, setEndDate] = useState('')
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
+
+  const endTimeError = startTime && endTime && endTime < startTime
+    ? 'End time must be after start time'
+    : null
   const [daysOfWeek, setDaysOfWeek] = useState<string[]>([])
   const [category, setCategory] = useState('')
 
@@ -118,7 +122,11 @@ export function ConflictPatternForm({
           <input
             type="time"
             value={startTime}
-            onChange={e => setStartTime(e.target.value)}
+            onChange={e => {
+              const val = e.target.value
+              setStartTime(val)
+              if (!endTime || val > endTime) setEndTime(val)
+            }}
             className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -130,8 +138,9 @@ export function ConflictPatternForm({
             type="time"
             value={endTime}
             onChange={e => setEndTime(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${endTimeError ? 'border-red-500' : 'border-gray-300'}`}
           />
+          {endTimeError && <p className="text-xs text-red-600 mt-1">{endTimeError}</p>}
         </div>
       </div>
 
@@ -188,7 +197,7 @@ export function ConflictPatternForm({
         <Button
           onClick={handleSubmit}
           disabled={
-            !startDate || !endDate || !startTime || !endTime ||
+            !startDate || !endDate || !startTime || !endTime || !!endTimeError ||
             daysOfWeek.length === 0 || !category || buildSchedule.isPending
           }
         >

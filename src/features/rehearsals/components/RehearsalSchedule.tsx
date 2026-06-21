@@ -294,7 +294,7 @@ export function RehearsalSchedule({
                           productionId={productionId}
                           theaterId={theaterId}
                           defaultSpaceId={productionSkeleton?.default_space_id}
-                          defaultStartTime={last.start_time}
+                          defaultStartTime={last.end_time}
                           defaultEndTime={last.end_time}
                           onSuccess={() => setAddFormDate(null)}
                           onCancel={() => setAddFormDate(null)}

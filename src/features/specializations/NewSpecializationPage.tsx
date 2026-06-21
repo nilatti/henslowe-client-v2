@@ -3,12 +3,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { Button, PageHeader } from '../../components/ui'
 import { createSpecializationFn } from './queries'
+import type { SpecializationContext } from './types'
 
 export function NewSpecializationPage() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [context, setContext] = useState<SpecializationContext>('both')
   const [productionAdmin, setProductionAdmin] = useState(false)
   const [theaterAdmin, setTheaterAdmin] = useState(false)
 
@@ -25,7 +27,7 @@ export function NewSpecializationPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    createMutation.mutate({ title, description: description || null, production_admin: productionAdmin, theater_admin: theaterAdmin })
+    createMutation.mutate({ title, description: description || null, context, production_admin: productionAdmin, theater_admin: theaterAdmin })
   }
 
   return (
@@ -56,6 +58,18 @@ export function NewSpecializationPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Context</label>
+            <select
+              className="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              value={context}
+              onChange={e => setContext(e.target.value as SpecializationContext)}
+            >
+              <option value="theater">Theater only</option>
+              <option value="production">Production only</option>
+              <option value="both">Both</option>
+            </select>
           </div>
           <div className="space-y-2">
             <label className="flex items-center gap-2 text-sm text-gray-700">

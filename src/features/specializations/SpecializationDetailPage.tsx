@@ -7,7 +7,7 @@ import { specializationQueryOptions, updateSpecializationFn, deleteSpecializatio
 import { phasesQueryOptions } from '../phases/queries'
 import { Button, ConfirmDialog } from '../../components/ui'
 import { UserLink } from '../../utils/actorUtils'
-import type { SpecializationJob, SpecializationUser } from './types'
+import type { SpecializationContext, SpecializationJob, SpecializationUser } from './types'
 
 interface Props {
   specializationId: number
@@ -57,13 +57,14 @@ export function SpecializationDetailPage({ specializationId }: Props) {
     },
   })
 
-  function handleSave(overrides?: Partial<{ production_admin: boolean; theater_admin: boolean; default_start_phase_id: number | null; default_end_phase_id: number | null }>) {
+  function handleSave(overrides?: Partial<{ production_admin: boolean; theater_admin: boolean; context: SpecializationContext; default_start_phase_id: number | null; default_end_phase_id: number | null }>) {
     updateMutation.mutate({
       id: specializationId,
       title: titleInput,
       description: descriptionInput || null,
       production_admin: specialization.production_admin,
       theater_admin: specialization.theater_admin,
+      context: specialization.context,
       default_start_phase_id: specialization.default_start_phase_id,
       default_end_phase_id: specialization.default_end_phase_id,
       ...overrides,
@@ -170,7 +171,20 @@ export function SpecializationDetailPage({ specializationId }: Props) {
                 )}
               </p>
             )}
-            <div className="mt-4 space-y-2">
+            <div className="mt-4 space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Context</label>
+                <select
+                  className="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  value={specialization.context}
+                  onChange={e => handleSave({ context: e.target.value as SpecializationContext })}
+                  disabled={updateMutation.isPending}
+                >
+                  <option value="theater">Theater only</option>
+                  <option value="production">Production only</option>
+                  <option value="both">Both</option>
+                </select>
+              </div>
               <label className="flex items-center gap-2 text-sm text-gray-700">
                 <input
                   type="checkbox"
@@ -244,6 +258,7 @@ export function SpecializationDetailPage({ specializationId }: Props) {
               <p className="text-sm text-gray-600 italic mb-3">{specialization.description}</p>
             )}
             <div className="space-y-1 text-sm text-gray-600">
+              <p>Context: {{ theater: 'Theater only', production: 'Production only', both: 'Both' }[specialization.context]}</p>
               {specialization.production_admin && <p>Production admin</p>}
               {specialization.theater_admin && <p>Theater admin</p>}
             </div>
