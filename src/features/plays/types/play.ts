@@ -51,6 +51,8 @@ export interface SceneSkeleton {
   pretty_name: string
   heading: string | null
   summary: string | null
+  start_page: number | null
+  end_page: number | null
   french_scenes: FrenchSceneSkeleton[]
 }
 

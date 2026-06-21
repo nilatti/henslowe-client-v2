@@ -62,6 +62,15 @@ export function ActsTab({ play, playId }: ActsTabProps) {
                     {scene.summary && (
                       <p className="text-xs text-gray-500 mt-0.5">{scene.summary}</p>
                     )}
+                    {(scene.start_page != null || scene.end_page != null) && (
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {scene.start_page != null && scene.end_page != null
+                          ? `pp. ${scene.start_page}–${scene.end_page}`
+                          : scene.start_page != null
+                          ? `p. ${scene.start_page}`
+                          : `p. ${scene.end_page}`}
+                      </p>
+                    )}
                     {(() => {
                       const songs = scene.french_scenes?.flatMap(fs => fs.songs) ?? []
                       return songs.length > 0 ? (

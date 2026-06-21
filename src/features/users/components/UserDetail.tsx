@@ -211,7 +211,7 @@ export function UserDetail({ userId }: UserDetailProps) {
                     <AddJobToUserForm
                       userId={userId}
                       invalidateKey={['users', userId]}
-                      targetUserJobs={user.jobs ?? []}
+                      targetUserJobs={(user.jobs ?? []).filter(j => j.theater_id != null) as { theater_id: number; production_id?: number | null }[]}
                       onSuccess={() => setAddingJob(false)}
                       onCancel={() => setAddingJob(false)}
                     />
