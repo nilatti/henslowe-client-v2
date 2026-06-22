@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -15,6 +15,8 @@ import { buildUserName } from '../../../utils/actorUtils'
 import { Button, Card, ConfirmDialog, PageHeader } from '../../../components/ui'
 import { useIsSuperAdmin } from '../../../hooks/useUserRole'
 
+const columnHelper = createColumnHelper<UserSummary>()
+
 export function UsersList() {
   const { data: users } = useSuspenseQuery(usersQueryOptions())
   const deleteUser = useDeleteUser()
@@ -27,8 +29,7 @@ export function UsersList() {
   const [confirmDelete, setConfirmDelete] = useState<UserSummary | null>(null)
   const [search, setSearch] = useState('')
 
-  const columnHelper = createColumnHelper<UserSummary>()
-  const columns = [
+  const columns = useMemo(() => [
     columnHelper.accessor(
       row => `${row.last_name} ${row.first_name}`,
       {
@@ -72,7 +73,7 @@ export function UsersList() {
         ),
       }),
     ] : []),
-  ]
+  ], [isSuperAdmin])
 
   const filteredUsers = (users as Array<UserSummary & { fake?: boolean }>).filter(u => {
     if (u.fake) return false
