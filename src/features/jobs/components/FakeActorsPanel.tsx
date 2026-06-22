@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useCreateJob, fakeUsersQueryOptions } from '../api/jobs'
+import { useCreateJob, useGenerateFakeUser, fakeUsersQueryOptions } from '../api/jobs'
 import type { FakeActorCount, JobWithDetails } from '../types/job'
 import { Button, Card, ErrorMessage } from '../../../components/ui'
 import { AUDITIONER_SPECIALIZATION_ID } from '../../../utils/constants'
@@ -20,6 +20,7 @@ export function FakeActorsPanel({
   invalidateKey,
 }: FakeActorsPanelProps) {
   const createJob = useCreateJob(invalidateKey)
+  const generateFakeUser = useGenerateFakeUser()
   const { data: allFakeUsers = [], isLoading: fakeUsersLoading } = useQuery(fakeUsersQueryOptions())
   const currentCount = getFakeActorCount(jobs)
   const fakeActors = jobs
@@ -32,16 +33,18 @@ export function FakeActorsPanel({
     male: currentCount.male,
     nonbinary: currentCount.nonbinary,
   })
-  const [shortfall, setShortfall] = useState<Partial<FakeActorCount> | null>(null)
+
+  const genderLabel = (gender: 'female' | 'male' | 'nonbinary') =>
+    gender === 'female' ? 'cis female' : gender === 'male' ? 'cis male' : 'nonbinary'
 
   const handleSubmit = async () => {
     const toAdd: typeof allFakeUsers = []
-    const missed: Partial<FakeActorCount> = {}
+    const pool = [...allFakeUsers]
 
-    const addForGender = (gender: 'female' | 'male' | 'nonbinary', current: number, desired: number) => {
+    const addForGender = async (gender: 'female' | 'male' | 'nonbinary', current: number, desired: number) => {
       const needed = desired - current
       if (needed <= 0) return
-      const pool = allFakeUsers.filter(u => {
+      const available = pool.filter(u => {
         const genderMatch =
           gender === 'female'
             ? u.gender === 'cis female' || u.gender === 'trans female'
@@ -54,19 +57,20 @@ export function FakeActorsPanel({
           !toAdd.find(a => a.id === u.id)
         )
       })
-      const available = pool.length
-      for (let i = 0; i < needed && pool.length > 0; i++) {
-        const idx = Math.floor(Math.random() * pool.length)
-        toAdd.push(pool.splice(idx, 1)[0])
+      for (let i = 0; i < needed; i++) {
+        if (available.length > 0) {
+          const idx = Math.floor(Math.random() * available.length)
+          toAdd.push(available.splice(idx, 1)[0])
+        } else {
+          const newUser = await generateFakeUser.mutateAsync(genderLabel(gender))
+          toAdd.push(newUser)
+        }
       }
-      if (available < needed) missed[gender] = needed - available
     }
 
-    addForGender('female', currentCount.female, counts.female)
-    addForGender('male', currentCount.male, counts.male)
-    addForGender('nonbinary', currentCount.nonbinary, counts.nonbinary)
-
-    setShortfall(Object.keys(missed).length > 0 ? missed : null)
+    await addForGender('female', currentCount.female, counts.female)
+    await addForGender('male', currentCount.male, counts.male)
+    await addForGender('nonbinary', currentCount.nonbinary, counts.nonbinary)
 
     for (const actor of toAdd) {
       await createJob.mutateAsync({
@@ -112,23 +116,13 @@ export function FakeActorsPanel({
       <div className="flex gap-2 mt-4">
         <Button
           onClick={handleSubmit}
-          disabled={createJob.isPending || fakeUsersLoading}
+          disabled={createJob.isPending || generateFakeUser.isPending || fakeUsersLoading}
         >
-          {createJob.isPending ? 'Adding...' : 'Update fake actors'}
+          {createJob.isPending || generateFakeUser.isPending ? 'Adding...' : 'Update fake actors'}
         </Button>
       </div>
       {createJob.error && (
         <ErrorMessage message={(createJob.error as Error).message || 'Failed to add actor'} />
-      )}
-      {shortfall && (
-        <p className="mt-2 text-xs text-amber-600">
-          Not enough placeholder actors available:{' '}
-          {(['female', 'male', 'nonbinary'] as const)
-            .filter(g => shortfall[g])
-            .map(g => `${shortfall[g]} ${g === 'nonbinary' ? 'nonbinary/fluid' : g}`)
-            .join(', ')}{' '}
-          could not be filled from the pool.
-        </p>
       )}
       {fakeActors.length > 0 && (
         <div className="mt-4">

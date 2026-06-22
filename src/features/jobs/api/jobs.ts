@@ -98,3 +98,14 @@ export const fakeUsersQueryOptions = () =>
       api.get('/api/v1/users/fake').then(r => r.data),
     staleTime: 1000 * 60 * 10,
   })
+
+export function useGenerateFakeUser() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (gender: string): Promise<any> =>
+      api.post('/api/v1/users/generate_fake', { gender }).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['users', { fake: true }] })
+    },
+  })
+}
