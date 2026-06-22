@@ -71,6 +71,7 @@ export function EditScript({ linesPerMinute }: EditScriptProps) {
     const oldItems = (text[fieldKey] ?? []) as typeof line[]
     const newItems = oldItems.map(l => (l.id === line.id ? line : l))
     setText(prev => ({ ...prev, [fieldKey]: newItems }))
+
   }
 
   if (!play) return null

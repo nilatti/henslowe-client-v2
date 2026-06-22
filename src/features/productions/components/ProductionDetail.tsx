@@ -211,17 +211,25 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
                 >
                   View play →
                 </Link>
-                <Link
-                  to="/plays/$playId/script"
-                  params={{ playId: String(production.play?.id ?? 0) }}
-                  className="text-sm text-blue-600 hover:text-blue-800"
-                >
-                  View script →
-                </Link>
+                {production.play?.has_lines && (
+                  <Link
+                    to="/plays/$playId/script"
+                    params={{ playId: String(production.play?.id ?? 0) }}
+                    className="text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    View script →
+                  </Link>
+                )}
               </div>
-              <Card className="p-4 text-sm text-gray-500 text-center">
-                Full script available at the link above.
-              </Card>
+              {production.play?.has_lines ? (
+                <Card className="p-4 text-sm text-gray-500 text-center">
+                  Full script available at the link above.
+                </Card>
+              ) : (
+                <Card className="p-4 text-sm text-gray-500 text-center">
+                  No script has been added to this production yet.
+                </Card>
+              )}
             </div>
           )}
 

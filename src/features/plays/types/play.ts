@@ -135,5 +135,5 @@ export function getAllCharacters(skeleton: PlaySkeleton) {
       ...cg,
       type: 'character_group' as const,
     })),
-  ].sort((a, b) => a.name.localeCompare(b.name))
+  ].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
 }

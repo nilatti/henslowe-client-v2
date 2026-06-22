@@ -40,6 +40,7 @@ export function PlayDetail({ playId }: PlayDetailProps) {
 
   const scenes = getScenes(play)
   const allCharacters = getAllCharacters(play)
+  const hasLines = play.characters.some(c => (c.original_line_count ?? 0) > 0)
 
   const tabs = [
     { id: 'info', label: 'Info' },
@@ -129,20 +130,24 @@ export function PlayDetail({ playId }: PlayDetailProps) {
                   </div>
                 )}
                 <div className="pt-2 flex gap-3 flex-wrap">
-                  <Link
-                    to="/plays/$playId/script"
-                    params={{ playId: String(playId) }}
-                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    View script →
-                  </Link>
-                  <Link
-                    to="/plays/$playId/part-scripts"
-                    params={{ playId: String(playId) }}
-                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    Part scripts →
-                  </Link>
+                  {hasLines && (
+                    <Link
+                      to="/plays/$playId/script"
+                      params={{ playId: String(playId) }}
+                      className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      View script →
+                    </Link>
+                  )}
+                  {hasLines && (
+                    <Link
+                      to="/plays/$playId/part-scripts"
+                      params={{ playId: String(playId) }}
+                      className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      Part scripts →
+                    </Link>
+                  )}
                   <Link
                     to="/plays/$playId/word-clouds"
                     params={{ playId: String(playId) }}

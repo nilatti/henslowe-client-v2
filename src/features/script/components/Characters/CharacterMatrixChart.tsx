@@ -59,7 +59,7 @@ export function CharacterMatrixChart({ playId }: Props) {
   const rows: MatrixRow[] = [
     ...script.characters.map(c => ({ kind: 'character' as const, id: c.id, name: c.name })),
     ...script.character_groups.map(cg => ({ kind: 'character_group' as const, id: cg.id, name: cg.name })),
-  ].sort((a, b) => a.name.localeCompare(b.name))
+  ].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
 
   function getAllOnStages(fss: MatrixFrenchScene[]): MatrixOnStage[] {
     return fss.flatMap(fs => fs.on_stages ?? [])

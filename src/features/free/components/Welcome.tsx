@@ -13,10 +13,6 @@ export function Welcome() {
         dramaturgy, and stage management facilitation.
       </div>
       <div className="py-2.5 [&_a]:font-semibold">
-        That version will also include the ability to download or save the
-        output of all the tools that are available on this free version.
-      </div>
-      <div className="py-2.5 [&_a]:font-semibold">
         Along with being a useful device for directors, dramaturgs, and stage
         managers, Henslowe's Cloud is a companion tool for the forthcoming book{' '}
         <em>Cutting Plays for Performance</em>, by Aili Huber and Toby Malone,
@@ -36,10 +32,9 @@ export function Welcome() {
       </div>
       <div className="py-2.5">
         <strong>
-          With the free version of our service, any changes you make will vanish
-          as soon as you close your browser or switch which play you are working
-          on. For more tools and the ability to save your work, please see our
-          premium plans, coming soon!
+          Any changes you make will vanish as soon as you close your browser or
+          switch which play you are working on. For more tools and the ability
+          to save your work, please see our premium plans, coming soon!
         </strong>
       </div>
     </div>

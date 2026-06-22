@@ -33,7 +33,7 @@ export interface Production {
   audition_information: string | null
   created_at: string
   updated_at: string
-  play: { id: number; title: string }
+  play: { id: number; title: string; has_lines: boolean }
   theater: { id: number; name: string }
   default_space_id: number | null
   default_space: { id: number; name: string } | null

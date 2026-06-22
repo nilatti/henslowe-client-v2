@@ -52,6 +52,8 @@ export function FrenchSceneDetail({
     .flatMap(a => a.scenes)
     .find(s => s.id === sceneId)?.number
 
+  const hasLines = playSkeleton.characters.some(c => (c.original_line_count ?? 0) > 0)
+
   const allFrenchScenes = playSkeleton.acts.flatMap(a =>
     a.scenes.flatMap(s =>
       s.french_scenes.map(fs => ({
@@ -194,13 +196,15 @@ export function FrenchSceneDetail({
           <p className="text-sm text-gray-400 italic">
             Script content (lines, sound cues, stage directions) coming in a future update.
           </p>
-          <Link
-            to="/plays/$playId/script"
-            params={{ playId: String(playId) }}
-            className="text-sm text-blue-600 hover:text-blue-800 mt-2 inline-block"
-          >
-            View full script →
-          </Link>
+          {hasLines && (
+            <Link
+              to="/plays/$playId/script"
+              params={{ playId: String(playId) }}
+              className="text-sm text-blue-600 hover:text-blue-800 mt-2 inline-block"
+            >
+              View full script →
+            </Link>
+          )}
         </Card>
       </div>
 
