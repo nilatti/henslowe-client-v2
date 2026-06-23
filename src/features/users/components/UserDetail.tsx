@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { userQueryOptions, useDeleteUser } from '../api/users'
 import { UserForm } from './UserForm'
@@ -37,7 +38,7 @@ export function UserDetail({ userId }: UserDetailProps) {
   const [activeTab, setActiveTab] = useState('info')
   const [isEditing, setIsEditing] = useState(false)
   const [addingJob, setAddingJob] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete()
 
   const tabs = [
     { id: 'info', label: 'Info' },
@@ -59,7 +60,7 @@ export function UserDetail({ userId }: UserDetailProps) {
               </Button>
             )}
             {canDelete && (
-              <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+              <Button variant="danger" onClick={requestDelete}>
                 Delete
               </Button>
             )}
@@ -301,7 +302,7 @@ export function UserDetail({ userId }: UserDetailProps) {
             await deleteUser.mutateAsync(userId)
             void navigate({ to: '/users' as never })
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </div>

@@ -1,7 +1,7 @@
 import { useForm } from '@tanstack/react-form'
 import { useCreateFrenchScene, useUpdateFrenchScene } from '../api/frenchScenes'
 import type { FrenchScene } from '../types/frenchScene'
-import { Button } from '../../../components/ui'
+import { FormField, FormActions, inputClass } from '../../../components/ui'
 
 interface FrenchSceneFormProps {
   playId: number
@@ -56,84 +56,62 @@ export function FrenchSceneForm({
       <div className="grid grid-cols-3 gap-4">
         <form.Field name="number">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Number *
-                <span className="text-gray-400 font-normal ml-1">(a, b, c...)</span>
-              </label>
+            <FormField label={<>Number <span className="text-gray-400 font-normal ml-1">(a, b, c...)</span></>} required>
               <input
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
                 placeholder="a"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
 
         <form.Field name="start_page">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start page
-              </label>
+            <FormField label="Start page">
               <input
                 type="number"
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
 
         <form.Field name="end_page">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                End page
-              </label>
+            <FormField label="End page">
               <input
                 type="number"
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
       </div>
 
       <form.Field name="summary">
         {field => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Summary
-            </label>
+          <FormField label="Summary">
             <textarea
               value={field.state.value}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
               rows={2}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             />
-          </div>
+          </FormField>
         )}
       </form.Field>
 
-      <div className="flex gap-3 justify-end pt-2">
-        <Button variant="secondary" type="button" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={form.state.isSubmitting}>
-          {form.state.isSubmitting
-            ? 'Saving...'
-            : isEditing ? 'Save changes' : 'Create french scene'}
-        </Button>
-      </div>
+      <FormActions isSubmitting={form.state.isSubmitting} isEditing={isEditing} onCancel={onCancel} submitLabel="Create french scene" />
     </form>
   )
 }

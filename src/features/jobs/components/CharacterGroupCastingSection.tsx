@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import { useCreateJob, useDeleteJob } from '../api/jobs'
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import type { JobWithDetails } from '../types/job'
 import type { PlayCharacterGroup } from '../../plays/types/play'
 import { Card, ConfirmDialog } from '../../../components/ui'
@@ -41,7 +41,7 @@ function CharacterGroupRow({
 }: GroupRowProps) {
   const createJob = useCreateJob(invalidateKey)
   const deleteJob = useDeleteJob(invalidateKey)
-  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
+  const { target: confirmDeleteId, open: requestDelete, close: clearDelete } = useConfirmDelete<number>()
 
   const assignedUserIds = new Set(groupJobs.map(j => j.user_id).filter(id => id != null))
   const availableAuditioners = auditioners.filter(a => !assignedUserIds.has(a.id))
@@ -59,7 +59,7 @@ function CharacterGroupRow({
   }
 
   return (
-    <li className="px-4 py-3 text-sm border-b border-gray-100 last:border-0">
+    <li className="px-4 py-3 text-sm border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
       <div className="flex items-start justify-between gap-4">
         <span className="font-medium text-gray-900 pt-0.5">{group.name}</span>
         <div className="flex flex-col items-end gap-1.5">
@@ -77,7 +77,7 @@ function CharacterGroupRow({
               )}
               {isAdmin && (
                 <button
-                  onClick={() => setConfirmDeleteId(job.id)}
+                  onClick={() => requestDelete(job.id)}
                   className="text-red-400 hover:text-red-600 leading-none"
                   title="Remove from group"
                 >
@@ -109,9 +109,9 @@ function CharacterGroupRow({
           confirmLabel="Remove"
           onConfirm={async () => {
             await deleteJob.mutateAsync(confirmDeleteId)
-            setConfirmDeleteId(null)
+            clearDelete()
           }}
-          onCancel={() => setConfirmDeleteId(null)}
+          onCancel={clearDelete}
         />
       )}
     </li>

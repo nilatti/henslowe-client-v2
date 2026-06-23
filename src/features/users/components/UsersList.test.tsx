@@ -29,17 +29,20 @@ vi.mock('../../../hooks/useUserRole', () => ({
   useIsSuperAdmin: mockUseIsSuperAdmin,
 }))
 
-vi.mock('../../../components/ui', () => ({
-  Button: ({ children, onClick }: any) => <button onClick={onClick}>{children}</button>,
-  Card: ({ children }: any) => <div>{children}</div>,
-  ConfirmDialog: () => null,
-  PageHeader: ({ title, action }: any) => (
-    <div>
-      <h1>{title}</h1>
-      {action}
-    </div>
-  ),
-}))
+vi.mock('../../../components/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../components/ui')>()
+  return {
+    ...actual,
+    Button: ({ children, onClick }: any) => <button onClick={onClick}>{children}</button>,
+    ConfirmDialog: () => null,
+    PageHeader: ({ title, action }: any) => (
+      <div>
+        <h1>{title}</h1>
+        {action}
+      </div>
+    ),
+  }
+})
 
 vi.mock('../../../utils/actorUtils', () => ({
   buildUserName: (user: any) =>

@@ -7,7 +7,7 @@ import { usersQueryOptions } from '../../users/api/users'
 import { productionSkeletonQueryOptions } from '../../productions/api/productions'
 import { AUDITIONER_SPECIALIZATION_ID } from '../../../utils/constants'
 import type { Job, JobWithDetails } from '../types/job'
-import { Button } from '../../../components/ui'
+import { FormField, FormActions, inputClass } from '../../../components/ui'
 import { useAuth } from '../../../hooks/useAuth'
 import { UserCombobox } from './UserCombobox'
 import { format } from 'date-fns'
@@ -125,26 +125,20 @@ export function JobForm({
     >
       <form.Field name="user_id">
         {field => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Person
-            </label>
+          <FormField label="Person">
             <UserCombobox
               users={filteredUsers}
               value={field.state.value}
               onChange={id => field.handleChange(id)}
             />
-          </div>
+          </FormField>
         )}
       </form.Field>
 
       {!specializationId && (
         <form.Field name="specialization_id">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Role *
-              </label>
+            <FormField label="Role" required>
               <select
                 value={field.state.value}
                 onChange={e => {
@@ -153,7 +147,7 @@ export function JobForm({
                   applyPhaseDefaults(id)
                 }}
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               >
                 <option value={0}>Select role</option>
                 {specializations
@@ -164,7 +158,7 @@ export function JobForm({
                     </option>
                   ))}
               </select>
-            </div>
+            </FormField>
           )}
         </form.Field>
       )}
@@ -172,47 +166,34 @@ export function JobForm({
       <div className="grid grid-cols-2 gap-4">
         <form.Field name="start_date">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start date
-              </label>
+            <FormField label="Start date">
               <input
                 type="date"
                 value={field.state.value ?? ''}
                 onChange={e => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
 
         <form.Field name="end_date">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                End date
-              </label>
+            <FormField label="End date">
               <input
                 type="date"
                 value={field.state.value ?? ''}
                 onChange={e => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
       </div>
 
-      <div className="flex gap-3 justify-end pt-2">
-        <Button variant="secondary" type="button" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={form.state.isSubmitting}>
-          {form.state.isSubmitting ? 'Saving...' : isEditing ? 'Save changes' : 'Add job'}
-        </Button>
-      </div>
+      <FormActions isSubmitting={form.state.isSubmitting} isEditing={isEditing} onCancel={onCancel} submitLabel="Add job" />
     </form>
   )
 }

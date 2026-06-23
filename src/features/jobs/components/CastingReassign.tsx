@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useUpdateJob } from '../api/jobs'
 import type { JobWithDetails } from '../types/job'
-import { Button, Card } from '../../../components/ui'
+import { Button, Card, FormField } from '../../../components/ui'
 import { getActorsAndAuditioners } from '../utils/jobUtils'
 import { ACTOR_SPECIALIZATION_ID } from '../../../utils/constants'
 import { UserCombobox } from './UserCombobox'
@@ -48,26 +48,20 @@ export function CastingReassign({
         Transfer all roles from one actor to another in a single operation.
       </p>
       <div className="space-y-3">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            From actor
-          </label>
+        <FormField label="From actor">
           <UserCombobox
             users={actorsAndAuditioners}
             value={fromUserId}
             onChange={setFromUserId}
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            To actor
-          </label>
+        </FormField>
+        <FormField label="To actor">
           <UserCombobox
             users={actorsAndAuditioners.filter(u => u.id !== fromUserId)}
             value={toUserId}
             onChange={setToUserId}
           />
-        </div>
+        </FormField>
       </div>
       <div className="flex gap-2 mt-4">
         <Button

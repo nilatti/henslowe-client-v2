@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useUpdateJob, useDeleteJob } from '../api/jobs'
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import type { JobWithDetails } from '../types/job'
 import { Button, ConfirmDialog } from '../../../components/ui'
 import { buildUserName, fakeActorGenderLabel } from '../../../utils/actorUtils'
@@ -22,7 +23,7 @@ export function CastingRow({
   const updateJob = useUpdateJob(invalidateKey)
   const deleteJob = useDeleteJob(invalidateKey)
   const [isEditing, setIsEditing] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete()
 
   const lineCount =
     casting.character?.new_line_count ?? casting.character?.original_line_count
@@ -36,7 +37,7 @@ export function CastingRow({
   const actorName = casting.user ? buildUserName(casting.user) : null
 
   return (
-    <li className="flex items-center justify-between px-4 py-3 text-sm border-b border-gray-100 last:border-0">
+    <li className="flex items-center justify-between px-4 py-3 text-sm border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
       <div className="flex items-center gap-2 min-w-0">
         {casting.character_id && casting.production?.play?.id ? (
           <Link
@@ -107,7 +108,7 @@ export function CastingRow({
                 </Button>
                 <Button
                   variant="danger"
-                  onClick={() => setConfirmDelete(true)}
+                  onClick={requestDelete}
                 >
                   ×
                 </Button>
@@ -124,9 +125,9 @@ export function CastingRow({
           confirmLabel="Remove"
           onConfirm={async () => {
             await deleteJob.mutateAsync(casting.id)
-            setConfirmDelete(false)
+            clearDelete()
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </li>

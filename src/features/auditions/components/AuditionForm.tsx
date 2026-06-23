@@ -7,7 +7,7 @@ import { useAuth } from '../../../hooks/useAuth'
 import { userQueryOptions } from '../../users/api/users'
 import { useCreateAuditionerJob, useUpdateAuditionerContact } from '../api/auditions'
 import { ConflictsManager } from '../../conflicts/components/ConflictsManager'
-import { Button } from '../../../components/ui'
+import { Button, FormField, inputClass } from '../../../components/ui'
 import { US_STATES_ARRAY, USER_GENDER_DESCRIPTORS } from '../../../utils/constants'
 
 interface Props {
@@ -17,8 +17,6 @@ interface Props {
   rehearsalStartDate: string | null
   runEndDate: string | null
 }
-
-const inputClass = 'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
 
 function formatPhaseDate(d: string | null) {
   if (!d) return null
@@ -95,8 +93,7 @@ export function AuditionForm({ productionId, playTitle, theaterName, rehearsalSt
   const textField = (name: Parameters<typeof form.Field>[0]['name'], label: string, placeholder?: string) => (
     <form.Field name={name}>
       {field => (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+        <FormField label={label}>
           <input
             value={field.state.value as string}
             onChange={e => field.handleChange(e.target.value as never)}
@@ -104,7 +101,7 @@ export function AuditionForm({ productionId, playTitle, theaterName, rehearsalSt
             placeholder={placeholder}
             className={inputClass}
           />
-        </div>
+        </FormField>
       )}
     </form.Field>
   )
@@ -147,8 +144,7 @@ export function AuditionForm({ productionId, playTitle, theaterName, rehearsalSt
         <div className="grid grid-cols-2 gap-4 mt-4">
           <form.Field name="state">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+              <FormField label="State">
                 <select
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
@@ -160,7 +156,7 @@ export function AuditionForm({ productionId, playTitle, theaterName, rehearsalSt
                     <option key={s.abbr} value={s.abbr}>{s.name}</option>
                   ))}
                 </select>
-              </div>
+              </FormField>
             )}
           </form.Field>
           {textField('zip', 'Zip')}
@@ -172,8 +168,7 @@ export function AuditionForm({ productionId, playTitle, theaterName, rehearsalSt
         <div className="grid grid-cols-2 gap-4">
           <form.Field name="gender">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+              <FormField label="Gender">
                 <select
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
@@ -185,7 +180,7 @@ export function AuditionForm({ productionId, playTitle, theaterName, rehearsalSt
                     <option key={g} value={g}>{g}</option>
                   ))}
                 </select>
-              </div>
+              </FormField>
             )}
           </form.Field>
           {textField('timezone', 'Timezone', 'e.g. America/New_York')}
@@ -193,8 +188,7 @@ export function AuditionForm({ productionId, playTitle, theaterName, rehearsalSt
         <div className="mt-4">
           <form.Field name="bio">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+              <FormField label="Bio">
                 <textarea
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
@@ -202,7 +196,7 @@ export function AuditionForm({ productionId, playTitle, theaterName, rehearsalSt
                   rows={3}
                   className={inputClass}
                 />
-              </div>
+              </FormField>
             )}
           </form.Field>
         </div>
@@ -214,8 +208,7 @@ export function AuditionForm({ productionId, playTitle, theaterName, rehearsalSt
           {textField('video_url', 'Video audition link', 'https://')}
           <form.Field name="notes">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+              <FormField label="Notes">
                 <textarea
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
@@ -224,7 +217,7 @@ export function AuditionForm({ productionId, playTitle, theaterName, rehearsalSt
                   placeholder="Anything you'd like the production team to know"
                   className={inputClass}
                 />
-              </div>
+              </FormField>
             )}
           </form.Field>
         </div>

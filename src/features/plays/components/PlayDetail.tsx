@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { usePageTitle } from '../../../hooks/usePageTitle'
 import { playSkeletonQueryOptions, useDeletePlay } from '../api/plays'
@@ -13,6 +14,7 @@ import {
   Button,
   Card,
   ConfirmDialog,
+  InfoCard,
   PageHeader,
   Tabs,
 } from '../../../components/ui'
@@ -30,7 +32,7 @@ export function PlayDetail({ playId }: PlayDetailProps) {
 
   const [activeTab, setActiveTab] = useState('info')
   const [isEditing, setIsEditing] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete()
 
   const isProductionCopy = !play.canonical && !!play.production_id
   const { data: productionSkeleton } = useQuery({
@@ -58,7 +60,7 @@ export function PlayDetail({ playId }: PlayDetailProps) {
               <Button variant="secondary" onClick={() => setIsEditing(true)}>
                 Edit
               </Button>
-              <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+              <Button variant="danger" onClick={requestDelete}>
                 Delete
               </Button>
             </div>
@@ -79,11 +81,11 @@ export function PlayDetail({ playId }: PlayDetailProps) {
           <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
           {activeTab === 'info' && (
-            <Card className="p-6">
-              <dl className="space-y-3 text-sm">
-                <div>
-                  <dt className="font-medium text-gray-700">Author</dt>
-                  <dd className="mt-1">
+            <>
+              <InfoCard fields={[
+                {
+                  label: 'Author',
+                  value: (
                     <Link
                       to="/authors/$authorId"
                       params={{ authorId: String(play.author.id) }}
@@ -91,45 +93,25 @@ export function PlayDetail({ playId }: PlayDetailProps) {
                     >
                       {play.author.first_name} {play.author.last_name}
                     </Link>
-                  </dd>
-                </div>
-                {play.synopsis && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Synopsis</dt>
-                    <dd className="text-gray-600 mt-1 leading-relaxed">
-                      {play.synopsis}
-                    </dd>
-                  </div>
-                )}
-                {play.text_notes && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Text notes</dt>
-                    <dd className="text-gray-600 mt-1 leading-relaxed">
-                      {play.text_notes}
-                    </dd>
-                  </div>
-                )}
-                <div>
-                  <dt className="font-medium text-gray-700">Type</dt>
-                  <dd className="text-gray-600 mt-1">
-                    {play.canonical ? 'Canonical' : 'Production copy'}
-                  </dd>
-                </div>
-                {isProductionCopy && play.production_id && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Production</dt>
-                    <dd className="mt-1">
-                      <Link
-                        to="/productions/$productionId"
-                        params={{ productionId: String(play.production_id) }}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        {productionSkeleton?.theater.name ?? 'View production'}
-                      </Link>
-                    </dd>
-                  </div>
-                )}
-                <div className="pt-2 flex gap-3 flex-wrap">
+                  ),
+                },
+                play.synopsis && { label: 'Synopsis', value: play.synopsis, valueClassName: 'leading-relaxed' },
+                play.text_notes && { label: 'Text notes', value: play.text_notes, valueClassName: 'leading-relaxed' },
+                { label: 'Type', value: play.canonical ? 'Canonical' : 'Production copy' },
+                (isProductionCopy && play.production_id) && {
+                  label: 'Production',
+                  value: (
+                    <Link
+                      to="/productions/$productionId"
+                      params={{ productionId: String(play.production_id) }}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      {productionSkeleton?.theater.name ?? 'View production'}
+                    </Link>
+                  ),
+                },
+              ]} />
+              <div className="flex gap-3 flex-wrap mt-4">
                   {hasLines && (
                     <Link
                       to="/plays/$playId/script"
@@ -156,8 +138,7 @@ export function PlayDetail({ playId }: PlayDetailProps) {
                     Word clouds →
                   </Link>
                 </div>
-              </dl>
-            </Card>
+            </>
           )}
 
           {activeTab === 'structure' && (
@@ -179,7 +160,7 @@ export function PlayDetail({ playId }: PlayDetailProps) {
             await deletePlay.mutateAsync(playId)
             navigate({ to: '/plays' })
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </div>

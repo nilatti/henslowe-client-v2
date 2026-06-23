@@ -1,5 +1,6 @@
 import { useState, Fragment } from "react";
 import { Link } from "@tanstack/react-router";
+import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
 import { parseISO, format } from "date-fns";
 import {
   useDeleteRehearsal,
@@ -41,7 +42,7 @@ export function RehearsalShow({
 }: RehearsalShowProps) {
   const deleteRehearsal = useDeleteRehearsal(productionId);
   const [isEditing, setIsEditing] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete();
   const [showContentManager, setShowContentManager] = useState(false);
   const [showPeopleManager, setShowPeopleManager] = useState(false);
 
@@ -208,7 +209,7 @@ export function RehearsalShow({
             <Button variant="secondary" onClick={() => setIsEditing(true)}>
               Edit
             </Button>
-            <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+            <Button variant="danger" onClick={requestDelete}>
               Delete
             </Button>
           </div>
@@ -272,10 +273,10 @@ export function RehearsalShow({
           isDestructive
           confirmLabel="Delete"
           onConfirm={() => {
-            setConfirmDelete(false);
+            clearDelete();
             deleteRehearsal.mutate(rehearsal.id);
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </div>

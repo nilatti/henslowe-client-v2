@@ -295,7 +295,7 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
     })
 
     return (
-      <tr key="uncast" className="odd:bg-white even:bg-teal-50 border-t-2 border-gray-400">
+      <tr key="uncast" className="odd:bg-white even:bg-teal-50 border-t-2 border-gray-400 hover:bg-blue-50 transition-colors">
         <td
           className="border border-gray-400 px-2 py-1 text-sm font-medium italic sticky left-0 bg-inherit z-10"
           style={{ width: '220px', minWidth: '220px' }}

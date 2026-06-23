@@ -35,11 +35,15 @@ vi.mock('../../../hooks/useAuth', () => ({
   useAuth: mockUseAuth,
 }))
 
-vi.mock('../../../components/ui', () => ({
-  Button: ({ children, type, onClick, disabled }: any) => (
-    <button type={type ?? 'button'} onClick={onClick} disabled={disabled}>{children}</button>
-  ),
-}))
+vi.mock('../../../components/ui', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    Button: ({ children, type, onClick, disabled }: any) => (
+      <button type={type ?? 'button'} onClick={onClick} disabled={disabled}>{children}</button>
+    ),
+  }
+})
 
 import { AddJobToUserForm } from './AddJobToUserForm'
 

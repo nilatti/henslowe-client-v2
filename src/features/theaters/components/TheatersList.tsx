@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { usePageTitle } from '../../../hooks/usePageTitle'
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import {
   useReactTable,
   getCoreRowModel,
   getSortedRowModel,
   createColumnHelper,
-  flexRender,
   type SortingState,
 } from '@tanstack/react-table'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -13,7 +13,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { theatersQueryOptions, useDeleteTheater } from '../api/theaters'
 import type { Theater } from '../types/theater'
 import { useIsSuperAdmin, useAdminTheaterIds } from '../../../hooks/useUserRole'
-import { Button, Card, ConfirmDialog, PageHeader } from '../../../components/ui'
+import { Button, ConfirmDialog, PageHeader, SortableTable } from '../../../components/ui'
 
 export function TheatersList() {
   usePageTitle('Theaters')
@@ -26,7 +26,8 @@ export function TheatersList() {
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'name', desc: false },
   ])
-  const [confirmDelete, setConfirmDelete] = useState<Theater | null>(null)
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete<Theater>()
+  const [search, setSearch] = useState('')
 
   const columnHelper = createColumnHelper<Theater>()
   const columns = [
@@ -61,7 +62,7 @@ export function TheatersList() {
           <div className="flex gap-2 justify-end">
             <Button
               variant="danger"
-              onClick={() => setConfirmDelete(row.original)}
+              onClick={() => requestDelete(row.original)}
             >
               Delete
             </Button>
@@ -71,9 +72,18 @@ export function TheatersList() {
     ] : []),
   ]
 
-  const filteredTheaters = theaters.filter(
-    t => !t.fake || adminTheaterIds === null || adminTheaterIds.has(t.id)
-  )
+  const filteredTheaters = useMemo(() => {
+    const visible = theaters.filter(
+      t => !t.fake || adminTheaterIds === null || adminTheaterIds.has(t.id)
+    )
+    if (!search) return visible
+    const q = search.toLowerCase()
+    return visible.filter(t =>
+      t.name?.toLowerCase().includes(q) ||
+      t.city?.toLowerCase().includes(q) ||
+      t.state?.toLowerCase().includes(q)
+    )
+  }, [theaters, adminTheaterIds, search])
 
   const table = useReactTable({
     data: filteredTheaters,
@@ -97,44 +107,13 @@ export function TheatersList() {
         }
       />
 
-      <Card>
-        <table className="w-full text-sm">
-          <thead className="border-b border-gray-200">
-            {table.getHeaderGroups().map(hg => (
-              <tr key={hg.id}>
-                {hg.headers.map(header => (
-                  <th
-                    key={header.id}
-                    className="px-4 py-3 text-left font-medium text-gray-700 cursor-pointer select-none"
-                    onClick={header.column.getToggleSortingHandler()}
-                  >
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                    {header.column.getIsSorted() === 'asc'
-                      ? ' ↑'
-                      : header.column.getIsSorted() === 'desc'
-                      ? ' ↓'
-                      : ''}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {table.getRowModel().rows.map(row => (
-              <tr key={row.id} className="hover:bg-gray-50">
-                {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} className="px-4 py-3 text-gray-700">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {filteredTheaters.length === 0 && (
-          <p className="px-4 py-6 text-sm text-gray-500 text-center">No theaters found.</p>
-        )}
-      </Card>
+      <SortableTable
+        table={table}
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search theaters…"
+        emptyMessage={search ? 'No theaters match your search.' : 'No theaters found.'}
+      />
 
       {confirmDelete && (
         <ConfirmDialog
@@ -143,9 +122,9 @@ export function TheatersList() {
           confirmLabel="Delete"
           onConfirm={async () => {
             await deleteTheater.mutateAsync(confirmDelete.id)
-            setConfirmDelete(null)
+            clearDelete()
           }}
-          onCancel={() => setConfirmDelete(null)}
+          onCancel={clearDelete}
         />
       )}
     </div>

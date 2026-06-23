@@ -38,21 +38,25 @@ vi.mock('../../conflicts/components/ConflictsManager', () => ({
 
 vi.mock('./SpaceForm', () => ({ SpaceForm: () => null }))
 
-vi.mock('../../../components/ui', () => ({
-  Button: ({ children, onClick }: any) => <button onClick={onClick}>{children}</button>,
-  Card: ({ children, className }: any) => <div className={className}>{children}</div>,
-  ConfirmDialog: () => null,
-  PageHeader: ({ title }: any) => <h1>{title}</h1>,
-  Tabs: ({ tabs, activeTab, onChange }: any) => (
-    <div>
-      {tabs.map((t: any) => (
-        <button key={t.id} onClick={() => onChange(t.id)} data-active={String(activeTab === t.id)}>
-          {t.label}
-        </button>
-      ))}
-    </div>
-  ),
-}))
+vi.mock('../../../components/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../components/ui')>()
+  return {
+    ...actual,
+    Button: ({ children, onClick }: any) => <button onClick={onClick}>{children}</button>,
+    Card: ({ children, className }: any) => <div className={className}>{children}</div>,
+    ConfirmDialog: () => null,
+    PageHeader: ({ title }: any) => <h1>{title}</h1>,
+    Tabs: ({ tabs, activeTab, onChange }: any) => (
+      <div>
+        {tabs.map((t: any) => (
+          <button key={t.id} onClick={() => onChange(t.id)} data-active={String(activeTab === t.id)}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+    ),
+  }
+})
 
 import { SpaceDetail } from './SpaceDetail'
 import { useUserRoleForSpace, useIsSuperAdmin } from '../../../hooks/useUserRole'

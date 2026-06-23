@@ -2,12 +2,13 @@ import _ from 'lodash'
 import type { JobWithDetails, FakeActorCount } from '../types/job'
 
 export function getCastings(jobs: JobWithDetails[]) {
-  return jobs.filter(
+  const filtered = jobs.filter(
     j =>
       j.specialization?.title === 'Actor' &&
       j.character_id != null &&
       !j.character?.name?.match(/Could Not Find Character/)
   )
+  return _.sortBy(filtered, j => j.user?.last_name)
 }
 
 export function getAuditionerJobs(jobs: JobWithDetails[]) {
@@ -15,11 +16,12 @@ export function getAuditionerJobs(jobs: JobWithDetails[]) {
 }
 
 export function getStaffJobs(jobs: JobWithDetails[]) {
-  return jobs.filter(
+  const filtered = jobs.filter(
     j =>
       j.specialization?.title !== 'Actor' &&
       j.specialization?.title !== 'Auditioner'
   )
+  return _.sortBy(filtered, j => j.user?.last_name)
 }
 
 export function getActors(jobs: JobWithDetails[]) {

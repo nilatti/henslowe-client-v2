@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { sceneQueryOptions, useDeleteScene } from "../api/scenes";
 import { actQueryOptions } from "../../acts/api/acts";
@@ -11,6 +12,7 @@ import {
   Button,
   Card,
   ConfirmDialog,
+  InfoCard,
   PageHeader,
 } from "../../../components/ui";
 
@@ -29,7 +31,7 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
   const navigate = useNavigate();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete();
   const [showForm, setShowForm] = useState(false);
 
   const prettyName = `${act.number}.${scene.number}`;
@@ -80,7 +82,7 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
               <Button variant="secondary" onClick={() => setIsEditing(true)}>
                 Edit
               </Button>
-              <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+              <Button variant="danger" onClick={requestDelete}>
                 Delete
               </Button>
             </div>
@@ -106,51 +108,25 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
       )}
 
       <div className="space-y-6">
-        {(scene.summary || scene.start_page || scene.heading) && (
-          <Card className="p-6">
-            <dl className="space-y-3 text-sm">
-              {scene.heading && (
-                <div>
-                  <dt className="font-medium text-gray-700">Heading</dt>
-                  <dd className="text-gray-600 mt-1 leading-relaxed">
-                    {scene.heading}
-                  </dd>
-                </div>
-              )}
-              {scene.summary && (
-                <div>
-                  <dt className="font-medium text-gray-700">Summary</dt>
-                  <dd className="text-gray-600 mt-1 leading-relaxed whitespace-pre-wrap">
-                    {scene.summary}
-                  </dd>
-                </div>
-              )}
-              {scene.start_page && (
-                <div>
-                  <dt className="font-medium text-gray-700">Pages</dt>
-                  <dd className="text-gray-600 mt-1">
-                    {scene.start_page}
-                    {scene.end_page ? ` – ${scene.end_page}` : ""}
-                  </dd>
-                </div>
-              )}
-              {scene.original_line_count != null && (
-                <div>
-                  <dt className="font-medium text-gray-700">Lines</dt>
-                  <dd className="text-gray-600 mt-1">
-                    {scene.new_line_count ?? scene.original_line_count}
-                    {scene.new_line_count != null &&
-                      scene.new_line_count !== scene.original_line_count && (
-                        <span className="text-gray-400 ml-1">
-                          (originally {scene.original_line_count})
-                        </span>
-                      )}
-                  </dd>
-                </div>
-              )}
-            </dl>
-          </Card>
-        )}
+        <InfoCard fields={[
+          scene.heading && { label: 'Heading', value: scene.heading, valueClassName: 'leading-relaxed' },
+          scene.summary && { label: 'Summary', value: scene.summary, valueClassName: 'leading-relaxed whitespace-pre-wrap' },
+          scene.start_page && {
+            label: 'Pages',
+            value: `${scene.start_page}${scene.end_page ? ` – ${scene.end_page}` : ''}`,
+          },
+          scene.original_line_count != null && {
+            label: 'Lines',
+            value: (
+              <>
+                {scene.new_line_count ?? scene.original_line_count}
+                {scene.new_line_count != null && scene.new_line_count !== scene.original_line_count && (
+                  <span className="text-gray-400 ml-1">(originally {scene.original_line_count})</span>
+                )}
+              </>
+            ),
+          },
+        ]} />
 
         <div>
           <h2 className="text-lg font-medium text-gray-900 mb-3">
@@ -258,7 +234,7 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
               params: { playId: String(playId), actId: String(actId) },
             });
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </div>

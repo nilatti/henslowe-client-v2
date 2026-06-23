@@ -1,15 +1,18 @@
 import { Suspense, useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { spaceQueryOptions, spaceRehearsalsQueryOptions, useDeleteSpace } from '../api/spaces'
 import { SpaceForm } from './SpaceForm'
 import { useIsSuperAdmin, useUserRoleForSpace } from '../../../hooks/useUserRole'
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import { ConflictsManager } from '../../conflicts/components/ConflictsManager'
 import { upcomingRehearsalsList } from '../../../utils/rehearsalUtils'
 import {
   Button,
   Card,
   ConfirmDialog,
+  InfoCard,
+  LinkedItemList,
   PageHeader,
   Tabs,
 } from '../../../components/ui'
@@ -80,7 +83,7 @@ export function SpaceDetail({ spaceId }: SpaceDetailProps) {
 
   const [activeTab, setActiveTab] = useState('info')
   const [isEditing, setIsEditing] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete()
 
   const tabs = [
     { id: 'info', label: 'Info' },
@@ -102,7 +105,7 @@ export function SpaceDetail({ spaceId }: SpaceDetailProps) {
               {isSuperAdmin && (
                 <Button
                   variant="danger"
-                  onClick={() => setConfirmDelete(true)}
+                  onClick={requestDelete}
                 >
                   Delete
                 </Button>
@@ -125,97 +128,35 @@ export function SpaceDetail({ spaceId }: SpaceDetailProps) {
           <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
           {activeTab === 'info' && (
-            <Card className="p-6">
-              <dl className="space-y-3 text-sm">
-                {space.mission_statement && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Mission</dt>
-                    <dd className="text-gray-600 mt-1">
-                      {space.mission_statement}
-                    </dd>
-                  </div>
-                )}
-                {(space.street_address || space.city) && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Address</dt>
-                    <dd className="text-gray-600 mt-1">
-                      {[space.street_address, space.city, space.state, space.zip]
-                        .filter(Boolean)
-                        .join(', ')}
-                    </dd>
-                  </div>
-                )}
-                {space.phone_number && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Phone</dt>
-                    <dd className="text-gray-600 mt-1">{space.phone_number}</dd>
-                  </div>
-                )}
-                {space.seating_capacity && (
-                  <div>
-                    <dt className="font-medium text-gray-700">
-                      Seating capacity
-                    </dt>
-                    <dd className="text-gray-600 mt-1">
-                      {space.seating_capacity}
-                    </dd>
-                  </div>
-                )}
-                {space.website && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Website</dt>
-                    <dd className="mt-1">
-                      <a
-                        href={space.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        {space.website}
-                      </a>
-                    </dd>
-                  </div>
-                )}
-                {!space.mission_statement &&
-                  !space.street_address &&
-                  !space.phone_number &&
-                  !space.seating_capacity &&
-                  !space.website && (
-                    <p className="text-gray-400 italic">
-                      No additional information.
-                    </p>
-                  )}
-              </dl>
-            </Card>
+            <InfoCard
+                emptyMessage="No additional information."
+                fields={[
+                  space.mission_statement && { label: 'Mission', value: space.mission_statement },
+                  (space.street_address || space.city) && {
+                    label: 'Address',
+                    value: [space.street_address, space.city, space.state, space.zip].filter(Boolean).join(', '),
+                  },
+                  space.phone_number && { label: 'Phone', value: space.phone_number },
+                  space.seating_capacity && { label: 'Seating capacity', value: space.seating_capacity },
+                  space.website && {
+                    label: 'Website',
+                    value: <a href={space.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">{space.website}</a>,
+                  },
+                ]}
+              />
           )}
 
           {activeTab === 'theaters' && (
-            <Card>
-              {space.theaters.length === 0 ? (
-                <p className="px-4 py-3 text-sm text-gray-500">
-                  Not associated with any theaters yet.
-                </p>
-              ) : (
-                <ul className="divide-y divide-gray-100">
-                  {space.theaters.map(theater => (
-                    <li key={theater.id}>
-                      <Link
-                        to={'/theaters/$theaterId' as never}
-                        params={{ theaterId: String(theater.id) } as never}
-                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
-                      >
-                        <span className="text-gray-900">{theater.name}</span>
-                        {theater.city && (
-                          <span className="text-gray-400 text-xs">
-                            {theater.city}, {theater.state}
-                          </span>
-                        )}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
+            <LinkedItemList
+              emptyMessage="Not associated with any theaters yet."
+              items={space.theaters.map(t => ({
+                key: t.id,
+                to: '/theaters/$theaterId',
+                params: { theaterId: String(t.id) },
+                label: t.name,
+                meta: t.city ? `${t.city}, ${t.state}` : undefined,
+              }))}
+            />
           )}
 
           {activeTab === 'conflicts' && (
@@ -242,7 +183,7 @@ export function SpaceDetail({ spaceId }: SpaceDetailProps) {
             await deleteSpace.mutateAsync(space.id)
             void navigate({ to: '/spaces' as never })
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </div>

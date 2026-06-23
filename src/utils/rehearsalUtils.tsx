@@ -133,7 +133,7 @@ function upcomingRehearsalsList({ rehearsals, playIdByProductionId, dateRangeEnd
         )
       );
       return (
-        <tr key={rehearsal.id} className="border-b border-gray-400">
+        <tr key={rehearsal.id} className="border-b border-gray-400 hover:bg-gray-50 transition-colors">
           <td className="p-[10px] border-r border-gray-300">
             <Link
               to="/productions/$productionId/rehearsals"

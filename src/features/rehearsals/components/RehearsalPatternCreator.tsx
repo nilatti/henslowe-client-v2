@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useBuildRehearsalSchedule } from "../api/rehearsals";
-import { Button, Card } from "../../../components/ui";
+import { Button, Card, FormField, inputClass } from "../../../components/ui";
 import { DAYS_OF_WEEK } from "../../../utils/constants";
 import type { RehearsalUser } from "../types/rehearsal";
 import RehearsalCallSelector from "./people/RehearsalCallSelector";
@@ -114,35 +114,26 @@ export function RehearsalPatternCreator({
 
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Start date
-            </label>
+          <FormField label="Start date">
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              End date
-            </label>
+          </FormField>
+          <FormField label="End date">
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             />
-          </div>
+          </FormField>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Start time
-            </label>
+          <FormField label="Start time">
             <input
               type="time"
               value={startTime}
@@ -151,21 +142,17 @@ export function RehearsalPatternCreator({
                 setStartTime(val);
                 if (!endTime || val > endTime) setEndTime(val);
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              End time
-            </label>
+          </FormField>
+          <FormField label="End time" error={endTimeError ?? undefined}>
             <input
               type="time"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
               className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${endTimeError ? "border-red-500" : "border-gray-300"}`}
             />
-            {endTimeError && <p className="text-xs text-red-600 mt-1">{endTimeError}</p>}
-          </div>
+          </FormField>
         </div>
 
         <div>
@@ -191,52 +178,40 @@ export function RehearsalPatternCreator({
         </div>
 
         <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Work time per block (min)
-            </label>
+          <FormField label="Work time per block (min)">
             <input
               type="number"
               value={timeBetweenBreaks}
               onChange={(e) => setTimeBetweenBreaks(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Break length (min)
-            </label>
+          </FormField>
+          <FormField label="Break length (min)">
             <input
               type="number"
               value={breakLength}
               onChange={(e) => setBreakLength(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Total block (min)
-            </label>
+          </FormField>
+          <FormField label="Total block (min)">
             <input
               type="number"
               value={blockLength}
               disabled
               className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-gray-50"
             />
-          </div>
+          </FormField>
         </div>
 
         {theater && theater.spaces.length > 0 && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Location
-            </label>
+          <FormField label="Location">
             <select
               value={spaceId ?? ""}
               onChange={(e) =>
                 setSpaceId(e.target.value ? Number(e.target.value) : null)
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             >
               <option value="">No location</option>
               {theater.spaces.map((s) => (
@@ -245,15 +220,12 @@ export function RehearsalPatternCreator({
                 </option>
               ))}
             </select>
-          </div>
+          </FormField>
         )}
 
         {actors.length > 0 ||
           (productionStaff.length > 0 && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Always call these people
-              </label>
+            <FormField label="Always call these people">
               <div className="space-y-1 max-h-40 overflow-y-auto">
                 <RehearsalCallSelector
                   actors={actors}
@@ -263,7 +235,7 @@ export function RehearsalPatternCreator({
                   actorCharacterNames={actorCharacterNames}
                 />
               </div>
-            </div>
+            </FormField>
           ))}
       </div>
 

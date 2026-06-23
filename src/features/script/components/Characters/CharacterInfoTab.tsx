@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
+import { useConfirmDelete } from '../../../../hooks/useConfirmDelete'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { calculateLineCount } from '../../../../utils/playScriptUtils'
 import { isLineCut } from '../../utils/scriptUtils'
@@ -63,7 +64,7 @@ export default function CharacterInfoTab({ character, playId }: Props) {
   const [age, setAge] = useState(charData?.age ?? '')
   const [description, setDescription] = useState(charData?.description ?? '')
   const [showCut, setShowCut] = useState(true)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete()
 
   const updateCharacter = useUpdateCharacter(playId)
   const updateCharacterGroup = useUpdateCharacterGroup(playId)
@@ -98,7 +99,7 @@ export default function CharacterInfoTab({ character, playId }: Props) {
     } else {
       deleteCharacterGroup.mutate(character.id)
     }
-    setConfirmDelete(false)
+    clearDelete()
   }
 
   return (
@@ -137,7 +138,7 @@ export default function CharacterInfoTab({ character, playId }: Props) {
           </h2>
         )}
         <button
-          onClick={() => setConfirmDelete(true)}
+          onClick={requestDelete}
           className="ml-auto mt-1 text-red-400 hover:text-red-600 p-1 shrink-0"
           title="Delete character"
         >
@@ -315,7 +316,7 @@ export default function CharacterInfoTab({ character, playId }: Props) {
           isDestructive
           confirmLabel="Delete"
           onConfirm={handleDelete}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </div>

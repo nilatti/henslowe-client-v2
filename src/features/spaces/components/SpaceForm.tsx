@@ -3,7 +3,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { useCreateSpace, useUpdateSpace } from '../api/spaces'
 import type { SpaceDetail } from '../types/space'
 import { theatersQueryOptions } from '../../theaters/api/theaters'
-import { Button } from '../../../components/ui'
+import { FormField, FormActions, inputClass } from '../../../components/ui'
 import { US_STATES_ARRAY } from '../../../utils/constants'
 
 interface SpaceFormProps {
@@ -54,26 +54,20 @@ export function SpaceForm({ space, onSuccess, onCancel }: SpaceFormProps) {
     >
       <form.Field name="name">
         {field => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Space name *
-            </label>
+          <FormField label="Space name" required>
             <input
               value={field.state.value}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             />
-          </div>
+          </FormField>
         )}
       </form.Field>
 
       <form.Field name="theater_ids">
         {field => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Associated theaters
-            </label>
+          <FormField label="Associated theaters">
             <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2">
               {theaters
                 .filter(t => !t.fake)
@@ -99,40 +93,34 @@ export function SpaceForm({ space, onSuccess, onCancel }: SpaceFormProps) {
                   </label>
                 ))}
             </div>
-          </div>
+          </FormField>
         )}
       </form.Field>
 
       <div className="grid grid-cols-2 gap-4">
         <form.Field name="street_address">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Street address
-              </label>
+            <FormField label="Street address">
               <input
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
 
         <form.Field name="city">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                City
-              </label>
+            <FormField label="City">
               <input
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
       </div>
@@ -140,38 +128,32 @@ export function SpaceForm({ space, onSuccess, onCancel }: SpaceFormProps) {
       <div className="grid grid-cols-2 gap-4">
         <form.Field name="state">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                State
-              </label>
+            <FormField label="State">
               <select
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               >
                 <option value="">Select state</option>
                 {US_STATES_ARRAY.map(s => (
                   <option key={s.abbr} value={s.abbr}>{s.name}</option>
                 ))}
               </select>
-            </div>
+            </FormField>
           )}
         </form.Field>
 
         <form.Field name="zip">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Zip
-              </label>
+            <FormField label="Zip">
               <input
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
       </div>
@@ -179,82 +161,61 @@ export function SpaceForm({ space, onSuccess, onCancel }: SpaceFormProps) {
       <div className="grid grid-cols-2 gap-4">
         <form.Field name="phone_number">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone
-              </label>
+            <FormField label="Phone">
               <input
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
 
         <form.Field name="seating_capacity">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Seating capacity
-              </label>
+            <FormField label="Seating capacity">
               <input
                 type="number"
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
       </div>
 
       <form.Field name="website">
         {field => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Website
-            </label>
+          <FormField label="Website">
             <input
               value={field.state.value}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
               placeholder="https://"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             />
-          </div>
+          </FormField>
         )}
       </form.Field>
 
       <form.Field name="mission_statement">
         {field => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Mission statement
-            </label>
+          <FormField label="Mission statement">
             <textarea
               value={field.state.value}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             />
-          </div>
+          </FormField>
         )}
       </form.Field>
 
-      <div className="flex gap-3 justify-end pt-2">
-        <Button variant="secondary" type="button" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={form.state.isSubmitting}>
-          {form.state.isSubmitting
-            ? 'Saving...'
-            : isEditing ? 'Save changes' : 'Create space'}
-        </Button>
-      </div>
+      <FormActions isSubmitting={form.state.isSubmitting} isEditing={isEditing} onCancel={onCancel} submitLabel="Create space" />
     </form>
   )
 }

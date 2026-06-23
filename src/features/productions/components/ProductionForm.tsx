@@ -5,7 +5,7 @@ import { theatersQueryOptions, theaterSkeletonQueryOptions } from '../../theater
 import { useCreateProduction, useUpdateProduction } from '../api/productions'
 import { productionJobsQueryOptions } from '../../jobs/api/jobs'
 import type { Production } from '../types/production'
-import { Button } from '../../../components/ui'
+import { FormField, FormActions, inputClass } from '../../../components/ui'
 import { useAdminTheaterIds } from '../../../hooks/useUserRole'
 import { buildUserName } from '../../../utils/actorUtils'
 
@@ -47,7 +47,7 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
         ? String(production.lines_per_minute)
         : '',
       default_space_id: production?.default_space_id ?? null as number | null,
-      default_call_user_ids: production?.default_call_users?.map(u => u.id) ?? [] as number[],
+      default_call_user_ids: production?.default_call_user_ids ?? [] as number[],
     },
     onSubmit: async ({ value }) => {
       const data: Record<string, unknown> = {
@@ -72,9 +72,6 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
     },
   })
 
-  const inputClass =
-    'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-
   return (
     <form
       onSubmit={e => {
@@ -87,10 +84,7 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
         <div className="grid grid-cols-2 gap-4">
           <form.Field name="play_id">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Play <span className="text-red-500">*</span>
-                </label>
+              <FormField label="Play" required>
                 <select
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
@@ -105,16 +99,13 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
                     </option>
                   ))}
                 </select>
-              </div>
+              </FormField>
             )}
           </form.Field>
 
           <form.Field name="theater_id">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Theater <span className="text-red-500">*</span>
-                </label>
+              <FormField label="Theater" required>
                 <select
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
@@ -129,7 +120,7 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
                     </option>
                   ))}
                 </select>
-              </div>
+              </FormField>
             )}
           </form.Field>
         </div>
@@ -138,10 +129,7 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
       <div className="grid grid-cols-2 gap-4">
         <form.Field name="start_date">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start date
-              </label>
+            <FormField label="Start date">
               <input
                 type="date"
                 value={field.state.value}
@@ -149,16 +137,13 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
                 onBlur={field.handleBlur}
                 className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
 
         <form.Field name="end_date">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                End date
-              </label>
+            <FormField label="End date">
               <input
                 type="date"
                 value={field.state.value}
@@ -166,17 +151,14 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
                 onBlur={field.handleBlur}
                 className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
       </div>
 
       <form.Field name="audition_information">
         {field => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Audition information
-            </label>
+          <FormField label="Audition information">
             <textarea
               value={field.state.value}
               onChange={e => field.handleChange(e.target.value)}
@@ -185,24 +167,23 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
               placeholder="What should auditioners know? (requirements, what to prepare, dates, etc.)"
               className={inputClass}
             />
-          </div>
+          </FormField>
         )}
       </form.Field>
 
       <form.Field name="lines_per_minute">
         {field => (
           <div className="w-1/2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Lines per minute
-            </label>
-            <input
-              type="number"
-              value={field.state.value}
-              onChange={e => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-              min={0}
-              className={inputClass}
-            />
+            <FormField label="Lines per minute">
+              <input
+                type="number"
+                value={field.state.value}
+                onChange={e => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+                min={0}
+                className={inputClass}
+              />
+            </FormField>
           </div>
         )}
       </form.Field>
@@ -210,10 +191,7 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
       {isEditing && theater && theater.spaces.length > 0 && (
         <form.Field name="default_space_id">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Default location
-              </label>
+            <FormField label="Default location">
               <select
                 value={field.state.value ?? ''}
                 onChange={e => field.handleChange(e.target.value ? Number(e.target.value) : null)}
@@ -227,7 +205,7 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
                   </option>
                 ))}
               </select>
-            </div>
+            </FormField>
           )}
         </form.Field>
       )}
@@ -243,10 +221,7 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
               ).values()
             )
             return (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Default calls
-                </label>
+              <FormField label="Default calls">
                 <div className="border border-gray-300 rounded-md max-h-48 overflow-y-auto">
                   {allUsers.map(u => (
                     <label
@@ -268,24 +243,13 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
                     </label>
                   ))}
                 </div>
-              </div>
+              </FormField>
             )
           }}
         </form.Field>
       )}
 
-      <div className="flex gap-3 justify-end pt-2">
-        <Button variant="secondary" type="button" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={form.state.isSubmitting}>
-          {form.state.isSubmitting
-            ? 'Saving...'
-            : isEditing
-              ? 'Save changes'
-              : 'Create production'}
-        </Button>
-      </div>
+      <FormActions isSubmitting={form.state.isSubmitting} isEditing={isEditing} onCancel={onCancel} submitLabel="Create production" />
     </form>
   )
 }

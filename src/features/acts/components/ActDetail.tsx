@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { actQueryOptions, useDeleteAct } from "../api/acts";
 import { playSkeletonQueryOptions } from "../../plays/api/plays";
@@ -10,6 +11,7 @@ import {
   Button,
   Card,
   ConfirmDialog,
+  LinkedItemList,
   PageHeader,
 } from "../../../components/ui";
 
@@ -26,7 +28,7 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
   const navigate = useNavigate();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete();
   const [showForm, setShowForm] = useState(false);
 
   const lastScene = act.scenes[act.scenes.length - 1];
@@ -60,7 +62,7 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
               <Button variant="secondary" onClick={() => setIsEditing(true)}>
                 Edit
               </Button>
-              <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+              <Button variant="danger" onClick={requestDelete}>
                 Delete
               </Button>
             </div>
@@ -134,39 +136,19 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
         <div>
           <h2 className="text-lg font-medium text-gray-900 mb-3">Scenes</h2>
 
-          <Card>
-            {act.scenes.length === 0 ? (
-              <p className="px-4 py-3 text-sm text-gray-500">
-                No scenes yet.
-              </p>
-            ) : (
-              <ul className="divide-y divide-gray-100">
-                {act.scenes.map((scene) => {
-                  const songs = scene.french_scenes?.flatMap(fs => fs.songs) ?? []
-                  return (
-                    <li key={scene.id}>
-                      <Link
-                        to="/plays/$playId/acts/$actId/scenes/$sceneId"
-                        params={{
-                          playId: String(playId),
-                          actId: String(actId),
-                          sceneId: String(scene.id),
-                        }}
-                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
-                      >
-                        <div>
-                          <span className="text-gray-900">Scene {scene.number}</span>
-                          {songs.length > 0 && (
-                            <p className="text-xs text-gray-400 mt-0.5">{songs.map(s => s.title).join(' · ')}</p>
-                          )}
-                        </div>
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </Card>
+          <LinkedItemList
+            emptyMessage="No scenes yet."
+            items={act.scenes.map(scene => {
+              const songs = scene.french_scenes?.flatMap(fs => fs.songs) ?? []
+              return {
+                key: scene.id,
+                to: '/plays/$playId/acts/$actId/scenes/$sceneId',
+                params: { playId: String(playId), actId: String(actId), sceneId: String(scene.id) },
+                label: `Scene ${scene.number}`,
+                sublabel: songs.length > 0 ? songs.map(s => s.title).join(' · ') : undefined,
+              }
+            })}
+          />
           {isAdmin && !showForm && (
             <Button className="mt-3" onClick={() => setShowForm(true)}>
               Add Scene
@@ -221,7 +203,7 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
               params: { playId: String(playId) },
             });
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </div>

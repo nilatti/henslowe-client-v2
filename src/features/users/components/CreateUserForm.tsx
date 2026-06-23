@@ -1,7 +1,7 @@
 import { useForm } from '@tanstack/react-form'
 import { useNavigate } from '@tanstack/react-router'
 import { useCreateUser } from '../api/users'
-import { Button, ErrorMessage } from '../../../components/ui'
+import { Button, ErrorMessage, FormField, inputClass } from '../../../components/ui'
 import {
   US_STATES_ARRAY,
   USER_GENDER_DESCRIPTORS,
@@ -51,21 +51,15 @@ export function CreateUserForm() {
       validators={required ? { onChange: ({ value }) => value ? undefined : `${label} is required` } : undefined}
     >
       {field => (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {label}{required && <span className="text-red-500 ml-0.5">*</span>}
-          </label>
+        <FormField label={label} required={required} error={field.state.meta.errors[0] as string | undefined}>
           <input
             value={field.state.value}
             onChange={e => field.handleChange(e.target.value)}
             onBlur={field.handleBlur}
             placeholder={placeholder}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={inputClass}
           />
-          {field.state.meta.errors.length > 0 && (
-            <p className="mt-1 text-xs text-red-600">{field.state.meta.errors[0]}</p>
-          )}
-        </div>
+        </FormField>
       )}
     </form.Field>
   )
@@ -106,22 +100,19 @@ export function CreateUserForm() {
         <div className="grid grid-cols-2 gap-4 mt-4">
           <form.Field name="state">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  State
-                </label>
+              <FormField label="State">
                 <select
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                 >
                   <option value="">Select state</option>
                   {US_STATES_ARRAY.map(s => (
                     <option key={s.abbr} value={s.abbr}>{s.name}</option>
                   ))}
                 </select>
-              </div>
+              </FormField>
             )}
           </form.Field>
           {textField('zip', 'Zip')}
@@ -134,22 +125,19 @@ export function CreateUserForm() {
           {textField('birthdate', 'Date of birth', false, 'YYYY-MM-DD')}
           <form.Field name="gender">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Gender
-                </label>
+              <FormField label="Gender">
                 <select
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                 >
                   <option value="">Prefer not to say</option>
                   {USER_GENDER_DESCRIPTORS.map(g => (
                     <option key={g} value={g}>{g}</option>
                   ))}
                 </select>
-              </div>
+              </FormField>
             )}
           </form.Field>
         </div>
@@ -163,30 +151,28 @@ export function CreateUserForm() {
         <div className="space-y-4">
           <form.Field name="bio">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+              <FormField label="Bio">
                 <textarea
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                 />
-              </div>
+              </FormField>
             )}
           </form.Field>
           <form.Field name="description">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <FormField label="Description">
                 <textarea
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                 />
-              </div>
+              </FormField>
             )}
           </form.Field>
         </div>

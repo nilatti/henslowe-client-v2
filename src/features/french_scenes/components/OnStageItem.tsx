@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import { useUpdateOnStage, useDeleteOnStage } from '../api/frenchScenes'
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import type { OnStage } from '../types/frenchScene'
 import { Button, ConfirmDialog } from '../../../components/ui'
 
@@ -20,7 +20,7 @@ export function OnStageItem({
 }: OnStageItemProps) {
   const updateOnStage = useUpdateOnStage(frenchSceneId, playId, sceneId)
   const deleteOnStage = useDeleteOnStage(frenchSceneId, playId, sceneId)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete()
 
   const name =
     onStage.character?.name ??
@@ -88,7 +88,7 @@ export function OnStageItem({
         {isAdmin && (
           <Button
             variant="danger"
-            onClick={() => setConfirmDelete(true)}
+            onClick={requestDelete}
           >
             Remove
           </Button>
@@ -102,9 +102,9 @@ export function OnStageItem({
           confirmLabel="Remove"
           onConfirm={async () => {
             await deleteOnStage.mutateAsync(onStage.id)
-            setConfirmDelete(false)
+            clearDelete()
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </li>

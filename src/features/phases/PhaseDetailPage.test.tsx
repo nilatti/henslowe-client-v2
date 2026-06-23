@@ -28,20 +28,24 @@ vi.mock('./queries', () => ({
   deletePhaseFn: vi.fn(),
 }))
 
-vi.mock('../../components/ui', () => ({
-  Button: ({ children, onClick, type, variant }: any) => (
-    <button type={type ?? 'button'} onClick={onClick} data-variant={variant}>
-      {children}
-    </button>
-  ),
-  ConfirmDialog: ({ message, onConfirm, onCancel, confirmLabel }: any) => (
-    <div role="dialog">
-      <p>{message}</p>
-      <button onClick={onConfirm}>{confirmLabel}</button>
-      <button onClick={onCancel}>Cancel</button>
-    </div>
-  ),
-}))
+vi.mock('../../components/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../components/ui')>()
+  return {
+    ...actual,
+    Button: ({ children, onClick, type, variant }: any) => (
+      <button type={type ?? 'button'} onClick={onClick} data-variant={variant}>
+        {children}
+      </button>
+    ),
+    ConfirmDialog: ({ message, onConfirm, onCancel, confirmLabel }: any) => (
+      <div role="dialog">
+        <p>{message}</p>
+        <button onClick={onConfirm}>{confirmLabel}</button>
+        <button onClick={onCancel}>Cancel</button>
+      </div>
+    ),
+  }
+})
 
 import { PhaseDetailPage } from './PhaseDetailPage'
 

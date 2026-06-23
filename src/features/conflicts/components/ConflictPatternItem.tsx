@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import { useDeleteConflictPattern } from '../api/conflicts'
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import type { ConflictPattern } from '../types/conflict'
 import { Button, ConfirmDialog } from '../../../components/ui'
 
@@ -36,7 +36,7 @@ export function ConflictPatternItem({
   invalidateKey,
 }: ConflictPatternItemProps) {
   const deletePattern = useDeleteConflictPattern(invalidateKey)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete()
 
   const days = parseDays(pattern.days_of_week)
   const daysDisplay = days
@@ -61,7 +61,7 @@ export function ConflictPatternItem({
       </div>
       {canEdit && (
         <div className="ml-4 shrink-0">
-          <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+          <Button variant="danger" onClick={requestDelete}>
             Delete
           </Button>
         </div>
@@ -73,9 +73,9 @@ export function ConflictPatternItem({
           confirmLabel="Delete"
           onConfirm={async () => {
             await deletePattern.mutateAsync(pattern.id)
-            setConfirmDelete(false)
+            clearDelete()
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </li>

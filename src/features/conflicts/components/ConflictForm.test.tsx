@@ -26,11 +26,15 @@ vi.mock('../../../utils/stringUtils', () => ({
   firstLetterUpcase: (s: string) => s.charAt(0).toUpperCase() + s.slice(1),
 }))
 
-vi.mock('../../../components/ui', () => ({
-  Button: ({ children, onClick, disabled, type }: any) => (
-    <button onClick={onClick} disabled={disabled} type={type}>{children}</button>
-  ),
-}))
+vi.mock('../../../components/ui', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    Button: ({ children, onClick, disabled, type }: any) => (
+      <button onClick={onClick} disabled={disabled} type={type}>{children}</button>
+    ),
+  }
+})
 
 import { ConflictForm } from './ConflictForm'
 

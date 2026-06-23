@@ -26,11 +26,15 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
   return { ...actual, useQuery: vi.fn(() => ({ data: null })) }
 })
 
-vi.mock('../../../components/ui', () => ({
-  Button: ({ children, onClick, disabled, type }: any) => (
-    <button onClick={onClick} disabled={disabled} type={type}>{children}</button>
-  ),
-}))
+vi.mock('../../../components/ui', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    Button: ({ children, onClick, disabled, type }: any) => (
+      <button onClick={onClick} disabled={disabled} type={type}>{children}</button>
+    ),
+  }
+})
 
 import { RehearsalForm } from './RehearsalForm'
 

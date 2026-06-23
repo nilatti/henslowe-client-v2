@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useUpdateSong, useDeleteSong } from '../api/frenchScenes'
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import type { Song } from '../types/frenchScene'
 import type { PlaySkeleton } from '../../plays/types/play'
 import { Button, ConfirmDialog } from '../../../components/ui'
@@ -22,7 +23,7 @@ export function SongItem({ song, frenchSceneId, playId, sceneId, playSkeleton, i
   const deleteSong = useDeleteSong(frenchSceneId, playId, sceneId)
   const [editingTitle, setEditingTitle] = useState(false)
   const [titleValue, setTitleValue] = useState(song.title)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete()
   const [showAddCharacter, setShowAddCharacter] = useState(false)
 
   const assignedCharacterIds = new Set(song.characters.map(c => c.id))
@@ -173,7 +174,7 @@ export function SongItem({ song, frenchSceneId, playId, sceneId, playSkeleton, i
         )}
 
         {isAdmin && (
-          <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+          <Button variant="danger" onClick={requestDelete}>
             Delete
           </Button>
         )}
@@ -186,9 +187,9 @@ export function SongItem({ song, frenchSceneId, playId, sceneId, playSkeleton, i
           confirmLabel="Delete"
           onConfirm={async () => {
             await deleteSong.mutateAsync(song.id)
-            setConfirmDelete(false)
+            clearDelete()
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </li>

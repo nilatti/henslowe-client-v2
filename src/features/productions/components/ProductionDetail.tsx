@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import {
@@ -18,6 +19,7 @@ import {
   Button,
   Card,
   ConfirmDialog,
+  InfoCard,
   PageHeader,
   Tabs,
 } from "../../../components/ui";
@@ -52,7 +54,7 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
 
   const [activeTab, setActiveTab] = useState("info");
   const [isEditing, setIsEditing] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete();
 
   const title = production.play?.title ?? "";
 
@@ -84,7 +86,7 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
                 Edit
               </Button>
               {canDelete && (
-                <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+                <Button variant="danger" onClick={requestDelete}>
                   Delete
                 </Button>
               )}
@@ -106,55 +108,32 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
           <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
           {activeTab === "info" && (
-            <Card className="p-6">
-              <dl className="space-y-3 text-sm">
-                <div>
-                  <dt className="font-medium text-gray-700">Theater</dt>
-                  <dd className="text-gray-600 mt-1">
-                    <Link
-                      to="/theaters/$theaterId"
-                      params={{
-                        theaterId: String(production.theater?.id ?? 0),
-                      }}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      {production.theater?.name}
-                    </Link>
-                  </dd>
-                </div>
-                <div>
-                  <dt className="font-medium text-gray-700">Play</dt>
-                  <dd className="text-gray-600 mt-1">
-                    {production.play?.title}
-                  </dd>
-                </div>
-                {(production.start_date || production.end_date) && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Dates</dt>
-                    <dd className="text-gray-600 mt-1">
-                      {formatDate(production.start_date)}
-                      {production.end_date &&
-                        ` – ${formatDate(production.end_date)}`}
-                    </dd>
-                  </div>
-                )}
-                {production.lines_per_minute != null && (
-                  <div>
-                    <dt className="font-medium text-gray-700">
-                      Lines per minute
-                    </dt>
-                    <dd className="text-gray-600 mt-1">
-                      {production.lines_per_minute}
-                    </dd>
-                  </div>
-                )}
-              </dl>
+            <InfoCard fields={[
+              {
+                label: 'Theater',
+                value: (
+                  <Link
+                    to="/theaters/$theaterId"
+                    params={{ theaterId: String(production.theater?.id ?? 0) }}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    {production.theater?.name}
+                  </Link>
+                ),
+              },
+              { label: 'Play', value: production.play?.title },
+              (production.start_date || production.end_date) && {
+                label: 'Dates',
+                value: `${formatDate(production.start_date)}${production.end_date ? ` – ${formatDate(production.end_date)}` : ''}`,
+              },
+              production.lines_per_minute != null && { label: 'Lines per minute', value: production.lines_per_minute },
+            ]}>
               <ProductionPhasesSection
                 productionId={productionId}
                 productionPhases={production.production_phases ?? []}
                 isAdmin={isAdmin}
               />
-            </Card>
+            </InfoCard>
           )}
 
           {activeTab === "people" && (
@@ -261,7 +240,7 @@ export function ProductionDetail({ productionId }: ProductionDetailProps) {
             await deleteProduction.mutateAsync(productionId);
             navigate({ to: "/productions" });
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </div>

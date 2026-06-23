@@ -8,7 +8,7 @@ import { productionsQueryOptions } from '../../productions/api/productions'
 import { userAllJobsQueryOptions } from '../../../hooks/useUserRole'
 import { theatersWhereUserIsAdmin, productionsWhereUserIsAdmin } from '../../../utils/authorizationUtils'
 import { useAuth } from '../../../hooks/useAuth'
-import { Button } from '../../../components/ui'
+import { Button, FormField, inputClass } from '../../../components/ui'
 
 interface Props {
   userId: number
@@ -95,16 +95,11 @@ export function AddJobToUserForm({ userId, invalidateKey, onSuccess, onCancel, t
     }
   }
 
-  const inputClass = 'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border border-gray-200 rounded-md bg-gray-50 mt-3">
       <h4 className="text-sm font-semibold text-gray-800">Add job</h4>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Theater or production *
-        </label>
+      <FormField label="Theater or production" required>
         <select
           value={context}
           onChange={e => setContext(e.target.value)}
@@ -129,10 +124,9 @@ export function AddJobToUserForm({ userId, invalidateKey, onSuccess, onCancel, t
             </optgroup>
           )}
         </select>
-      </div>
+      </FormField>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
+      <FormField label="Role" required>
         <select
           value={specializationId}
           onChange={e => setSpecializationId(Number(e.target.value))}
@@ -144,27 +138,25 @@ export function AddJobToUserForm({ userId, invalidateKey, onSuccess, onCancel, t
             <option key={s.id} value={s.id}>{s.title}</option>
           ))}
         </select>
-      </div>
+      </FormField>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Start date</label>
+        <FormField label="Start date">
           <input
             type="date"
             value={startDate}
             onChange={e => setStartDate(e.target.value)}
             className={inputClass}
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">End date</label>
+        </FormField>
+        <FormField label="End date">
           <input
             type="date"
             value={endDate}
             onChange={e => setEndDate(e.target.value)}
             className={inputClass}
           />
-        </div>
+        </FormField>
       </div>
 
       <div className="flex gap-3 justify-end">

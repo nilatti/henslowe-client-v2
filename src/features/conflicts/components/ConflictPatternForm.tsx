@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useBuildConflictSchedule } from '../api/conflicts'
-import { Button, Card } from '../../../components/ui'
+import { Button, Card, FormField, inputClass } from '../../../components/ui'
 import { USER_CONFLICT_REASONS, SPACE_CONFLICT_REASONS, DAYS_OF_WEEK } from '../../../utils/constants'
 import { firstLetterUpcase } from '../../../utils/stringUtils'
 
@@ -90,35 +90,26 @@ export function ConflictPatternForm({
       </p>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Start date
-          </label>
+        <FormField label="Start date">
           <input
             type="date"
             value={startDate}
             onChange={e => setStartDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={inputClass}
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            End date
-          </label>
+        </FormField>
+        <FormField label="End date">
           <input
             type="date"
             value={endDate}
             onChange={e => setEndDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={inputClass}
           />
-        </div>
+        </FormField>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Start time
-          </label>
+        <FormField label="Start time">
           <input
             type="time"
             value={startTime}
@@ -127,21 +118,17 @@ export function ConflictPatternForm({
               setStartTime(val)
               if (!endTime || val > endTime) setEndTime(val)
             }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={inputClass}
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            End time
-          </label>
+        </FormField>
+        <FormField label="End time" error={endTimeError ?? undefined}>
           <input
             type="time"
             value={endTime}
             onChange={e => setEndTime(e.target.value)}
             className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${endTimeError ? 'border-red-500' : 'border-gray-300'}`}
           />
-          {endTimeError && <p className="text-xs text-red-600 mt-1">{endTimeError}</p>}
-        </div>
+        </FormField>
       </div>
 
       <div>

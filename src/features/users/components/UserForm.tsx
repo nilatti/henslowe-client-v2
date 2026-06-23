@@ -1,7 +1,7 @@
 import { useForm } from '@tanstack/react-form'
 import { useUpdateUser } from '../api/users'
 import type { UserDetail, UserEditableFields } from '../types/user'
-import { Button } from '../../../components/ui'
+import { FormField, FormActions, inputClass } from '../../../components/ui'
 import {
   US_STATES_ARRAY,
   USER_GENDER_DESCRIPTORS,
@@ -51,18 +51,15 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
   ) => (
     <form.Field name={name}>
       {field => (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {label}
-          </label>
+        <FormField label={label}>
           <input
             value={field.state.value}
             onChange={e => field.handleChange(e.target.value)}
             onBlur={field.handleBlur}
             placeholder={placeholder}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={inputClass}
           />
-        </div>
+        </FormField>
       )}
     </form.Field>
   )
@@ -109,22 +106,19 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
         <div className="grid grid-cols-2 gap-4 mt-4">
           <form.Field name="state">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  State
-                </label>
+              <FormField label="State">
                 <select
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                 >
                   <option value="">Select state</option>
                   {US_STATES_ARRAY.map(s => (
                     <option key={s.abbr} value={s.abbr}>{s.name}</option>
                   ))}
                 </select>
-              </div>
+              </FormField>
             )}
           </form.Field>
           {textField('zip', 'Zip')}
@@ -139,40 +133,34 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
           {textField('birthdate', 'Date of birth', 'YYYY-MM-DD')}
           <form.Field name="gender">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Gender
-                </label>
+              <FormField label="Gender">
                 <select
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                 >
                   <option value="">Prefer not to say</option>
                   {USER_GENDER_DESCRIPTORS.map(g => (
                     <option key={g} value={g}>{g}</option>
                   ))}
                 </select>
-              </div>
+              </FormField>
             )}
           </form.Field>
         </div>
         <div className="mt-4">
           <form.Field name="timezone">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Timezone
-                </label>
+              <FormField label="Timezone">
                 <input
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
                   placeholder="e.g. America/New_York"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                 />
-              </div>
+              </FormField>
             )}
           </form.Field>
         </div>
@@ -185,34 +173,28 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
         <div className="space-y-4">
           <form.Field name="bio">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Bio
-                </label>
+              <FormField label="Bio">
                 <textarea
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                 />
-              </div>
+              </FormField>
             )}
           </form.Field>
           <form.Field name="description">
             {field => (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
+              <FormField label="Description">
                 <textarea
                   value={field.state.value}
                   onChange={e => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                 />
-              </div>
+              </FormField>
             )}
           </form.Field>
         </div>
@@ -228,14 +210,7 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
         </div>
       </div>
 
-      <div className="flex gap-3 justify-end pt-2 border-t border-gray-200">
-        <Button variant="secondary" type="button" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={form.state.isSubmitting}>
-          {form.state.isSubmitting ? 'Saving...' : 'Save changes'}
-        </Button>
-      </div>
+      <FormActions isSubmitting={form.state.isSubmitting} isEditing={true} onCancel={onCancel} className="border-t border-gray-200" />
     </form>
   )
 }

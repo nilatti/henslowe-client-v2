@@ -11,6 +11,7 @@ export interface ProductionPhase {
 
 export interface ProductionListItem {
   id: number
+  end_date: string | null
   play: { id: number; title: string }
   theater: { id: number; name: string }
 }

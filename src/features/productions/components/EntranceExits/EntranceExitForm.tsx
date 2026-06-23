@@ -1,5 +1,5 @@
 import { useForm } from '@tanstack/react-form'
-import { Button } from '../../../../components/ui'
+import { Button, FormField, inputClass } from '../../../../components/ui'
 import type { PlayCharacter } from '../../../plays/types/play'
 import type { StageExit } from '../../types/stageExit'
 import type { EntranceExit } from '../../types/entranceExit'
@@ -56,10 +56,7 @@ export function EntranceExitForm({
     >
       <form.Field name="stage_exit_id">
         {field => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Stage Exit <span className="text-red-500">*</span>
-            </label>
+          <FormField label="Stage Exit" required>
             <select
               value={String(field.state.value)}
               onChange={e =>
@@ -67,7 +64,7 @@ export function EntranceExitForm({
               }
               onBlur={field.handleBlur}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             >
               <option value="">Choose the exit</option>
               {stageExits.map(se => (
@@ -76,16 +73,13 @@ export function EntranceExitForm({
                 </option>
               ))}
             </select>
-          </div>
+          </FormField>
         )}
       </form.Field>
 
       <form.Field name="character_ids">
         {field => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Characters <span className="text-red-500">*</span>
-            </label>
+          <FormField label="Characters" required>
             {field.state.value.length > 0 && (
               <ul className="mb-2 flex flex-wrap gap-1.5">
                 {field.state.value.map(id => {
@@ -119,16 +113,13 @@ export function EntranceExitForm({
               }}
               disabled={isPending}
             />
-          </div>
+          </FormField>
         )}
       </form.Field>
 
       <form.Field name="category">
         {field => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Category <span className="text-red-500">*</span>
-            </label>
+          <FormField label="Category" required>
             <select
               value={field.state.value}
               onChange={e =>
@@ -136,23 +127,20 @@ export function EntranceExitForm({
               }
               onBlur={field.handleBlur}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             >
               <option value=""></option>
               <option value="Enter">Enter</option>
               <option value="Exit">Exit</option>
             </select>
-          </div>
+          </FormField>
         )}
       </form.Field>
 
       <div className="grid grid-cols-2 gap-4">
         <form.Field name="line">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Line Number
-              </label>
+            <FormField label="Line Number">
               <input
                 type="number"
                 value={field.state.value ?? ''}
@@ -161,18 +149,15 @@ export function EntranceExitForm({
                 }
                 onBlur={field.handleBlur}
                 placeholder="line number"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
 
         <form.Field name="page">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Page Number
-              </label>
+            <FormField label="Page Number">
               <input
                 type="number"
                 value={field.state.value ?? ''}
@@ -181,26 +166,25 @@ export function EntranceExitForm({
                 }
                 onBlur={field.handleBlur}
                 placeholder="page number"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
       </div>
 
       <form.Field name="notes">
         {field => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+          <FormField label="Notes">
             <textarea
               value={field.state.value}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
               rows={3}
               placeholder="Add notes, like whether they should bring a certain prop on."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             />
-          </div>
+          </FormField>
         )}
       </form.Field>
 

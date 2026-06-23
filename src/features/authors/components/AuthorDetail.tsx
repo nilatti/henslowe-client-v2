@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { authorQueryOptions, useDeleteAuthor } from '../api/authors'
 import { AuthorForm } from './AuthorForm'
 import { PlayForm } from '../../plays/components/PlayForm'
 import { useIsSuperAdmin } from '../../../hooks/useUserRole'
-import { Button, Card, ConfirmDialog, PageHeader } from '../../../components/ui'
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
+import { Button, Card, ConfirmDialog, LinkedItemList, PageHeader } from '../../../components/ui'
 
 interface AuthorDetailProps {
   authorId: number
@@ -19,7 +20,7 @@ export function AuthorDetail({ authorId }: AuthorDetailProps) {
 
   const [isEditing, setIsEditing] = useState(false)
   const [showPlayForm, setShowPlayForm] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete()
 
   const nameParts = [author.first_name, author.middle_name, author.last_name].filter(Boolean)
   const fullName = nameParts.join(' ')
@@ -40,7 +41,7 @@ export function AuthorDetail({ authorId }: AuthorDetailProps) {
               <Button variant="secondary" onClick={() => setIsEditing(true)}>
                 Edit
               </Button>
-              <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+              <Button variant="danger" onClick={requestDelete}>
                 Delete
               </Button>
             </div>
@@ -98,24 +99,15 @@ export function AuthorDetail({ authorId }: AuthorDetailProps) {
             )}
 
             {canonicalPlays.length > 0 && (
-              <Card>
-                <ul className="divide-y divide-gray-100">
-                  {canonicalPlays.map(play => (
-                    <li key={play.id}>
-                      <Link
-                        to={"/plays/$playId" as never}
-                        params={{ playId: String(play.id) } as never}
-                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
-                      >
-                        <span className="text-gray-900">{play.title}</span>
-                        {play.date && (
-                          <span className="text-gray-400">{play.date}</span>
-                        )}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </Card>
+              <LinkedItemList
+                items={canonicalPlays.map(p => ({
+                  key: p.id,
+                  to: '/plays/$playId',
+                  params: { playId: String(p.id) },
+                  label: p.title,
+                  meta: p.date ?? undefined,
+                }))}
+              />
             )}
             {canonicalPlays.length === 0 && !showPlayForm && (
               <p className="text-sm text-gray-400 italic">No plays yet.</p>
@@ -133,7 +125,7 @@ export function AuthorDetail({ authorId }: AuthorDetailProps) {
             await deleteAuthor.mutateAsync(author.id)
             void navigate({ to: '/authors' })
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </div>

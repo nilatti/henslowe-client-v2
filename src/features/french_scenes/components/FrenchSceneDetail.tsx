@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { frenchSceneQueryOptions, useDeleteFrenchScene } from '../api/frenchScenes'
 import { playSkeletonQueryOptions } from '../../plays/api/plays'
@@ -44,7 +45,7 @@ export function FrenchSceneDetail({
   const navigate = useNavigate()
 
   const [isEditing, setIsEditing] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete()
 
   const prettyName = frenchScene.pretty_name ?? `${frenchScene.number}`
   const actNumber = playSkeleton.acts.find(a => a.id === actId)?.number
@@ -110,7 +111,7 @@ export function FrenchSceneDetail({
               <Button variant="secondary" onClick={() => setIsEditing(true)}>
                 Edit
               </Button>
-              <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+              <Button variant="danger" onClick={requestDelete}>
                 Delete
               </Button>
             </div>
@@ -247,7 +248,7 @@ export function FrenchSceneDetail({
               },
             })
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </div>

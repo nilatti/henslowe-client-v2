@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
+import { useNavigate } from '@tanstack/react-router'
 import { usePageTitle } from '../../../hooks/usePageTitle'
 import { theaterSkeletonQueryOptions, useDeleteTheater } from '../api/theaters'
 import { TheaterForm } from './TheaterForm'
@@ -11,6 +12,8 @@ import {
   Button,
   Card,
   ConfirmDialog,
+  InfoCard,
+  LinkedItemList,
   PageHeader,
   Tabs,
 } from '../../../components/ui'
@@ -31,7 +34,7 @@ export function TheaterDetail({ theaterId }: TheaterDetailProps) {
 
   const [activeTab, setActiveTab] = useState('info')
   const [isEditing, setIsEditing] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete()
   const [showProductionForm, setShowProductionForm] = useState(false)
 
   const tabs = [
@@ -52,7 +55,7 @@ export function TheaterDetail({ theaterId }: TheaterDetailProps) {
                 Edit
               </Button>
               {isSuperAdmin && (
-                <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+                <Button variant="danger" onClick={requestDelete}>
                   Delete
                 </Button>
               )}
@@ -74,46 +77,18 @@ export function TheaterDetail({ theaterId }: TheaterDetailProps) {
           <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
           {activeTab === 'info' && (
-            <Card className="p-6">
-              <dl className="space-y-3 text-sm">
-                {theater.mission_statement && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Mission</dt>
-                    <dd className="text-gray-600 mt-1">{theater.mission_statement}</dd>
-                  </div>
-                )}
-                {(theater.street_address || theater.city) && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Address</dt>
-                    <dd className="text-gray-600 mt-1">
-                      {[theater.street_address, theater.city, theater.state, theater.zip]
-                        .filter(Boolean).join(', ')}
-                    </dd>
-                  </div>
-                )}
-                {theater.phone_number && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Phone</dt>
-                    <dd className="text-gray-600 mt-1">{theater.phone_number}</dd>
-                  </div>
-                )}
-                {theater.website && (
-                  <div>
-                    <dt className="font-medium text-gray-700">Website</dt>
-                    <dd className="mt-1">
-                      <a
-                        href={theater.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        {theater.website}
-                      </a>
-                    </dd>
-                  </div>
-                )}
-              </dl>
-            </Card>
+            <InfoCard fields={[
+                theater.mission_statement && { label: 'Mission', value: theater.mission_statement },
+                (theater.street_address || theater.city) && {
+                  label: 'Address',
+                  value: [theater.street_address, theater.city, theater.state, theater.zip].filter(Boolean).join(', '),
+                },
+                theater.phone_number && { label: 'Phone', value: theater.phone_number },
+                theater.website && {
+                  label: 'Website',
+                  value: <a href={theater.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">{theater.website}</a>,
+                },
+              ]} />
           )}
 
           {activeTab === 'productions' && (
@@ -133,66 +108,36 @@ export function TheaterDetail({ theaterId }: TheaterDetailProps) {
                   />
                 </Card>
               )}
-              <Card>
-                {theater.productions.length === 0 ? (
-                  <p className="px-4 py-3 text-sm text-gray-500">No productions yet.</p>
-                ) : (
-                  <ul className="divide-y divide-gray-100">
-                    {theater.productions
-                      .slice()
-                      .sort((a, b) =>
-                        (b.start_date ?? '').localeCompare(a.start_date ?? '')
-                      )
-                      .map(production => (
-                        <li key={production.id}>
-                          <Link
-                            to={'/productions/$productionId' as never}
-                            params={{ productionId: String(production.id) } as never}
-                            className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
-                          >
-                            <span className="text-gray-900">{production.play?.title}</span>
-                            <span className="text-gray-400 text-xs">
-                              {production.start_date
-                                ? format(parseISO(production.start_date), 'MMM yyyy')
-                                : '—'}
-                              {production.end_date
-                                ? ` → ${format(parseISO(production.end_date), 'MMM yyyy')}`
-                                : ''}
-                            </span>
-                          </Link>
-                        </li>
-                      ))}
-                  </ul>
-                )}
-              </Card>
+              <LinkedItemList
+                emptyMessage="No productions yet."
+                items={theater.productions
+                  .slice()
+                  .sort((a, b) => (b.start_date ?? '').localeCompare(a.start_date ?? ''))
+                  .map(p => ({
+                    key: p.id,
+                    to: '/productions/$productionId',
+                    params: { productionId: String(p.id) },
+                    label: p.play?.title,
+                    meta: p.start_date
+                      ? `${format(parseISO(p.start_date), 'MMM yyyy')}${p.end_date ? ` → ${format(parseISO(p.end_date), 'MMM yyyy')}` : ''}`
+                      : '—',
+                  }))
+                }
+              />
             </>
           )}
 
           {activeTab === 'spaces' && (
-            <Card>
-              {theater.spaces.length === 0 ? (
-                <p className="px-4 py-3 text-sm text-gray-500">No spaces yet.</p>
-              ) : (
-                <ul className="divide-y divide-gray-100">
-                  {theater.spaces.map(space => (
-                    <li key={space.id}>
-                      <Link
-                        to={'/spaces/$spaceId' as never}
-                        params={{ spaceId: String(space.id) } as never}
-                        className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
-                      >
-                        <span className="text-gray-900">{space.name}</span>
-                        {space.seating_capacity && (
-                          <span className="text-gray-400 text-xs">
-                            {space.seating_capacity} seats
-                          </span>
-                        )}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
+            <LinkedItemList
+              emptyMessage="No spaces yet."
+              items={theater.spaces.map(s => ({
+                key: s.id,
+                to: '/spaces/$spaceId',
+                params: { spaceId: String(s.id) },
+                label: s.name,
+                meta: s.seating_capacity ? `${s.seating_capacity} seats` : undefined,
+              }))}
+            />
           )}
 
           {activeTab === 'people' && (
@@ -215,7 +160,7 @@ export function TheaterDetail({ theaterId }: TheaterDetailProps) {
             await deleteTheater.mutateAsync(theater.id)
             void navigate({ to: '/theaters' as never })
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { useDeleteConflict } from '../api/conflicts'
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import type { Conflict } from '../types/conflict'
 import { ConflictForm } from './ConflictForm'
 import { Button, ConfirmDialog } from '../../../components/ui'
@@ -14,7 +15,7 @@ interface ConflictItemProps {
 export function ConflictItem({ conflict, canEdit, invalidateKey }: ConflictItemProps) {
   const deleteConflict = useDeleteConflict(invalidateKey)
   const [isEditing, setIsEditing] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete()
 
   if (isEditing) {
     return (
@@ -48,7 +49,7 @@ export function ConflictItem({ conflict, canEdit, invalidateKey }: ConflictItemP
           <Button variant="secondary" onClick={() => setIsEditing(true)}>
             Edit
           </Button>
-          <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+          <Button variant="danger" onClick={requestDelete}>
             Delete
           </Button>
         </div>
@@ -60,9 +61,9 @@ export function ConflictItem({ conflict, canEdit, invalidateKey }: ConflictItemP
           confirmLabel="Delete"
           onConfirm={async () => {
             await deleteConflict.mutateAsync(conflict.id)
-            setConfirmDelete(false)
+            clearDelete()
           }}
-          onCancel={() => setConfirmDelete(false)}
+          onCancel={clearDelete}
         />
       )}
     </li>

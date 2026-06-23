@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { useCreateRehearsal, useUpdateRehearsal } from "../api/rehearsals";
 import type { RehearsalWithDetails } from "../types/rehearsal";
 import { theaterSkeletonQueryOptions } from "../../theaters/api/theaters";
-import { Button } from "../../../components/ui";
+import { FormField, FormActions, inputClass } from "../../../components/ui";
 
 interface RehearsalFormProps {
   productionId: number;
@@ -79,10 +79,7 @@ export function RehearsalForm({
       <div className="grid grid-cols-2 gap-4">
         <form.Field name="start_time">
           {(field) => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start time *
-              </label>
+            <FormField label="Start time" required>
               <input
                 type="datetime-local"
                 value={field.state.value}
@@ -94,9 +91,9 @@ export function RehearsalForm({
                   }
                 }}
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
 
@@ -111,10 +108,7 @@ export function RehearsalForm({
           }}
         >
           {(field) => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                End time *
-              </label>
+            <FormField label="End time" required error={field.state.meta.errors[0] as string | undefined}>
               <input
                 type="datetime-local"
                 value={field.state.value}
@@ -122,55 +116,43 @@ export function RehearsalForm({
                 onBlur={field.handleBlur}
                 className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${field.state.meta.errors.length ? "border-red-500" : "border-gray-300"}`}
               />
-              {field.state.meta.errors.length > 0 && (
-                <p className="text-xs text-red-600 mt-1">{field.state.meta.errors[0]}</p>
-              )}
-            </div>
+            </FormField>
           )}
         </form.Field>
       </div>
 
       <form.Field name="title">
         {(field) => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Title
-            </label>
+          <FormField label="Title">
             <input
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
               placeholder="e.g. Act 1 run"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             />
-          </div>
+          </FormField>
         )}
       </form.Field>
 
       <form.Field name="notes">
         {(field) => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
-            </label>
+          <FormField label="Notes">
             <textarea
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputClass}
             />
-          </div>
+          </FormField>
         )}
       </form.Field>
 
       {theater && theater.spaces.length > 0 && (
         <form.Field name="space_id">
           {(field) => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Location
-              </label>
+            <FormField label="Location">
               <select
                 value={field.state.value ?? ""}
                 onChange={(e) =>
@@ -179,7 +161,7 @@ export function RehearsalForm({
                   )
                 }
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               >
                 <option value="">No location</option>
                 {theater.spaces.map((s) => (
@@ -188,23 +170,12 @@ export function RehearsalForm({
                   </option>
                 ))}
               </select>
-            </div>
+            </FormField>
           )}
         </form.Field>
       )}
 
-      <div className="flex gap-3 justify-end pt-2">
-        <Button variant="secondary" type="button" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={form.state.isSubmitting}>
-          {form.state.isSubmitting
-            ? "Saving..."
-            : isEditing
-              ? "Save changes"
-              : "Create rehearsal"}
-        </Button>
-      </div>
+      <FormActions isSubmitting={form.state.isSubmitting} isEditing={isEditing} onCancel={onCancel} submitLabel="Create rehearsal" />
     </form>
   );
 }

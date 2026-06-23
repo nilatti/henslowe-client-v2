@@ -2,7 +2,7 @@ import { useForm } from '@tanstack/react-form'
 import { format } from 'date-fns'
 import { useCreateConflict, useUpdateConflict } from '../api/conflicts'
 import type { Conflict } from '../types/conflict'
-import { Button } from '../../../components/ui'
+import { FormField, FormActions, inputClass } from '../../../components/ui'
 import { USER_CONFLICT_REASONS, SPACE_CONFLICT_REASONS } from '../../../utils/constants'
 import { firstLetterUpcase } from '../../../utils/stringUtils'
 
@@ -64,10 +64,7 @@ export function ConflictForm({
       <div className="grid grid-cols-2 gap-4">
         <form.Field name="start_time">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start *
-              </label>
+            <FormField label="Start" required>
               <input
                 type="datetime-local"
                 value={field.state.value}
@@ -79,9 +76,9 @@ export function ConflictForm({
                   }
                 }}
                 onBlur={field.handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
 
@@ -96,10 +93,7 @@ export function ConflictForm({
           }}
         >
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                End *
-              </label>
+            <FormField label="End" required error={field.state.meta.errors[0] as string | undefined}>
               <input
                 type="datetime-local"
                 value={field.state.value}
@@ -107,20 +101,14 @@ export function ConflictForm({
                 onBlur={field.handleBlur}
                 className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${field.state.meta.errors.length ? 'border-red-500' : 'border-gray-300'}`}
               />
-              {field.state.meta.errors.length > 0 && (
-                <p className="text-xs text-red-600 mt-1">{field.state.meta.errors[0]}</p>
-              )}
-            </div>
+            </FormField>
           )}
         </form.Field>
       </div>
 
       <form.Field name="category">
         {field => (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category *
-            </label>
+          <FormField label="Category" required>
             <div className="flex flex-wrap gap-3">
               {reasons.map(reason => (
                 <label
@@ -139,20 +127,11 @@ export function ConflictForm({
                 </label>
               ))}
             </div>
-          </div>
+          </FormField>
         )}
       </form.Field>
 
-      <div className="flex gap-3 justify-end pt-2">
-        <Button variant="secondary" type="button" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={form.state.isSubmitting}>
-          {form.state.isSubmitting
-            ? 'Saving...'
-            : isEditing ? 'Save changes' : 'Add conflict'}
-        </Button>
-      </div>
+      <FormActions isSubmitting={form.state.isSubmitting} isEditing={isEditing} onCancel={onCancel} submitLabel="Add conflict" />
     </form>
   )
 }

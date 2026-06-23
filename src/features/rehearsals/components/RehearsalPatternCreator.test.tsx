@@ -26,12 +26,16 @@ vi.mock('../../../utils/constants', () => ({
   DAYS_OF_WEEK: ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
 }))
 
-vi.mock('../../../components/ui', () => ({
-  Button: ({ children, onClick, disabled, type }: any) => (
-    <button onClick={onClick} disabled={disabled} type={type}>{children}</button>
-  ),
-  Card: ({ children, className }: any) => <div className={className}>{children}</div>,
-}))
+vi.mock('../../../components/ui', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    Button: ({ children, onClick, disabled, type }: any) => (
+      <button onClick={onClick} disabled={disabled} type={type}>{children}</button>
+    ),
+    Card: ({ children, className }: any) => <div className={className}>{children}</div>,
+  }
+})
 
 vi.mock('./people/RehearsalCallSelector', () => ({ default: () => null }))
 

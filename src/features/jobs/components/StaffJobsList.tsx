@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import { useDeleteJob } from '../api/jobs'
 import type { JobWithDetails } from '../types/job'
 import { JobForm } from './JobForm'
@@ -23,7 +24,7 @@ export function StaffJobsList({
 }: StaffJobsListProps) {
   const deleteJob = useDeleteJob(invalidateKey)
   const [showForm, setShowForm] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState<number | null>(null)
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete<number>()
 
   return (
     <div>
@@ -76,7 +77,7 @@ export function StaffJobsList({
                 {isAdmin && (
                   <Button
                     variant="danger"
-                    onClick={() => setConfirmDelete(job.id)}
+                    onClick={() => requestDelete(job.id)}
                   >
                     Remove
                   </Button>
@@ -94,9 +95,9 @@ export function StaffJobsList({
           confirmLabel="Remove"
           onConfirm={async () => {
             await deleteJob.mutateAsync(confirmDelete)
-            setConfirmDelete(null)
+            clearDelete()
           }}
-          onCancel={() => setConfirmDelete(null)}
+          onCancel={clearDelete}
         />
       )}
     </div>

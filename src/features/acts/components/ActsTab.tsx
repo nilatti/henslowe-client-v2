@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
 import { useDeleteAct } from "../api/acts";
 import { ActForm } from "./ActForm";
 import type { PlaySkeleton } from "../../plays/types/play";
@@ -16,7 +17,7 @@ export function ActsTab({ play, playId }: ActsTabProps) {
   const isAdmin = useIsPlayAdmin(playId);
 
   const [showForm, setShowForm] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete<number>();
 
   const nextActNumber = (play.acts[play.acts.length - 1]?.number ?? 0) + 1;
 
@@ -38,7 +39,7 @@ export function ActsTab({ play, playId }: ActsTabProps) {
               )}
             </div>
             {isAdmin && (
-              <Button variant="danger" onClick={() => setConfirmDelete(act.id)}>
+              <Button variant="danger" onClick={() => requestDelete(act.id)}>
                 Delete
               </Button>
             )}
@@ -116,9 +117,9 @@ export function ActsTab({ play, playId }: ActsTabProps) {
           confirmLabel="Delete"
           onConfirm={async () => {
             await deleteAct.mutateAsync(confirmDelete);
-            setConfirmDelete(null);
+            clearDelete();
           }}
-          onCancel={() => setConfirmDelete(null)}
+          onCancel={clearDelete}
         />
       )}
     </div>

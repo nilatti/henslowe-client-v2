@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
 import _ from "lodash";
 import { useQuery } from "@tanstack/react-query";
 import { useDeleteJob } from "../api/jobs";
@@ -33,7 +34,7 @@ export function AuditionersList({
   const [showAuditioners, setShowAuditioners] = useState(false);
   const [hideCast, setHideCast] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
+  const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete<number>();
 
   const auditionerJobs = jobs.filter(
     (j) => j.specialization?.title === 'Auditioner',
@@ -102,7 +103,7 @@ export function AuditionersList({
             {displayedAuditioners.map((job) => (
               <li
                 key={job.id}
-                className="flex items-center justify-between px-4 py-3 text-sm"
+                className="flex items-center justify-between px-4 py-3 text-sm hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   {job.user?.fake ? (
@@ -131,7 +132,7 @@ export function AuditionersList({
                 {isAdmin && (
                   <Button
                     variant="danger"
-                    onClick={() => setConfirmDelete(job.id)}
+                    onClick={() => requestDelete(job.id)}
                   >
                     Remove
                   </Button>
@@ -149,9 +150,9 @@ export function AuditionersList({
           confirmLabel="Remove"
           onConfirm={async () => {
             await deleteJob.mutateAsync(confirmDelete);
-            setConfirmDelete(null);
+            clearDelete();
           }}
-          onCancel={() => setConfirmDelete(null)}
+          onCancel={clearDelete}
         />
       )}
     </div>

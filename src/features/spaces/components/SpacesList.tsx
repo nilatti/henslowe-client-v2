@@ -1,10 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
   getSortedRowModel,
   createColumnHelper,
-  flexRender,
   type SortingState,
 } from '@tanstack/react-table'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -13,7 +12,7 @@ import { spacesQueryOptions, useDeleteSpace } from '../api/spaces'
 import type { Space } from '../types/space'
 import { SpaceForm } from './SpaceForm'
 import { useIsSuperAdmin } from '../../../hooks/useUserRole'
-import { Button, Card, ConfirmDialog, PageHeader } from '../../../components/ui'
+import { Button, Card, ConfirmDialog, PageHeader, SortableTable } from '../../../components/ui'
 
 export function SpacesList() {
   const { data: spaces } = useSuspenseQuery(spacesQueryOptions())
@@ -25,6 +24,17 @@ export function SpacesList() {
   ])
   const [showForm, setShowForm] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState<Space | null>(null)
+  const [search, setSearch] = useState('')
+
+  const filteredSpaces = useMemo(() => {
+    if (!search) return spaces
+    const q = search.toLowerCase()
+    return spaces.filter(s =>
+      s.name?.toLowerCase().includes(q) ||
+      s.city?.toLowerCase().includes(q) ||
+      s.state?.toLowerCase().includes(q)
+    )
+  }, [spaces, search])
 
   const columnHelper = createColumnHelper<Space>()
   const columns = [
@@ -71,7 +81,7 @@ export function SpacesList() {
   ]
 
   const table = useReactTable({
-    data: spaces,
+    data: filteredSpaces,
     columns,
     state: { sorting },
     onSortingChange: setSorting,
@@ -102,52 +112,13 @@ export function SpacesList() {
         </Card>
       )}
 
-      <Card>
-        <table className="w-full text-sm">
-          <thead className="border-b border-gray-200">
-            {table.getHeaderGroups().map(hg => (
-              <tr key={hg.id}>
-                {hg.headers.map(header => (
-                  <th
-                    key={header.id}
-                    className="px-4 py-3 text-left font-medium text-gray-700 cursor-pointer select-none"
-                    onClick={header.column.getToggleSortingHandler()}
-                  >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                    {header.column.getIsSorted() === 'asc'
-                      ? ' ↑'
-                      : header.column.getIsSorted() === 'desc'
-                      ? ' ↓'
-                      : ''}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {table.getRowModel().rows.map(row => (
-              <tr key={row.id} className="hover:bg-gray-50">
-                {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} className="px-4 py-3 text-gray-700">
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
-                    )}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {spaces.length === 0 && (
-          <p className="px-4 py-6 text-sm text-gray-500 text-center">
-            No spaces found.
-          </p>
-        )}
-      </Card>
+      <SortableTable
+        table={table}
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search spaces…"
+        emptyMessage={search ? 'No spaces match your search.' : 'No spaces found.'}
+      />
 
       {confirmDelete && (
         <ConfirmDialog

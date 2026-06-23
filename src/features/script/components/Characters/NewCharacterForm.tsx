@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { useCreateCharacter, useCreateCharacterGroup } from '../../../plays/api/characters'
-import { Button } from '../../../../components/ui'
+import { Button, FormField, inputClass } from '../../../../components/ui'
 import { CHARACTER_AGE_DESCRIPTORS, CHARACTER_GENDER_DESCRIPTORS } from '../../../../utils/constants'
 import { firstLetterUpcase } from '../../../../utils/stringUtils'
 
@@ -42,9 +42,6 @@ export default function NewCharacterForm({ playId, onCreated }: Props) {
     },
   })
 
-  const inputClass =
-    'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-
   return (
     <div className="p-4 max-w-md">
       <h3 className="text-lg font-semibold mb-4">Add New Character</h3>
@@ -54,8 +51,7 @@ export default function NewCharacterForm({ playId, onCreated }: Props) {
       >
         <form.Field name="type">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+            <FormField label="Type" required>
               <select
                 value={field.state.value}
                 onChange={e => {
@@ -69,14 +65,13 @@ export default function NewCharacterForm({ playId, onCreated }: Props) {
                 <option value="character">Character</option>
                 <option value="character_group">Character Group</option>
               </select>
-            </div>
+            </FormField>
           )}
         </form.Field>
 
         <form.Field name="name">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+            <FormField label="Name" required>
               <input
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
@@ -84,14 +79,13 @@ export default function NewCharacterForm({ playId, onCreated }: Props) {
                 required
                 className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
 
         <form.Field name="description">
           {field => (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <FormField label="Description">
               <textarea
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
@@ -99,7 +93,7 @@ export default function NewCharacterForm({ playId, onCreated }: Props) {
                 rows={3}
                 className={inputClass}
               />
-            </div>
+            </FormField>
           )}
         </form.Field>
 
@@ -107,8 +101,7 @@ export default function NewCharacterForm({ playId, onCreated }: Props) {
           <>
             <form.Field name="age">
               {field => (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                <FormField label="Age">
                   <select
                     value={field.state.value}
                     onChange={e => field.handleChange(e.target.value)}
@@ -120,14 +113,13 @@ export default function NewCharacterForm({ playId, onCreated }: Props) {
                       <option key={a} value={a}>{firstLetterUpcase(a)}</option>
                     ))}
                   </select>
-                </div>
+                </FormField>
               )}
             </form.Field>
 
             <form.Field name="gender">
               {field => (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                <FormField label="Gender">
                   <select
                     value={field.state.value}
                     onChange={e => field.handleChange(e.target.value)}
@@ -139,7 +131,7 @@ export default function NewCharacterForm({ playId, onCreated }: Props) {
                       <option key={g} value={g}>{firstLetterUpcase(g)}</option>
                     ))}
                   </select>
-                </div>
+                </FormField>
               )}
             </form.Field>
           </>
