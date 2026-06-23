@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildUserName, sortUsers } from './actorUtils'
+import { buildUserName, sortUsers, fakeActorGenderLabel } from './actorUtils'
 import type { User } from './actorUtils'
 
 describe('buildUserName', () => {
@@ -27,6 +27,48 @@ describe('buildUserName', () => {
     const user: User = { id: 1, email: 'j@test.com', first_name: 'John' }
     expect(buildUserName(user)).toContain('John')
     expect(buildUserName(user)).toContain('j@test.com')
+  })
+})
+
+describe('fakeActorGenderLabel', () => {
+  it('returns null for a real user', () => {
+    const user: User = { id: 1, email: 'a@test.com', fake: false, gender: 'cis female' }
+    expect(fakeActorGenderLabel(user)).toBeNull()
+  })
+
+  it('returns null when fake is undefined', () => {
+    const user: User = { id: 1, email: 'a@test.com', gender: 'cis female' }
+    expect(fakeActorGenderLabel(user)).toBeNull()
+  })
+
+  it('returns (F) for cis female', () => {
+    const user: User = { id: 1, email: 'a@test.com', fake: true, gender: 'cis female' }
+    expect(fakeActorGenderLabel(user)).toBe('(F)')
+  })
+
+  it('returns (F) for trans female', () => {
+    const user: User = { id: 1, email: 'a@test.com', fake: true, gender: 'trans female' }
+    expect(fakeActorGenderLabel(user)).toBe('(F)')
+  })
+
+  it('returns (M) for cis male', () => {
+    const user: User = { id: 1, email: 'a@test.com', fake: true, gender: 'cis male' }
+    expect(fakeActorGenderLabel(user)).toBe('(M)')
+  })
+
+  it('returns (M) for trans male', () => {
+    const user: User = { id: 1, email: 'a@test.com', fake: true, gender: 'trans male' }
+    expect(fakeActorGenderLabel(user)).toBe('(M)')
+  })
+
+  it('returns (NB) for nonbinary', () => {
+    const user: User = { id: 1, email: 'a@test.com', fake: true, gender: 'nonbinary' }
+    expect(fakeActorGenderLabel(user)).toBe('(NB)')
+  })
+
+  it('returns (NB) when gender is null', () => {
+    const user: User = { id: 1, email: 'a@test.com', fake: true, gender: null }
+    expect(fakeActorGenderLabel(user)).toBe('(NB)')
   })
 })
 

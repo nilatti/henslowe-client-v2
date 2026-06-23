@@ -126,6 +126,36 @@ describe('UserCombobox', () => {
 
     await user.click(input)
 
-    expect(screen.getAllByRole('listitem')).toHaveLength(3)
+    // 3 users + 1 "clear casting" item
+    expect(screen.getAllByRole('listitem')).toHaveLength(4)
+  })
+
+  it('shows "— clear casting —" when a value is selected', async () => {
+    const user = userEvent.setup()
+    const { input } = renderCombobox({ value: 2 })
+
+    await user.click(input)
+
+    expect(screen.getByText('— clear casting —')).toBeInTheDocument()
+  })
+
+  it('does not show "— clear casting —" when no value is selected', async () => {
+    const user = userEvent.setup()
+    const { input } = renderCombobox({ value: 0 })
+
+    await user.click(input)
+
+    expect(screen.queryByText('— clear casting —')).not.toBeInTheDocument()
+  })
+
+  it('calls onChange(0) and closes dropdown when "— clear casting —" is clicked', async () => {
+    const user = userEvent.setup()
+    const { onChange, input } = renderCombobox({ value: 2 })
+
+    await user.click(input)
+    await user.click(screen.getByText('— clear casting —'))
+
+    expect(onChange).toHaveBeenCalledWith(0)
+    expect(screen.queryByText('— clear casting —')).not.toBeInTheDocument()
   })
 })

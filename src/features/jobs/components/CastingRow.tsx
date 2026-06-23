@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { useUpdateJob, useDeleteJob } from '../api/jobs'
 import type { JobWithDetails } from '../types/job'
 import { Button, ConfirmDialog } from '../../../components/ui'
-import { buildUserName } from '../../../utils/actorUtils'
+import { buildUserName, fakeActorGenderLabel } from '../../../utils/actorUtils'
 import { UserCombobox } from './UserCombobox'
 
 interface CastingRowProps {
@@ -28,10 +28,9 @@ export function CastingRow({
     casting.character?.new_line_count ?? casting.character?.original_line_count
 
   const handleCast = (userId: number) => {
-    if (!userId) return
     const user = actorsAndAuditioners.find(a => a.id === userId) ?? null
     setIsEditing(false)
-    updateJob.mutate({ id: casting.id, user_id: userId, _user: user })
+    updateJob.mutate({ id: casting.id, user_id: userId || null, _user: user })
   }
 
   const actorName = casting.user ? buildUserName(casting.user) : null
@@ -80,13 +79,19 @@ export function CastingRow({
         ) : (
           <>
             {actorName ? (
-              <Link
-                to="/users/$userId"
-                params={{ userId: String(casting.user_id) }}
-                className={casting.user?.fake ? 'text-amber-600 italic' : 'hover:text-blue-600'}
-              >
-                {actorName}
-              </Link>
+              casting.user?.fake ? (
+                <span className="text-amber-600 italic">
+                  {actorName}{fakeActorGenderLabel(casting.user!) ? ` ${fakeActorGenderLabel(casting.user!)}` : ''}
+                </span>
+              ) : (
+                <Link
+                  to="/users/$userId"
+                  params={{ userId: String(casting.user_id) }}
+                  className="hover:text-blue-600"
+                >
+                  {actorName}
+                </Link>
+              )
             ) : isAdmin ? (
               <button
                 onClick={() => setIsEditing(true)}

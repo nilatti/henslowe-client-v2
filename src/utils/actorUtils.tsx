@@ -10,6 +10,15 @@ export interface User {
   last_name?: string;
   preferred_name?: string | null;
   fake?: boolean;
+  gender?: string | null;
+}
+
+export function fakeActorGenderLabel(user: User): string | null {
+  if (!user.fake) return null
+  const g = user.gender ?? ''
+  if (g === 'cis female' || g === 'trans female') return '(F)'
+  if (g === 'cis male' || g === 'trans male') return '(M)'
+  return '(NB)'
 }
 
 export function buildUserName(user: User): string {

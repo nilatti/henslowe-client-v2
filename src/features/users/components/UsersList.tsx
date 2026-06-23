@@ -75,17 +75,20 @@ export function UsersList() {
     ] : []),
   ], [isSuperAdmin])
 
-  const filteredUsers = (users as Array<UserSummary & { fake?: boolean }>).filter(u => {
-    if (u.fake) return false
-    if (!search) return true
-    const q = search.toLowerCase()
-    return (
-      u.first_name?.toLowerCase().includes(q) ||
-      u.last_name?.toLowerCase().includes(q) ||
-      u.preferred_name?.toLowerCase().includes(q) ||
-      u.email?.toLowerCase().includes(q)
-    )
-  })
+  const filteredUsers = useMemo(() =>
+    (users as Array<UserSummary & { fake?: boolean }>).filter(u => {
+      if (u.fake) return false
+      if (!search) return true
+      const q = search.toLowerCase()
+      return (
+        u.first_name?.toLowerCase().includes(q) ||
+        u.last_name?.toLowerCase().includes(q) ||
+        u.preferred_name?.toLowerCase().includes(q) ||
+        u.email?.toLowerCase().includes(q)
+      )
+    }),
+    [users, search]
+  )
 
   const table = useReactTable({
     data: filteredUsers,

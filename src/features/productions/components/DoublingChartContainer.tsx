@@ -5,6 +5,7 @@ import { productionSkeletonQueryOptions } from "../api/productions";
 import { productionJobsQueryOptions } from "../../jobs/api/jobs";
 import { playScriptQueryOptions } from "../../script/api/script";
 import { getActors } from "../../jobs/utils/jobUtils";
+import { buildUserName } from "../../../utils/actorUtils";
 import { ACTOR_SPECIALIZATION_ID } from "../../../utils/constants";
 import { DoublingChartShow } from "./DoublingChartShow";
 import type { ChartPlay } from "./DoublingChartShow";
@@ -76,6 +77,59 @@ export function DoublingChartContainer({
           act/scene/french scene. A character name in parenthesis indicates that
           the character is onstage but (in your cut) doesn't talk.
         </p>
+
+        {actors.some((actor) => castings.some((c) => c.user_id === actor.id)) && (
+          <ul className="mb-4 list-disc list-inside text-sm">
+            {actors
+              .filter((actor) => castings.some((c) => c.user_id === actor.id))
+              .map((actor) => {
+                const actorCastings = castings.filter(
+                  (c) => c.user_id === actor.id,
+                );
+                return (
+                  <li key={actor.id}>
+                    {actor.fake ? (
+                      <span>{buildUserName(actor)}</span>
+                    ) : (
+                      <Link
+                        to="/users/$userId"
+                        params={{ userId: String(actor.id) }}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        {buildUserName(actor)}
+                      </Link>
+                    )}
+                    <ul className="list-disc list-inside ml-4">
+                      {actorCastings.map((casting) => {
+                        const charName =
+                          casting.character?.name ??
+                          casting.character_group?.name;
+                        const charId = casting.character_id;
+                        return (
+                          <li key={casting.id}>
+                            {charId && playId ? (
+                              <Link
+                                to="/plays/$playId/characters/$characterId"
+                                params={{
+                                  playId: String(playId),
+                                  characterId: String(charId),
+                                }}
+                                className="text-blue-600 hover:text-blue-800"
+                              >
+                                {charName}
+                              </Link>
+                            ) : (
+                              charName
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </li>
+                );
+              })}
+          </ul>
+        )}
 
         <Tabs
           tabs={[...TABS]}

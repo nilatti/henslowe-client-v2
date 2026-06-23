@@ -17,7 +17,10 @@ vi.mock('@tanstack/react-router', () => ({
 
 vi.mock('./UserCombobox', () => ({
   UserCombobox: ({ onChange, disabled }: { value: number; onChange: (id: number) => void; disabled?: boolean }) => (
-    <button onClick={() => onChange(7)} disabled={disabled}>SelectActor</button>
+    <>
+      <button onClick={() => onChange(7)} disabled={disabled}>SelectActor</button>
+      <button onClick={() => onChange(0)} disabled={disabled}>ClearActor</button>
+    </>
   ),
 }))
 
@@ -26,6 +29,8 @@ import type { JobWithDetails } from '../types/job'
 
 const actors = [
   { id: 7, email: 'bob@example.com', first_name: 'Bob', last_name: 'Apple', preferred_name: null, program_name: null, fake: false, gender: null },
+  { id: 8, email: 'emily.chen@fake.example', first_name: 'Emily', last_name: 'Chen', preferred_name: null, program_name: null, fake: true, gender: 'cis female' },
+  { id: 9, email: 'marcus.webb@fake.example', first_name: 'Marcus', last_name: 'Webb', preferred_name: null, program_name: null, fake: true, gender: 'cis male' },
 ]
 
 const baseCasting = {
@@ -131,5 +136,37 @@ describe('CastingRow — editing', () => {
   it('shows no Change button for non-admin', () => {
     renderRow(baseCasting, false)
     expect(screen.queryByRole('button', { name: 'Change' })).not.toBeInTheDocument()
+  })
+
+  it('calls updateJob.mutate with user_id null when actor is cleared', async () => {
+    const user = userEvent.setup()
+    renderRow()
+    await user.click(screen.getByRole('button', { name: 'Change' }))
+    await user.click(screen.getByText('ClearActor'))
+    expect(mockMutate).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 1, user_id: null }),
+    )
+  })
+})
+
+describe('CastingRow — fake actors', () => {
+  const fakeFemale = { ...baseCasting, user_id: 8, user: actors[1] }
+  const fakeMale = { ...baseCasting, user_id: 9, user: actors[2] }
+
+  it('renders a fake actor name as plain text, not a link', () => {
+    renderRow(fakeFemale)
+    const name = screen.getByText('Emily Chen (F)')
+    expect(name.tagName).toBe('SPAN')
+    expect(name.closest('a')).toBeNull()
+  })
+
+  it('shows (F) gender label for a female fake actor', () => {
+    renderRow(fakeFemale)
+    expect(screen.getByText('Emily Chen (F)')).toBeInTheDocument()
+  })
+
+  it('shows (M) gender label for a male fake actor', () => {
+    renderRow(fakeMale)
+    expect(screen.getByText('Marcus Webb (M)')).toBeInTheDocument()
   })
 })

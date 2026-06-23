@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { buildUserName, sortUsers } from '../../../utils/actorUtils'
+import { buildUserName, sortUsers, fakeActorGenderLabel } from '../../../utils/actorUtils'
 import type { User } from '../../../utils/actorUtils'
 
 interface UserComboboxProps {
@@ -102,11 +102,24 @@ export function UserCombobox({ users, value, onChange, disabled }: UserComboboxP
         className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
       />
 
-      {isOpen && filtered.length > 0 && (
+      {isOpen && (
         <ul
           ref={listRef}
           className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-56 overflow-auto"
         >
+          {value > 0 && (
+            <li
+              className="px-3 py-2 text-sm cursor-pointer text-gray-400 italic hover:bg-gray-50"
+              onMouseDown={e => {
+                e.preventDefault()
+                onChange(0)
+                setQuery('')
+                setIsOpen(false)
+              }}
+            >
+              — clear casting —
+            </li>
+          )}
           {filtered.map((user, i) => (
             <li
               key={user.id}
@@ -119,17 +132,15 @@ export function UserCombobox({ users, value, onChange, disabled }: UserComboboxP
               }}
               onMouseEnter={() => setHighlighted(i)}
             >
-              {buildUserName(user)}
+              {buildUserName(user)}{fakeActorGenderLabel(user) ? ` ${fakeActorGenderLabel(user)}` : ''}
             </li>
           ))}
+          {filtered.length === 0 && value === 0 && (
+            <li className="px-3 py-2 text-sm text-gray-400 italic">No matches</li>
+          )}
         </ul>
       )}
 
-      {isOpen && filtered.length === 0 && (
-        <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg px-3 py-2 text-sm text-gray-400 italic">
-          No matches
-        </div>
-      )}
     </div>
   )
 }
