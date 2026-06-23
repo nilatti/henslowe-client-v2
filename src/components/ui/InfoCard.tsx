@@ -8,13 +8,13 @@ interface InfoField {
 }
 
 interface InfoCardProps {
-  fields: (InfoField | null | false | undefined)[]
+  fields: (InfoField | null | false | undefined | '' | 0)[]
   emptyMessage?: string
   children?: ReactNode
 }
 
 export function InfoCard({ fields, emptyMessage, children }: InfoCardProps) {
-  const visible = fields.filter((f): f is InfoField => Boolean(f))
+  const visible = fields.filter((f): f is InfoField => !!f && typeof f === 'object')
 
   if (visible.length === 0 && !emptyMessage && !children) return null
 
