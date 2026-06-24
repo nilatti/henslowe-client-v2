@@ -302,8 +302,9 @@ function returnWordsFromLines(lines: Line[]): {
   const newContentWords: string[][] = [];
   const originalContentWords: string[][] = [];
   lines.map((line) => {
-    if (line.new_content) {
-      if (!line.new_content.match(/^\s+$/)) {
+    if (line.new_content != null) {
+      // new_content present: "" or whitespace = cut (skip); non-empty = edit (use new text)
+      if (line.new_content.trim() !== '') {
         newContentWords.push(lineToWords(line.new_content));
       }
     } else {
