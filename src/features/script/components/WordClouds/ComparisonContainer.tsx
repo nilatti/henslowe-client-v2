@@ -1,12 +1,8 @@
-import { memo, useMemo, useState } from 'react'
-import WordCloud from 'react-d3-cloud'
+import { useMemo, useState } from 'react'
+import { WordCloudCanvas } from '../../../../components/WordCloudCanvas'
 import WordCount from './WordCount'
 import type { WordCloudContextItem, WordEntry, WordLines } from './types'
 import type { PlayScript } from '../../types/script'
-
-const cloudFontSize = (word: { value: number }) => Math.log2(word.value) * 8 + 12
-
-const StableWordCloud = memo(WordCloud)
 
 interface ComparisonContainerProps {
   context: { item: WordCloudContextItem; lines: WordLines }
@@ -53,18 +49,19 @@ export default function ComparisonContainer({ context, play }: ComparisonContain
       <div className="flex flex-row flex-nowrap gap-6">
         <div className="flex flex-col items-center">
           <h3 className="text-base font-semibold mb-2">Original text</h3>
-          <div className="w-[500px] h-[500px]">
-            {includedOriginalWords.length > 0 ? (
-              <StableWordCloud
-                data={includedOriginalWords}
-                width={500}
-                height={500}
-                fontSize={cloudFontSize}
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full text-gray-400 text-sm">No words selected</div>
-            )}
-          </div>
+          <WordCloudCanvas
+            words={includedOriginalWords}
+            width={500}
+            height={500}
+            onWordClick={w =>
+              updateWords(
+                words.originalContent.map(e =>
+                  e.text === w.text ? { ...e, include: false } : e
+                ),
+                'originalContent'
+              )
+            }
+          />
           <WordCount
             list="originalContent"
             updateWordList={updateWords}
@@ -75,18 +72,19 @@ export default function ComparisonContainer({ context, play }: ComparisonContain
         {!play.canonical && (
           <div className="flex flex-col items-center">
             <h3 className="text-base font-semibold mb-2">Cut text</h3>
-            <div className="w-[500px] h-[500px]">
-              {includedNewWords.length > 0 ? (
-                <StableWordCloud
-                  data={includedNewWords}
-                  width={500}
-                  height={500}
-                  fontSize={cloudFontSize}
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-400 text-sm">No words selected</div>
-              )}
-            </div>
+            <WordCloudCanvas
+              words={includedNewWords}
+              width={500}
+              height={500}
+              onWordClick={w =>
+                updateWords(
+                  words.newContent.map(e =>
+                    e.text === w.text ? { ...e, include: false } : e
+                  ),
+                  'newContent'
+                )
+              }
+            />
             <WordCount
               list="newContent"
               updateWordList={updateWords}
