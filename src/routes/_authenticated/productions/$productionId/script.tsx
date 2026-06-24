@@ -7,6 +7,7 @@ import { playScriptQueryOptions } from '../../../../features/script/api/script'
 import { productionJobsQueryOptions } from '../../../../features/jobs/api/jobs'
 import { ExportButtons } from '../../../../features/script/components/ExportButtons'
 import PartScriptContainer from '../../../../features/script/components/PartScripts/PartScriptContainer'
+import { PartScriptExportButtons } from '../../../../features/script/components/PartScripts/PartScriptExportButtons'
 import { ACTOR_SPECIALIZATION_ID } from '../../../../utils/constants'
 import type { JobWithDetails } from '../../../../features/jobs/types/job'
 import { Card } from '../../../../components/ui'
@@ -70,16 +71,26 @@ function ScriptContent({
     }))
   }, [jobs])
 
+  const scriptLinks = [
+    { to: '/plays/$playId', label: 'Play structure' },
+    { to: '/plays/$playId/script', label: 'View/edit script' },
+    { to: '/plays/$playId/part-scripts', label: 'Part scripts' },
+    { to: '/plays/$playId/word-clouds', label: 'Word clouds' },
+  ] as const
+
   return (
     <div className="space-y-8">
-      <div className="flex justify-end gap-4">
-        <Link
-          to="/plays/$playId/script"
-          params={{ playId: String(playId) }}
-          className="text-sm text-blue-600 hover:text-blue-800"
-        >
-          View/edit script →
-        </Link>
+      <div className="flex flex-wrap gap-2">
+        {scriptLinks.map(({ to, label }) => (
+          <Link
+            key={to}
+            to={to}
+            params={{ playId: String(playId) }}
+            className="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50"
+          >
+            {label} →
+          </Link>
+        ))}
       </div>
 
       <section className="space-y-4">
@@ -101,9 +112,20 @@ function ScriptContent({
       <hr />
 
       <section className="space-y-4">
+        <h2 className="text-base font-semibold text-gray-800">Download Part Scripts</h2>
+        <p className="text-sm text-gray-500">
+          Cut script removes all cut lines; marked script shows cuts as strikethroughs and
+          edits as underlines. Select an actor or character to download their part script.
+        </p>
+        <PartScriptExportButtons play={play} actors={actors} />
+      </section>
+
+      <hr />
+
+      <section className="space-y-4">
         <h2 className="text-base font-semibold text-gray-800">Part Scripts</h2>
         <p className="text-sm text-gray-500">
-          Generate a part script showing only an actor's lines with a few words of cue.
+          Preview a part script showing only an actor's lines with a few words of cue.
         </p>
         <PartScriptContainer actors={actors} play={play} />
       </section>

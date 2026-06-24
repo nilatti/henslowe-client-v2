@@ -1,6 +1,9 @@
 import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx'
+import _ from 'lodash'
 import type { ScriptAct } from '../types/script'
 import { mergeTextFromFrenchScenes, sortScriptItems, isLineCut } from './scriptUtils'
+import { sortLines } from '../../../utils/playScriptUtils'
+import type { PartLine, PartText } from '../components/PartScripts/types'
 
 const PAGE_SIZE = { width: 12240, height: 15840 }
 const MARGIN = { top: 1440, bottom: 1440, left: 1440, right: 1440 }
@@ -190,6 +193,157 @@ export async function generateMarkedScript(
     }
   }
 
+  const doc = new Document({
+    sections: [{ properties: { page: { size: PAGE_SIZE, margin: MARGIN } }, children }],
+  })
+  return Packer.toBlob(doc)
+}
+
+// ── Part script helpers ────────────────────────────────────────────────────
+
+type IndexedPartLine = PartLine & { _idx: number }
+
+function isPartLineCut(line: PartLine): boolean {
+  return line.new_content != null && line.new_content.trim() === ''
+}
+
+function ellide(content: string): string {
+  const words = content.split(' ')
+  return `${words.length >= 3 ? '…' : ''}${words.slice(-3).join(' ')}`
+}
+
+function findClosestCue(
+  i: number,
+  lineIndex: number,
+  lines: IndexedPartLine[],
+  characterIds: number[],
+  showCut: boolean
+): PartLine | null | undefined {
+  const testLine = lines[lineIndex - i]
+  if (!testLine) return undefined
+  const cid = testLine.character_id
+  if (cid != null && characterIds.includes(cid)) return null
+  if (testLine.number.match(/^SD/)) return testLine
+  if (!showCut && isPartLineCut(testLine)) return null
+  if (!showCut && testLine.new_content) return { ...testLine, new_content: ellide(testLine.new_content) }
+  if (!testLine.new_content) return { ...testLine, original_content: ellide(testLine.original_content) }
+  if (cid !== lines[lineIndex].character_id) return testLine
+  const next = i + 1
+  if (lineIndex - next < 0) return undefined
+  // intentional missing return — mirrors display logic; _.compact filters undefined
+  findClosestCue(next, lineIndex, lines, characterIds, showCut)
+}
+
+function cullPartLines(
+  text: PartText,
+  characterIds: number[],
+  showCut: boolean
+): PartLine[] {
+  let bucket: PartLine[] = [
+    ...text.lines,
+    ...text.stage_directions,
+    ...text.sound_cues,
+  ].filter(l => l.original_content.trim() !== '')
+
+  if (!showCut) {
+    bucket = bucket.filter(l => l.new_content == null || !isPartLineCut(l))
+  }
+
+  const ordered = sortLines(bucket as Parameters<typeof sortLines>[0]) as PartLine[]
+  const indexed: IndexedPartLine[] = ordered.map((l, i) => ({ ...l, _idx: i }))
+  const charLines = indexed.filter(l => characterIds.includes(l.character_id ?? -1))
+  const cueLines = _.compact(
+    charLines.map(cl => {
+      if (indexed[cl._idx - 1]?.character_id === cl.character_id) return undefined
+      return findClosestCue(1, cl._idx, indexed, characterIds, showCut)
+    })
+  )
+  return sortLines(
+    [...charLines, ...cueLines] as Parameters<typeof sortLines>[0]
+  ) as PartLine[]
+}
+
+function partLineParagraph(
+  line: PartLine,
+  characterIds: number[],
+  marked: boolean
+): Paragraph {
+  const isTarget = characterIds.includes(line.character_id ?? -1)
+  const numRun = new TextRun({ text: `${line.number}\t`, color: '999999', size: 18 })
+
+  if (!isTarget) {
+    const text = line.new_content?.trim() || line.original_content
+    return new Paragraph({
+      children: [numRun, new TextRun({ text, italics: true, color: '888888' })],
+      indent: INDENT_LEFT,
+    })
+  }
+
+  const nameRun = line.character
+    ? new TextRun({ text: `${line.character.name}\t`, bold: true })
+    : undefined
+
+  if (!marked) {
+    const text = line.new_content?.trim() || line.original_content
+    const runs: TextRun[] = _.compact([numRun, nameRun, new TextRun({ text })])
+    return new Paragraph({ children: runs })
+  }
+
+  if (isPartLineCut(line)) {
+    const runs: TextRun[] = _.compact([
+      numRun,
+      nameRun,
+      new TextRun({ text: line.original_content, strike: true, color: 'CC0000' }),
+    ])
+    return new Paragraph({ children: runs })
+  }
+  if (line.new_content?.trim()) {
+    const runs: TextRun[] = _.compact([
+      numRun,
+      nameRun,
+      new TextRun({ text: line.original_content, strike: true }),
+      new TextRun({ text: ` ${line.new_content}`, underline: {} }),
+    ])
+    return new Paragraph({ children: runs })
+  }
+  const runs: TextRun[] = _.compact([numRun, nameRun, new TextRun({ text: line.original_content })])
+  return new Paragraph({ children: runs })
+}
+
+export async function generateCutPartScript(
+  text: PartText,
+  characterIds: number[],
+  name: string,
+  playTitle: string
+): Promise<Blob> {
+  const culled = cullPartLines(text, characterIds, false)
+  const children: Paragraph[] = [
+    new Paragraph({
+      text: `${playTitle} — Part Script for ${name} (Cut)`,
+      heading: HeadingLevel.HEADING_1,
+    }),
+    ...culled.map(l => partLineParagraph(l, characterIds, false)),
+  ]
+  const doc = new Document({
+    sections: [{ properties: { page: { size: PAGE_SIZE, margin: MARGIN } }, children }],
+  })
+  return Packer.toBlob(doc)
+}
+
+export async function generateMarkedPartScript(
+  text: PartText,
+  characterIds: number[],
+  name: string,
+  playTitle: string
+): Promise<Blob> {
+  const culled = cullPartLines(text, characterIds, true)
+  const children: Paragraph[] = [
+    new Paragraph({
+      text: `${playTitle} — Part Script for ${name} (Cuts Marked)`,
+      heading: HeadingLevel.HEADING_1,
+    }),
+    ...culled.map(l => partLineParagraph(l, characterIds, true)),
+  ]
   const doc = new Document({
     sections: [{ properties: { page: { size: PAGE_SIZE, margin: MARGIN } }, children }],
   })
