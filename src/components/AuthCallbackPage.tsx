@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import api from '../api/client'
 import type { AuthUser } from '../types/auth'
 
 export function AuthCallbackPage() {
@@ -11,40 +12,35 @@ export function AuthCallbackPage() {
     handled.current = true
 
     const params = new URLSearchParams(window.location.search)
-    const token = params.get('token')
     const error = params.get('error')
 
-    if (error || !token) {
+    if (error) {
       navigate({ to: '/' })
       return
     }
 
-    const role = params.get('role') ?? 'regular'
-    const user: AuthUser = {
-      id: Number(params.get('id')),
-      email: params.get('email') ?? '',
-      first_name: params.get('first_name') ?? '',
-      last_name: params.get('last_name') ?? '',
-      role,
-      subscription_status: params.get('subscription_status') ?? 'never subscribed',
-      is_superadmin: role === 'superadmin',
-    }
+    // Cookie was set by the Rails OAuth callback. Fetch profile to confirm the
+    // session is valid and populate the user stored in localStorage.
+    api.get<AuthUser>('/api/v1/sessions/me')
+      .then(({ data }) => {
+        localStorage.setItem('auth_user', JSON.stringify({
+          ...data,
+          is_superadmin: data.role === 'superadmin',
+        }))
 
-    if (!user.id || !user.email) {
-      navigate({ to: '/' })
-      return
-    }
+        const redirectTo = localStorage.getItem('redirect_after_login') ?? '/'
+        localStorage.removeItem('redirect_after_login')
 
-    localStorage.setItem('auth_token', token)
-    localStorage.setItem('auth_user', JSON.stringify(user))
+        const safeRedirect = redirectTo.startsWith('/') && !redirectTo.startsWith('//')
+          ? redirectTo
+          : '/'
 
-    const redirectTo = localStorage.getItem('redirect_after_login') ?? '/'
-    localStorage.removeItem('redirect_after_login')
-
-    // Full reload so AuthProvider re-initializes from the freshly stored token.
-    // Client-side navigate() won't work here because the storage event only
-    // fires cross-tab, so AuthProvider's in-memory state is still null.
-    window.location.href = redirectTo
+        // Full reload so AuthProvider re-initializes from the freshly stored user.
+        window.location.href = safeRedirect
+      })
+      .catch(() => {
+        navigate({ to: '/' })
+      })
   }, [navigate])
 
   return (

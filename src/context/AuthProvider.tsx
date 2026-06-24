@@ -1,5 +1,6 @@
 import { useState, useEffect, type ReactNode } from "react";
 import { AuthContext } from "./AuthContext";
+import api from "../api/client";
 import type { AuthUser } from "../types/auth";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -13,17 +14,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return null;
     }
   });
-  const [token, setToken] = useState<string | null>(() =>
-    localStorage.getItem("auth_token"),
-  );
 
-  // Re-read from localStorage when it changes
-  // (e.g. after OAuth callback stores the token)
+  // Re-read from localStorage when it changes cross-tab
   useEffect(() => {
     const handleStorage = () => {
-      const storedToken = localStorage.getItem("auth_token");
       const storedUser = localStorage.getItem("auth_user");
-      setToken(storedToken);
       try {
         if (storedUser) {
           const parsed = JSON.parse(storedUser);
@@ -40,10 +35,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = () => {
-    localStorage.removeItem("auth_token");
+    api.delete('/api/v1/sessions').catch(() => {});
     localStorage.removeItem("auth_user");
     setUser(null);
-    setToken(null);
     window.location.href = "/";
   };
 
@@ -51,8 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
-        token,
-        isAuthenticated: !!token && !!user,
+        isAuthenticated: !!user,
         logout,
       }}
     >
