@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const cloud = require('d3-cloud') as () => D3Cloud
+// @ts-expect-error d3-cloud has no type declarations
+import _cloudFactory from 'd3-cloud'
 
 interface Word {
   text: string
@@ -27,6 +27,8 @@ interface D3Cloud {
   start(): D3Cloud
   stop(): D3Cloud
 }
+
+const cloudFactory = _cloudFactory as () => D3Cloud
 
 const COLORS = [
   '#1d4ed8', '#15803d', '#b91c1c', '#7e22ce',
@@ -71,7 +73,7 @@ export function WordCloudCanvas({
     const min = Math.min(...words.map(w => w.value))
     const max = Math.max(...words.map(w => w.value))
 
-    const layout = cloud()
+    const layout = cloudFactory()
       .size([width, height])
       .words(words.map(w => ({ ...w, size: fontSizeFor(w.value, min, max) })))
       .padding(5)
