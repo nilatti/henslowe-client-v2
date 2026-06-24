@@ -2,7 +2,7 @@ import { Suspense, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useFreePlayStore } from '../store/freePlayStore'
 import { SelectPlay } from './SelectPlay'
-import { LoadingSpinner } from '../../../components/ui'
+import { Button, LoadingSpinner } from '../../../components/ui'
 import { buildUserName } from '../../../utils/actorUtils'
 import type { FakeActorCounts, FreeCasting, FakeActor } from '../types/freePlay'
 
@@ -101,50 +101,56 @@ function CastingItem({ casting, availableActors, onFormSubmit }: CastingRowProps
   const actorName = casting.user ? buildUserName(casting.user) : null
 
   return (
-    <li className="flex items-center gap-2 px-4 py-2 text-sm border-b border-gray-100 last:border-0">
-      <span className="font-medium text-gray-900 w-40 truncate">
-        {casting.character.name}
-        {lineCount != null && lineCount > 0 && (
-          <span className="text-xs text-gray-400 ml-1">({lineCount})</span>
-        )}
-      </span>
-      {editing ? (
-        <div className="flex items-center gap-2">
-          <select
-            value={selectedId}
-            onChange={e => setSelectedId(Number(e.target.value))}
-            autoFocus
-            className="px-2 py-1 border border-gray-300 rounded text-sm"
-          >
-            <option value="">Select actor</option>
-            {availableActors.map(a => (
-              <option key={a.id} value={a.id}>
-                {buildUserName(a)}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={handleCast}
-            disabled={!selectedId}
-            className="px-2 py-1 bg-blue-600 text-white text-xs rounded disabled:opacity-50"
-          >
-            Cast
-          </button>
-          <button
-            onClick={() => setEditing(false)}
-            className="px-2 py-1 border border-gray-300 text-xs rounded"
-          >
-            Cancel
-          </button>
-        </div>
-      ) : (
-        <span
-          className="cursor-pointer hover:text-blue-600 text-sm"
-          onClick={() => setEditing(true)}
-        >
-          {actorName ?? <strong className="text-blue-600">Click to cast</strong>}
+    <li className="flex items-center justify-between px-4 py-3 text-sm border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+      <div className="flex items-center gap-2 min-w-0">
+        <span className="font-medium text-gray-900 truncate">
+          {casting.character.name}
         </span>
-      )}
+        {lineCount != null && lineCount > 0 && (
+          <span className="text-xs text-gray-400 shrink-0">({lineCount} lines)</span>
+        )}
+      </div>
+      <div className="flex items-center gap-2 ml-4 shrink-0">
+        {editing ? (
+          <div className="flex items-center gap-2">
+            <select
+              value={selectedId}
+              onChange={e => setSelectedId(Number(e.target.value))}
+              autoFocus
+              className="px-2 py-1 border border-gray-300 rounded text-sm"
+            >
+              <option value="">Select actor</option>
+              {availableActors.map(a => (
+                <option key={a.id} value={a.id}>
+                  {buildUserName(a)}
+                </option>
+              ))}
+            </select>
+            <Button onClick={handleCast} disabled={!selectedId}>
+              Cast
+            </Button>
+            <Button variant="secondary" onClick={() => setEditing(false)}>
+              Cancel
+            </Button>
+          </div>
+        ) : (
+          <>
+            {actorName ? (
+              <span className="text-amber-600 italic">{actorName}</span>
+            ) : (
+              <button
+                onClick={() => setEditing(true)}
+                className="text-blue-600 font-semibold hover:text-blue-800"
+              >
+                Click to cast
+              </button>
+            )}
+            <Button variant="secondary" onClick={() => setEditing(true)}>
+              Change
+            </Button>
+          </>
+        )}
+      </div>
     </li>
   )
 }

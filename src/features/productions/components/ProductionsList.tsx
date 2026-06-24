@@ -18,7 +18,7 @@ import { Button, Card, PageHeader, SortableTable } from '../../../components/ui'
 const columnHelper = createColumnHelper<ProductionListItem>()
 
 const columns = [
-  columnHelper.accessor(row => row.play.title, {
+  columnHelper.accessor(row => row.play?.title ?? '', {
     id: 'title',
     header: 'Title',
     cell: ({ row }) => (
@@ -27,14 +27,14 @@ const columns = [
         params={{ productionId: String(row.original.id) }}
         className="text-blue-600 hover:text-blue-800"
       >
-        {row.original.play.title}
+        {row.original.play?.title ?? '(untitled)'}
       </Link>
     ),
   }),
-  columnHelper.accessor(row => row.theater.name, {
+  columnHelper.accessor(row => row.theater?.name ?? '', {
     id: 'theater',
     header: 'Theater',
-    cell: ({ row }) => row.original.theater.name,
+    cell: ({ row }) => row.original.theater?.name ?? '—',
   }),
   columnHelper.accessor('end_date', {
     header: 'Year',
@@ -58,8 +58,8 @@ export function ProductionsList() {
     if (!search) return productions
     const q = search.toLowerCase()
     return productions.filter(p =>
-      p.play.title.toLowerCase().includes(q) ||
-      p.theater.name.toLowerCase().includes(q)
+      p.play?.title.toLowerCase().includes(q) ||
+      p.theater?.name.toLowerCase().includes(q)
     )
   }, [productions, search])
 
