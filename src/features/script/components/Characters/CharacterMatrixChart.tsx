@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { playScriptQueryOptions } from '../../api/script'
 import { Button, Tabs } from '../../../../components/ui'
 import { downloadCsv, slugify } from '../../../../utils/csvUtils'
@@ -44,6 +45,9 @@ type MatrixRow =
 interface Column {
   label: string
   onStages: MatrixOnStage[]
+  actId?: number
+  sceneId?: number
+  frenchSceneId?: number
 }
 
 interface Props {
@@ -70,12 +74,15 @@ export function CharacterMatrixChart({ playId }: Props) {
       return acts.map(act => ({
         label: `Act ${act.number}`,
         onStages: getAllOnStages(act.scenes.flatMap(s => s.french_scenes)),
+        actId: act.id,
       }))
     } else if (level === 'scene') {
       return acts.flatMap(act =>
         act.scenes.map(scene => ({
           label: scene.pretty_name,
           onStages: getAllOnStages(scene.french_scenes),
+          actId: act.id,
+          sceneId: scene.id,
         })),
       )
     } else {
@@ -84,6 +91,9 @@ export function CharacterMatrixChart({ playId }: Props) {
           scene.french_scenes.map(fs => ({
             label: fs.pretty_name,
             onStages: fs.on_stages ?? [],
+            actId: act.id,
+            sceneId: scene.id,
+            frenchSceneId: fs.id,
           })),
         ),
       )
@@ -145,7 +155,31 @@ export function CharacterMatrixChart({ playId }: Props) {
                   className="border border-gray-400 px-2 py-2 text-sm font-bold text-center bg-white"
                   style={{ minWidth: '60px' }}
                 >
-                  {col.label}
+                  {col.frenchSceneId ? (
+                    <Link
+                      to="/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId"
+                      params={{ playId: String(playId), actId: String(col.actId), sceneId: String(col.sceneId), frenchSceneId: String(col.frenchSceneId) }}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      {col.label}
+                    </Link>
+                  ) : col.sceneId ? (
+                    <Link
+                      to="/plays/$playId/acts/$actId/scenes/$sceneId"
+                      params={{ playId: String(playId), actId: String(col.actId), sceneId: String(col.sceneId) }}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      {col.label}
+                    </Link>
+                  ) : col.actId ? (
+                    <Link
+                      to="/plays/$playId/acts/$actId"
+                      params={{ playId: String(playId), actId: String(col.actId) }}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      {col.label}
+                    </Link>
+                  ) : col.label}
                 </th>
               ))}
             </tr>
@@ -159,7 +193,15 @@ export function CharacterMatrixChart({ playId }: Props) {
                     className="border border-gray-400 px-2 py-1 text-sm font-medium sticky left-0 bg-inherit z-10"
                     style={{ width: '200px', minWidth: '200px' }}
                   >
-                    {row.name}
+                    {row.kind === 'character' ? (
+                      <Link
+                        to="/plays/$playId/characters/$characterId"
+                        params={{ playId: String(playId), characterId: String(row.id) }}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        {row.name}
+                      </Link>
+                    ) : row.name}
                   </td>
                   {cells.map((val, i) => (
                     <td
