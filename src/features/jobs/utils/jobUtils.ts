@@ -5,7 +5,7 @@ export function getCastings(jobs: JobWithDetails[]) {
   const filtered = jobs.filter(
     j =>
       j.specialization?.title === 'Actor' &&
-      j.character_id != null &&
+      (j.character_id != null || j.character_group_id != null) &&
       !j.character?.name?.match(/Could Not Find Character/)
   )
   return _.sortBy(filtered, j => j.user?.last_name)
