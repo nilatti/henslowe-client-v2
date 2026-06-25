@@ -2,6 +2,7 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "../routeTree.gen";
 import { useAuth } from "../hooks/useAuth";
 import { queryClient } from "../lib/queryClient";
+import { LoadingSpinner } from "./ui";
 
 const router = createRouter({
   routeTree,
@@ -9,6 +10,7 @@ const router = createRouter({
     queryClient,
     auth: undefined!, // will be set by AuthProvider
   },
+  defaultPendingComponent: () => <LoadingSpinner />,
 });
 
 declare module "@tanstack/react-router" {

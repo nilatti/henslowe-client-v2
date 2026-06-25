@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
 import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import { Link, useNavigate } from '@tanstack/react-router'
@@ -15,6 +15,7 @@ import {
   Card,
   ConfirmDialog,
   InfoCard,
+  LoadingSpinner,
   PageHeader,
   Tabs,
 } from '../../../components/ui'
@@ -146,7 +147,9 @@ export function PlayDetail({ playId }: PlayDetailProps) {
           )}
 
           {activeTab === 'characters' && (
-            <CharactersBreakdown playId={playId} embedded />
+            <Suspense fallback={<LoadingSpinner />}>
+              <CharactersBreakdown playId={playId} embedded />
+            </Suspense>
           )}
         </>
       )}
