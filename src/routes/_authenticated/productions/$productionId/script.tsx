@@ -35,8 +35,19 @@ export const Route = createFileRoute('/_authenticated/productions/$productionId/
 
     if (!hasLines) {
       return (
-        <Card className="p-4 text-sm text-gray-500 text-center">
-          No script has been added to this production yet.
+        <Card className="p-4 space-y-3">
+          <p className="text-sm text-gray-500 text-center">
+            No script has been added to this production yet.
+          </p>
+          <div className="flex justify-center">
+            <Link
+              to="/plays/$playId"
+              params={{ playId: String(playId) }}
+              className="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50"
+            >
+              Play structure →
+            </Link>
+          </div>
         </Card>
       )
     }
