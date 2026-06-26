@@ -6,6 +6,9 @@ export interface UserSummary {
   last_name: string
   preferred_name: string | null
   program_name: string | null
+  subscription_status?: string
+  paid_override?: boolean
+  fake?: boolean
 }
 
 // Full user — returned by show action, fields vary by overlap level
@@ -34,6 +37,7 @@ export interface UserDetail {
   role?: string
   subscription_status?: string
   subscription_end_date?: string | null
+  paid_override?: boolean
   created_at?: string
   updated_at?: string
   headshot_url?: string | null

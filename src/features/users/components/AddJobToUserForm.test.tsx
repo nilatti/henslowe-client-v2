@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
-const { mockUseQuery, mockUseAuth } = vi.hoisted(() => ({
+const { mockUseQuery, mockUseAuth, mockMutateOverride } = vi.hoisted(() => ({
   mockUseQuery: vi.fn(),
   mockUseAuth: vi.fn(),
+  mockMutateOverride: vi.fn(),
 }))
 
 vi.mock('@tanstack/react-query', async (importOriginal) => {
@@ -12,7 +14,15 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
 })
 
 vi.mock('../../jobs/api/jobs', () => ({
-  useCreateJob: () => ({ mutateAsync: vi.fn() }),
+  useCreateJob: () => ({ mutateAsync: vi.fn().mockResolvedValue({}) }),
+}))
+
+vi.mock('../api/users', () => ({
+  useUpdatePaidOverride: () => ({ mutateAsync: mockMutateOverride }),
+}))
+
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children, to, className }: any) => <a href={to} className={className}>{children}</a>,
 }))
 
 vi.mock('../../specializations/queries', () => ({
@@ -59,7 +69,10 @@ const productions = [
   { id: 20, play: { title: 'Play B' }, theater: { id: 2 } },
 ]
 
-const specializations = [{ id: 1, title: 'Actor' }]
+const specializations = [
+  { id: 1, title: 'Actor',    production_admin: false, theater_admin: false },
+  { id: 2, title: 'Director', production_admin: true,  theater_admin: false },
+]
 
 function theaterAdminJob(theaterId: number) {
   return {
@@ -100,6 +113,7 @@ function defaultProps() {
 
 beforeEach(() => {
   mockUseQuery.mockReset()
+  mockMutateOverride.mockReset().mockResolvedValue({})
   mockUseAuth.mockReturnValue({ user: { id: 1, is_superadmin: false } })
 })
 
@@ -207,5 +221,103 @@ describe('AddJobToUserForm — no targetUserJobs (base admin filtering only)', (
     render(<AddJobToUserForm {...defaultProps()} />)
     expect(screen.getByRole('option', { name: 'Play A' })).toBeInTheDocument()
     expect(screen.queryByRole('option', { name: 'Play B' })).not.toBeInTheDocument()
+  })
+})
+
+// ── payment warning ────────────────────────────────────────────────────────────
+
+describe('AddJobToUserForm — payment warning', () => {
+  async function selectContextAndRole(theaterId: number, specializationId: number) {
+    const ue = userEvent.setup()
+    const contextSelect = screen.getAllByRole('combobox')[0]
+    const roleSelect    = screen.getAllByRole('combobox')[1]
+    await ue.selectOptions(contextSelect, `theater:${theaterId}`)
+    await ue.selectOptions(roleSelect, String(specializationId))
+    return ue
+  }
+
+  it('shows payment warning when target user is unsubscribed and role is admin', async () => {
+    mockUseAuth.mockReturnValue({ user: { id: 1, is_superadmin: true } })
+    setupQueries([theaterAdminJob(1)])
+    render(
+      <AddJobToUserForm
+        {...defaultProps()}
+        targetUserSubscriptionStatus="never subscribed"
+        targetUserPaidOverride={false}
+      />
+    )
+    await selectContextAndRole(1, 2)  // theater:1, Director (production_admin)
+    expect(screen.getByText(/subscription required/i)).toBeInTheDocument()
+  })
+
+  it('does not show warning when target user is subscribed', async () => {
+    mockUseAuth.mockReturnValue({ user: { id: 1, is_superadmin: true } })
+    setupQueries([theaterAdminJob(1)])
+    render(
+      <AddJobToUserForm
+        {...defaultProps()}
+        targetUserSubscriptionStatus="active"
+        targetUserPaidOverride={false}
+      />
+    )
+    await selectContextAndRole(1, 2)
+    expect(screen.queryByText(/subscription required/i)).not.toBeInTheDocument()
+  })
+
+  it('does not show warning when target user has paid_override', async () => {
+    mockUseAuth.mockReturnValue({ user: { id: 1, is_superadmin: true } })
+    setupQueries([theaterAdminJob(1)])
+    render(
+      <AddJobToUserForm
+        {...defaultProps()}
+        targetUserSubscriptionStatus="canceled"
+        targetUserPaidOverride={true}
+      />
+    )
+    await selectContextAndRole(1, 2)
+    expect(screen.queryByText(/subscription required/i)).not.toBeInTheDocument()
+  })
+
+  it('does not show warning for a non-admin role', async () => {
+    mockUseAuth.mockReturnValue({ user: { id: 1, is_superadmin: true } })
+    setupQueries([theaterAdminJob(1)])
+    render(
+      <AddJobToUserForm
+        {...defaultProps()}
+        targetUserSubscriptionStatus="never subscribed"
+        targetUserPaidOverride={false}
+      />
+    )
+    await selectContextAndRole(1, 1)  // Actor (not admin)
+    expect(screen.queryByText(/subscription required/i)).not.toBeInTheDocument()
+  })
+
+  it('shows subscribe link for non-superadmin', async () => {
+    setupQueries([theaterAdminJob(1)])
+    render(
+      <AddJobToUserForm
+        {...defaultProps()}
+        targetUserSubscriptionStatus="never subscribed"
+        targetUserPaidOverride={false}
+      />
+    )
+    await selectContextAndRole(1, 2)
+    const link = screen.getByRole('link', { name: /subscribe here/i })
+    expect(link).toHaveAttribute('href', '/subscriptions')
+  })
+
+  it('shows "Add anyway" button for superadmin', async () => {
+    mockUseAuth.mockReturnValue({ user: { id: 1, is_superadmin: true } })
+    setupQueries([theaterAdminJob(1)])
+    render(
+      <AddJobToUserForm
+        {...defaultProps()}
+        targetUserSubscriptionStatus="never subscribed"
+        targetUserPaidOverride={false}
+      />
+    )
+    await selectContextAndRole(1, 2)
+    expect(screen.getByRole('button', { name: /grant paid access/i })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /subscribe here/i })).not.toBeInTheDocument()
   })
 })

@@ -52,6 +52,20 @@ export function useUploadHeadshot(userId: number) {
   })
 }
 
+export function useUpdatePaidOverride() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, paid_override }: { id: number; paid_override: boolean }) =>
+      import('../../../api/client').then(m =>
+        m.default.put(`/api/v1/users/${id}`, { user: { paid_override } }).then(r => r.data)
+      ),
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: ['users', vars.id] })
+      qc.invalidateQueries({ queryKey: ['users'] })
+    },
+  })
+}
+
 export function useDeleteUser() {
   const qc = useQueryClient()
   return useMutation({

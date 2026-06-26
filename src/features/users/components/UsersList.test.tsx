@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 const { mockUseSuspenseQuery, mockUseIsSuperAdmin } = vi.hoisted(() => ({
   mockUseSuspenseQuery: vi.fn(),
@@ -20,9 +21,12 @@ vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => vi.fn(),
 }))
 
+const { mockMutateOverride } = vi.hoisted(() => ({ mockMutateOverride: vi.fn() }))
+
 vi.mock('../api/users', () => ({
   usersQueryOptions: () => ({ queryKey: ['users'] }),
   useDeleteUser: () => ({ mutateAsync: vi.fn() }),
+  useUpdatePaidOverride: () => ({ mutate: mockMutateOverride }),
 }))
 
 vi.mock('../../../hooks/useUserRole', () => ({
@@ -69,6 +73,7 @@ function setup(users = [alice, bob, diana, fake]) {
 beforeEach(() => {
   mockUseSuspenseQuery.mockReset()
   mockUseIsSuperAdmin.mockReturnValue(false)
+  mockMutateOverride.mockReset()
 })
 
 // ── initial render ─────────────────────────────────────────────────────────────
@@ -160,5 +165,66 @@ describe('UsersList search filtering', () => {
     render(<UsersList />)
     expect(screen.getByText(/no users found/i)).toBeInTheDocument()
     expect(screen.queryByText(/no users match/i)).not.toBeInTheDocument()
+  })
+})
+
+// ── paid override column (superadmin only) ─────────────────────────────────────
+
+describe('UsersList paid override column', () => {
+  const withOverride = { ...alice, id: 10, paid_override: true,  subscription_status: 'never subscribed' }
+  const withSub      = { ...bob,   id: 11, paid_override: false, subscription_status: 'active' }
+  const withNeither  = { ...diana, id: 12, paid_override: false, subscription_status: 'never subscribed' }
+
+  it('does not show paid override column for non-superadmins', () => {
+    mockUseSuspenseQuery.mockReturnValue({ data: [withNeither] })
+    render(<UsersList />)
+    expect(screen.queryByRole('switch')).not.toBeInTheDocument()
+  })
+
+  it('shows paid override toggle for each user when superadmin', () => {
+    mockUseIsSuperAdmin.mockReturnValue(true)
+    mockUseSuspenseQuery.mockReturnValue({ data: [withOverride, withNeither] })
+    render(<UsersList />)
+    const toggles = screen.getAllByRole('switch')
+    expect(toggles.length).toBe(2)
+  })
+
+  it('shows "override" label for user with paid_override and no active subscription', () => {
+    mockUseIsSuperAdmin.mockReturnValue(true)
+    mockUseSuspenseQuery.mockReturnValue({ data: [withOverride] })
+    render(<UsersList />)
+    expect(screen.getByText('override')).toBeInTheDocument()
+  })
+
+  it('shows "subscribed" label for user with active subscription', () => {
+    mockUseIsSuperAdmin.mockReturnValue(true)
+    mockUseSuspenseQuery.mockReturnValue({ data: [withSub] })
+    render(<UsersList />)
+    expect(screen.getByText('subscribed')).toBeInTheDocument()
+  })
+
+  it('shows "free" label for user with neither', () => {
+    mockUseIsSuperAdmin.mockReturnValue(true)
+    mockUseSuspenseQuery.mockReturnValue({ data: [withNeither] })
+    render(<UsersList />)
+    expect(screen.getByText('free')).toBeInTheDocument()
+  })
+
+  it('calls updatePaidOverride when the toggle is clicked', async () => {
+    mockUseIsSuperAdmin.mockReturnValue(true)
+    mockUseSuspenseQuery.mockReturnValue({ data: [withNeither] })
+    const ue = userEvent.setup()
+    render(<UsersList />)
+    await ue.click(screen.getByRole('switch'))
+    expect(mockMutateOverride).toHaveBeenCalledWith({ id: withNeither.id, paid_override: true })
+  })
+
+  it('toggles paid_override off when already enabled', async () => {
+    mockUseIsSuperAdmin.mockReturnValue(true)
+    mockUseSuspenseQuery.mockReturnValue({ data: [withOverride] })
+    const ue = userEvent.setup()
+    render(<UsersList />)
+    await ue.click(screen.getByRole('switch'))
+    expect(mockMutateOverride).toHaveBeenCalledWith({ id: withOverride.id, paid_override: false })
   })
 })

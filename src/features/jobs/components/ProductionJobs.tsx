@@ -26,6 +26,7 @@ interface CastListProps {
   playId: number;
   productionStartDate: string | null;
   productionEndDate: string | null;
+  isDreamTheater?: boolean;
 }
 
 export function ProductionJobs({
@@ -34,6 +35,7 @@ export function ProductionJobs({
   playId,
   productionStartDate,
   productionEndDate,
+  isDreamTheater = false,
 }: CastListProps) {
   const invalidateKey = ["jobs", { productionId }];
   const { data: jobs } = useSuspenseQuery(
@@ -156,6 +158,7 @@ export function ProductionJobs({
           productionId={productionId}
           theaterId={theaterId}
           isAdmin={isAdmin}
+          isDreamTheater={isDreamTheater}
           invalidateKey={invalidateKey}
         />
       </div>

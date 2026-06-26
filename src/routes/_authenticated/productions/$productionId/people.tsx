@@ -18,6 +18,7 @@ export const Route = createFileRoute('/_authenticated/productions/$productionId/
         playId={production.play?.id ?? 0}
         productionStartDate={production.start_date}
         productionEndDate={production.end_date}
+        isDreamTheater={production.theater?.fake === true}
       />
     )
   },

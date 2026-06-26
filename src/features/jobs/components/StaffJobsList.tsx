@@ -12,6 +12,7 @@ interface StaffJobsListProps {
   productionId?: number
   theaterId?: number
   isAdmin: boolean
+  isDreamTheater?: boolean
   invalidateKey: unknown[]
 }
 
@@ -20,6 +21,7 @@ export function StaffJobsList({
   productionId,
   theaterId,
   isAdmin,
+  isDreamTheater = false,
   invalidateKey,
 }: StaffJobsListProps) {
   const deleteJob = useDeleteJob(invalidateKey)
@@ -28,7 +30,7 @@ export function StaffJobsList({
 
   return (
     <div>
-      {isAdmin && !showForm && (
+      {isAdmin && !isDreamTheater && !showForm && (
         <div className="mb-3">
           <Button type="button" onClick={() => setShowForm(true)}>
             Add Job
@@ -36,11 +38,18 @@ export function StaffJobsList({
         </div>
       )}
 
+      {isDreamTheater && isAdmin && (
+        <p className="mb-3 text-sm text-gray-500">
+          Dream theater productions can only use placeholder actors.
+        </p>
+      )}
+
       {showForm && (
         <Card className="p-4 mb-4">
           <JobForm
             productionId={productionId}
             theaterId={theaterId}
+            isDreamTheater={isDreamTheater}
             invalidateKey={invalidateKey}
             onSuccess={() => setShowForm(false)}
             onCancel={() => setShowForm(false)}

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { userQueryOptions, useDeleteUser } from '../api/users'
+import { userQueryOptions, useDeleteUser, useUpdatePaidOverride } from '../api/users'
 import { UserForm } from './UserForm'
 import { useAuth } from '../../../hooks/useAuth'
 import { useIsSuperAdmin } from '../../../hooks/useUserRole'
@@ -26,6 +26,7 @@ interface UserDetailProps {
 export function UserDetail({ userId }: UserDetailProps) {
   const { data: user } = useSuspenseQuery(userQueryOptions(userId))
   const deleteUser = useDeleteUser()
+  const updatePaidOverride = useUpdatePaidOverride()
   const { user: currentUser } = useAuth()
   const isSuperAdmin = useIsSuperAdmin()
   const navigate = useNavigate()
@@ -200,6 +201,34 @@ export function UserDetail({ userId }: UserDetailProps) {
                     </dd>
                   </div>
                 )}
+                {isSuperAdmin && (
+                  <div>
+                    <dt className="font-medium text-gray-700">Subscription</dt>
+                    <dd className="mt-1 flex items-center gap-3">
+                      <span className="text-sm text-gray-600">
+                        {user.subscription_status === 'active'
+                          ? 'Active subscriber'
+                          : user.paid_override
+                            ? 'Override (free access)'
+                            : 'Not subscribed'}
+                      </span>
+                      {user.subscription_status !== 'active' && (
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <button
+                            type="button"
+                            role="switch"
+                            aria-checked={user.paid_override === true}
+                            onClick={() => updatePaidOverride.mutate({ id: userId, paid_override: !user.paid_override })}
+                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 ${user.paid_override ? 'bg-purple-600' : 'bg-gray-300'}`}
+                          >
+                            <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${user.paid_override ? 'translate-x-4' : 'translate-x-1'}`} />
+                          </button>
+                          <span className="text-sm text-gray-600">Grant free access</span>
+                        </label>
+                      )}
+                    </dd>
+                  </div>
+                )}
               </dl>
             </Card>
           )}
@@ -213,6 +242,8 @@ export function UserDetail({ userId }: UserDetailProps) {
                       userId={userId}
                       invalidateKey={['users', userId]}
                       targetUserJobs={(user.jobs ?? []).filter(j => j.theater_id != null) as { theater_id: number; production_id?: number | null }[]}
+                      targetUserSubscriptionStatus={user.subscription_status}
+                      targetUserPaidOverride={user.paid_override}
                       onSuccess={() => setAddingJob(false)}
                       onCancel={() => setAddingJob(false)}
                     />

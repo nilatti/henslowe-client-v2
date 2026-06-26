@@ -35,7 +35,7 @@ export interface Production {
   created_at: string
   updated_at: string
   play: { id: number; title: string; has_lines: boolean }
-  theater: { id: number; name: string }
+  theater: { id: number; name: string; fake?: boolean }
   default_space_id: number | null
   default_space: { id: number; name: string } | null
   default_call_users: ProductionDefaultCallUser[]

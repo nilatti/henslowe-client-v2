@@ -33,6 +33,8 @@ export interface JobWithDetails extends Job {
   } | null
   user: (UserSummary & {
     fake: boolean
+    subscription_status?: string
+    paid_override?: boolean
     gender: string | null
     middle_name?: string | null
     phone_number?: string | null

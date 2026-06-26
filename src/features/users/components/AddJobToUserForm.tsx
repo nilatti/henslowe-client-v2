@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
+import { Link } from '@tanstack/react-router'
 import { useCreateJob } from '../../jobs/api/jobs'
 import { specializationsQueryOptions } from '../../specializations/queries'
 import { theatersQueryOptions } from '../../theaters/api/theaters'
@@ -8,6 +9,7 @@ import { productionsQueryOptions } from '../../productions/api/productions'
 import { userAllJobsQueryOptions } from '../../../hooks/useUserRole'
 import { theatersWhereUserIsAdmin, productionsWhereUserIsAdmin } from '../../../utils/authorizationUtils'
 import { useAuth } from '../../../hooks/useAuth'
+import { useUpdatePaidOverride } from '../api/users'
 import { Button, FormField, inputClass } from '../../../components/ui'
 
 interface Props {
@@ -15,14 +17,17 @@ interface Props {
   invalidateKey: unknown[]
   onSuccess: () => void
   onCancel: () => void
+  targetUserSubscriptionStatus?: string
+  targetUserPaidOverride?: boolean
   // When provided, restricts available theaters/productions to the overlap context.
   // Admins may only assign jobs within theaters/productions the target user is already part of.
   targetUserJobs?: { theater_id: number; production_id?: number | null }[]
 }
 
-export function AddJobToUserForm({ userId, invalidateKey, onSuccess, onCancel, targetUserJobs }: Props) {
+export function AddJobToUserForm({ userId, invalidateKey, onSuccess, onCancel, targetUserJobs, targetUserSubscriptionStatus, targetUserPaidOverride }: Props) {
   const { user: currentUser } = useAuth()
   const create = useCreateJob(invalidateKey)
+  const updatePaidOverride = useUpdatePaidOverride()
 
   const { data: allJobs = [] } = useQuery(userAllJobsQueryOptions(currentUser!.id))
   const { data: theaters = [] } = useQuery(theatersQueryOptions())
@@ -75,21 +80,46 @@ export function AddJobToUserForm({ userId, invalidateKey, onSuccess, onCancel, t
       })
     : adminProductions
 
+  const selectedSpec = specializations.find(s => s.id === specializationId)
+  const isAdminRole = selectedSpec ? (selectedSpec.production_admin || selectedSpec.theater_admin) : false
+  const targetUserPaid = targetUserPaidOverride || targetUserSubscriptionStatus === 'active'
+
+  const [type, idStr] = context.split(':')
+  const contextTheater = type === 'theater' ? overlapTheaters.find(t => t.id === Number(idStr)) : null
+  const contextProduction = type === 'production' ? overlapProductions.find(p => p.id === Number(idStr)) : null
+  const contextTheaterFake = contextTheater?.fake === true ||
+    (contextProduction ? (contextProduction as any).theater?.fake === true : false)
+
+  const showPaymentWarning = isAdminRole && !contextTheaterFake && !targetUserPaid && !!context && !!specializationId
+
+  async function doCreate() {
+    await create.mutateAsync({
+      user_id: userId,
+      specialization_id: specializationId,
+      theater_id: type === 'theater' ? Number(idStr) : null,
+      production_id: type === 'production' ? Number(idStr) : null,
+      start_date: startDate || null,
+      end_date: endDate || null,
+    })
+    onSuccess()
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!context || !specializationId) return
-    const [type, idStr] = context.split(':')
+    if (!context || !specializationId || (showPaymentWarning && !isSuperAdmin)) return
     setSubmitting(true)
     try {
-      await create.mutateAsync({
-        user_id: userId,
-        specialization_id: specializationId,
-        theater_id: type === 'theater' ? Number(idStr) : null,
-        production_id: type === 'production' ? Number(idStr) : null,
-        start_date: startDate || null,
-        end_date: endDate || null,
-      })
-      onSuccess()
+      await doCreate()
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  async function handleGrantAndAdd() {
+    setSubmitting(true)
+    try {
+      await updatePaidOverride.mutateAsync({ id: userId, paid_override: true })
+      await doCreate()
     } finally {
       setSubmitting(false)
     }
@@ -159,13 +189,37 @@ export function AddJobToUserForm({ userId, invalidateKey, onSuccess, onCancel, t
         </FormField>
       </div>
 
+      {showPaymentWarning && (
+        <div className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          <p className="font-medium mb-1">Subscription required for admin roles</p>
+          <p>
+            This user doesn't have an active subscription. Admin roles require a paid membership.{' '}
+            {!isSuperAdmin && (
+              <Link to={'/subscriptions' as never} className="underline font-medium">
+                Subscribe here
+              </Link>
+            )}
+          </p>
+        </div>
+      )}
+
       <div className="flex gap-3 justify-end">
         <Button variant="secondary" type="button" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit" disabled={submitting || !context || !specializationId}>
-          {submitting ? 'Saving...' : 'Add job'}
-        </Button>
+        {showPaymentWarning && isSuperAdmin ? (
+          <Button
+            type="button"
+            disabled={submitting}
+            onClick={handleGrantAndAdd}
+          >
+            {submitting ? 'Saving...' : 'Add anyway (grant paid access)'}
+          </Button>
+        ) : (
+          <Button type="submit" disabled={submitting || !context || !specializationId || (showPaymentWarning && !isSuperAdmin)}>
+            {submitting ? 'Saving...' : 'Add job'}
+          </Button>
+        )}
       </div>
     </form>
   )

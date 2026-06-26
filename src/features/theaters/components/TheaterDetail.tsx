@@ -44,10 +44,21 @@ export function TheaterDetail({ theaterId }: TheaterDetailProps) {
     { id: 'people', label: `People (${theater.jobs.length})` },
   ]
 
+  const isDreamTheater = theater.fake === true
+
   return (
     <div>
       <PageHeader
-        title={theater.name}
+        title={
+          <span className="flex items-center gap-2">
+            {theater.name}
+            {isDreamTheater && (
+              <span className="text-sm font-normal px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200">
+                Dream Theater
+              </span>
+            )}
+          </span>
+        }
         action={
           isAdmin ? (
             <div className="flex gap-2">
@@ -145,6 +156,7 @@ export function TheaterDetail({ theaterId }: TheaterDetailProps) {
               jobs={theater.jobs as unknown as import('../../jobs/types/job').JobWithDetails[]}
               theaterId={theaterId}
               isAdmin={isAdmin}
+              isDreamTheater={isDreamTheater}
               invalidateKey={['theaters', theaterId, 'skeleton']}
             />
           )}

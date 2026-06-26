@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-table'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { usersQueryOptions, useDeleteUser } from '../api/users'
+import { usersQueryOptions, useDeleteUser, useUpdatePaidOverride } from '../api/users'
 import type { UserSummary } from '../types/user'
 import { buildUserName } from '../../../utils/actorUtils'
 import { Button, ConfirmDialog, PageHeader, SortableTable } from '../../../components/ui'
@@ -20,6 +20,7 @@ const columnHelper = createColumnHelper<UserSummary>()
 export function UsersList() {
   const { data: users } = useSuspenseQuery(usersQueryOptions())
   const deleteUser = useDeleteUser()
+  const updatePaidOverride = useUpdatePaidOverride()
   const isSuperAdmin = useIsSuperAdmin()
   const navigate = useNavigate()
 
@@ -58,6 +59,31 @@ export function UsersList() {
       ),
     }),
     ...(isSuperAdmin ? [
+      columnHelper.display({
+        id: 'paid_override',
+        header: 'Paid override',
+        cell: ({ row }) => {
+          const u = row.original as UserSummary & { paid_override?: boolean; subscription_status?: string }
+          const isActive = u.subscription_status === 'active'
+          const hasOverride = u.paid_override === true
+          return (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                role="switch"
+                aria-checked={hasOverride}
+                onClick={() => updatePaidOverride.mutate({ id: u.id, paid_override: !hasOverride })}
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 ${hasOverride ? 'bg-purple-600' : 'bg-gray-300'}`}
+              >
+                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${hasOverride ? 'translate-x-4' : 'translate-x-1'}`} />
+              </button>
+              <span className="text-xs text-gray-500">
+                {isActive ? 'subscribed' : hasOverride ? 'override' : 'free'}
+              </span>
+            </div>
+          )
+        },
+      }),
       columnHelper.display({
         id: 'actions',
         header: '',
