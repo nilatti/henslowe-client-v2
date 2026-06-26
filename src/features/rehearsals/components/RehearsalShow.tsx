@@ -119,7 +119,7 @@ export function RehearsalShow({
   }
 
   return (
-    <div className="py-3 border-t border-gray-100">
+    <div className="py-3 border-t border-gray-300">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-1">
