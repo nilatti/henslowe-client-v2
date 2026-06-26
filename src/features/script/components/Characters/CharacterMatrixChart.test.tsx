@@ -16,6 +16,12 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
   return { ...actual, useSuspenseQuery: mockUseSuspenseQuery }
 })
 
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children, to, params, className }: any) => (
+    <a href={to} data-params={JSON.stringify(params ?? {})} className={className}>{children}</a>
+  ),
+}))
+
 vi.mock('../../api/script', () => ({
   playScriptQueryOptions: vi.fn(() => ({ queryKey: ['script-test'], queryFn: vi.fn() })),
 }))
