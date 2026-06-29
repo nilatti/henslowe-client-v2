@@ -54,9 +54,9 @@ function AuditionRows({ auditions, profile }: { auditions: OpenAudition[]; profi
 
   function handleAudition(productionId: number) {
     if (profile) {
-      navigate({ to: '/auditions/$productionId', params: { productionId: String(productionId) } })
+      navigate({ to: '/auditions/apply/$productionId', params: { productionId: String(productionId) } })
     } else {
-      localStorage.setItem('redirect_after_login', `/auditions/${productionId}`)
+      localStorage.setItem('redirect_after_login', `/auditions/apply/${productionId}`)
       window.location.href = `${VITE_API_URL}/auth/google_oauth2`
     }
   }

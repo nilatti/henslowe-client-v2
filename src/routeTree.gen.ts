@@ -34,7 +34,6 @@ import { Route as AuthenticatedProductionsIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedPlaysIndexRouteImport } from './routes/_authenticated/plays/index'
 import { Route as AuthenticatedPhasesIndexRouteImport } from './routes/_authenticated/phases/index'
 import { Route as AuthenticatedAuthorsIndexRouteImport } from './routes/_authenticated/authors/index'
-import { Route as PublicAuditionsProductionIdRouteImport } from './routes/_public/auditions.$productionId'
 import { Route as AuthenticatedUsersNewRouteImport } from './routes/_authenticated/users/new'
 import { Route as AuthenticatedTheatersNewRouteImport } from './routes/_authenticated/theaters/new'
 import { Route as AuthenticatedSpecializationsNewRouteImport } from './routes/_authenticated/specializations/new'
@@ -49,6 +48,7 @@ import { Route as AuthenticatedSpacesSpaceIdIndexRouteImport } from './routes/_a
 import { Route as AuthenticatedProductionsProductionIdIndexRouteImport } from './routes/_authenticated/productions/$productionId/index'
 import { Route as AuthenticatedPlaysPlayIdIndexRouteImport } from './routes/_authenticated/plays/$playId/index'
 import { Route as AuthenticatedAuthorsAuthorIdIndexRouteImport } from './routes/_authenticated/authors/$authorId/index'
+import { Route as PublicAuditionsApplyProductionIdRouteImport } from './routes/_public/auditions.apply.$productionId'
 import { Route as AuthenticatedProductionsProductionIdSetDesignRouteImport } from './routes/_authenticated/productions/$productionId/set-design'
 import { Route as AuthenticatedProductionsProductionIdScriptRouteImport } from './routes/_authenticated/productions/$productionId/script'
 import { Route as AuthenticatedProductionsProductionIdRehearsalsRouteImport } from './routes/_authenticated/productions/$productionId/rehearsals'
@@ -193,12 +193,6 @@ const AuthenticatedAuthorsIndexRoute =
     path: '/authors/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const PublicAuditionsProductionIdRoute =
-  PublicAuditionsProductionIdRouteImport.update({
-    id: '/auditions/$productionId',
-    path: '/auditions/$productionId',
-    getParentRoute: () => PublicRoute,
-  } as any)
 const AuthenticatedUsersNewRoute = AuthenticatedUsersNewRouteImport.update({
   id: '/users/new',
   path: '/users/new',
@@ -280,6 +274,12 @@ const AuthenticatedAuthorsAuthorIdIndexRoute =
     id: '/authors/$authorId/',
     path: '/authors/$authorId/',
     getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const PublicAuditionsApplyProductionIdRoute =
+  PublicAuditionsApplyProductionIdRouteImport.update({
+    id: '/auditions/apply/$productionId',
+    path: '/auditions/apply/$productionId',
+    getParentRoute: () => PublicRoute,
   } as any)
 const AuthenticatedProductionsProductionIdSetDesignRoute =
   AuthenticatedProductionsProductionIdSetDesignRouteImport.update({
@@ -394,7 +394,6 @@ export interface FileRoutesByFullPath {
   '/specializations/new': typeof AuthenticatedSpecializationsNewRoute
   '/theaters/new': typeof AuthenticatedTheatersNewRoute
   '/users/new': typeof AuthenticatedUsersNewRoute
-  '/auditions/$productionId': typeof PublicAuditionsProductionIdRoute
   '/authors/': typeof AuthenticatedAuthorsIndexRoute
   '/phases/': typeof AuthenticatedPhasesIndexRoute
   '/plays/': typeof AuthenticatedPlaysIndexRoute
@@ -411,6 +410,7 @@ export interface FileRoutesByFullPath {
   '/productions/$productionId/rehearsals': typeof AuthenticatedProductionsProductionIdRehearsalsRoute
   '/productions/$productionId/script': typeof AuthenticatedProductionsProductionIdScriptRoute
   '/productions/$productionId/set-design': typeof AuthenticatedProductionsProductionIdSetDesignRoute
+  '/auditions/apply/$productionId': typeof PublicAuditionsApplyProductionIdRoute
   '/authors/$authorId/': typeof AuthenticatedAuthorsAuthorIdIndexRoute
   '/plays/$playId/': typeof AuthenticatedPlaysPlayIdIndexRoute
   '/productions/$productionId/': typeof AuthenticatedProductionsProductionIdIndexRoute
@@ -446,7 +446,6 @@ export interface FileRoutesByTo {
   '/specializations/new': typeof AuthenticatedSpecializationsNewRoute
   '/theaters/new': typeof AuthenticatedTheatersNewRoute
   '/users/new': typeof AuthenticatedUsersNewRoute
-  '/auditions/$productionId': typeof PublicAuditionsProductionIdRoute
   '/authors': typeof AuthenticatedAuthorsIndexRoute
   '/phases': typeof AuthenticatedPhasesIndexRoute
   '/plays': typeof AuthenticatedPlaysIndexRoute
@@ -463,6 +462,7 @@ export interface FileRoutesByTo {
   '/productions/$productionId/rehearsals': typeof AuthenticatedProductionsProductionIdRehearsalsRoute
   '/productions/$productionId/script': typeof AuthenticatedProductionsProductionIdScriptRoute
   '/productions/$productionId/set-design': typeof AuthenticatedProductionsProductionIdSetDesignRoute
+  '/auditions/apply/$productionId': typeof PublicAuditionsApplyProductionIdRoute
   '/authors/$authorId': typeof AuthenticatedAuthorsAuthorIdIndexRoute
   '/plays/$playId': typeof AuthenticatedPlaysPlayIdIndexRoute
   '/productions/$productionId': typeof AuthenticatedProductionsProductionIdIndexRoute
@@ -503,7 +503,6 @@ export interface FileRoutesById {
   '/_authenticated/specializations/new': typeof AuthenticatedSpecializationsNewRoute
   '/_authenticated/theaters/new': typeof AuthenticatedTheatersNewRoute
   '/_authenticated/users/new': typeof AuthenticatedUsersNewRoute
-  '/_public/auditions/$productionId': typeof PublicAuditionsProductionIdRoute
   '/_authenticated/authors/': typeof AuthenticatedAuthorsIndexRoute
   '/_authenticated/phases/': typeof AuthenticatedPhasesIndexRoute
   '/_authenticated/plays/': typeof AuthenticatedPlaysIndexRoute
@@ -520,6 +519,7 @@ export interface FileRoutesById {
   '/_authenticated/productions/$productionId/rehearsals': typeof AuthenticatedProductionsProductionIdRehearsalsRoute
   '/_authenticated/productions/$productionId/script': typeof AuthenticatedProductionsProductionIdScriptRoute
   '/_authenticated/productions/$productionId/set-design': typeof AuthenticatedProductionsProductionIdSetDesignRoute
+  '/_public/auditions/apply/$productionId': typeof PublicAuditionsApplyProductionIdRoute
   '/_authenticated/authors/$authorId/': typeof AuthenticatedAuthorsAuthorIdIndexRoute
   '/_authenticated/plays/$playId/': typeof AuthenticatedPlaysPlayIdIndexRoute
   '/_authenticated/productions/$productionId/': typeof AuthenticatedProductionsProductionIdIndexRoute
@@ -559,7 +559,6 @@ export interface FileRouteTypes {
     | '/specializations/new'
     | '/theaters/new'
     | '/users/new'
-    | '/auditions/$productionId'
     | '/authors/'
     | '/phases/'
     | '/plays/'
@@ -576,6 +575,7 @@ export interface FileRouteTypes {
     | '/productions/$productionId/rehearsals'
     | '/productions/$productionId/script'
     | '/productions/$productionId/set-design'
+    | '/auditions/apply/$productionId'
     | '/authors/$authorId/'
     | '/plays/$playId/'
     | '/productions/$productionId/'
@@ -611,7 +611,6 @@ export interface FileRouteTypes {
     | '/specializations/new'
     | '/theaters/new'
     | '/users/new'
-    | '/auditions/$productionId'
     | '/authors'
     | '/phases'
     | '/plays'
@@ -628,6 +627,7 @@ export interface FileRouteTypes {
     | '/productions/$productionId/rehearsals'
     | '/productions/$productionId/script'
     | '/productions/$productionId/set-design'
+    | '/auditions/apply/$productionId'
     | '/authors/$authorId'
     | '/plays/$playId'
     | '/productions/$productionId'
@@ -667,7 +667,6 @@ export interface FileRouteTypes {
     | '/_authenticated/specializations/new'
     | '/_authenticated/theaters/new'
     | '/_authenticated/users/new'
-    | '/_public/auditions/$productionId'
     | '/_authenticated/authors/'
     | '/_authenticated/phases/'
     | '/_authenticated/plays/'
@@ -684,6 +683,7 @@ export interface FileRouteTypes {
     | '/_authenticated/productions/$productionId/rehearsals'
     | '/_authenticated/productions/$productionId/script'
     | '/_authenticated/productions/$productionId/set-design'
+    | '/_public/auditions/apply/$productionId'
     | '/_authenticated/authors/$authorId/'
     | '/_authenticated/plays/$playId/'
     | '/_authenticated/productions/$productionId/'
@@ -884,13 +884,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuthorsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_public/auditions/$productionId': {
-      id: '/_public/auditions/$productionId'
-      path: '/auditions/$productionId'
-      fullPath: '/auditions/$productionId'
-      preLoaderRoute: typeof PublicAuditionsProductionIdRouteImport
-      parentRoute: typeof PublicRoute
-    }
     '/_authenticated/users/new': {
       id: '/_authenticated/users/new'
       path: '/users/new'
@@ -988,6 +981,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/authors/$authorId/'
       preLoaderRoute: typeof AuthenticatedAuthorsAuthorIdIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_public/auditions/apply/$productionId': {
+      id: '/_public/auditions/apply/$productionId'
+      path: '/auditions/apply/$productionId'
+      fullPath: '/auditions/apply/$productionId'
+      preLoaderRoute: typeof PublicAuditionsApplyProductionIdRouteImport
+      parentRoute: typeof PublicRoute
     }
     '/_authenticated/productions/$productionId/set-design': {
       id: '/_authenticated/productions/$productionId/set-design'
@@ -1210,7 +1210,7 @@ interface PublicRouteChildren {
   PublicFaqRoute: typeof PublicFaqRoute
   PublicGettingStartedRoute: typeof PublicGettingStartedRoute
   PublicHelpRoute: typeof PublicHelpRoute
-  PublicAuditionsProductionIdRoute: typeof PublicAuditionsProductionIdRoute
+  PublicAuditionsApplyProductionIdRoute: typeof PublicAuditionsApplyProductionIdRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
@@ -1218,7 +1218,7 @@ const PublicRouteChildren: PublicRouteChildren = {
   PublicFaqRoute: PublicFaqRoute,
   PublicGettingStartedRoute: PublicGettingStartedRoute,
   PublicHelpRoute: PublicHelpRoute,
-  PublicAuditionsProductionIdRoute: PublicAuditionsProductionIdRoute,
+  PublicAuditionsApplyProductionIdRoute: PublicAuditionsApplyProductionIdRoute,
 }
 
 const PublicRouteWithChildren =

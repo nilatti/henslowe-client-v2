@@ -10,7 +10,7 @@ import { useAuth } from '../../hooks/useAuth'
 
 const VITE_API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
-export const Route = createFileRoute('/_public/auditions/$productionId')({
+export const Route = createFileRoute('/_public/auditions/apply/$productionId')({
   loader: async ({ params, context: { queryClient, auth } }) => {
     const [auditions] = await Promise.all([
       queryClient.ensureQueryData(openAuditionsQueryOptions()),
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/_public/auditions/$productionId')({
     useEffect(() => {
       if (!isAuthenticated && !redirected.current) {
         redirected.current = true
-        localStorage.setItem('redirect_after_login', `/auditions/${loaderData.production_id}`)
+        localStorage.setItem('redirect_after_login', `/auditions/apply/${loaderData.production_id}`)
         window.location.href = `${VITE_API_URL}/auth/google_oauth2`
       }
     }, [isAuthenticated, loaderData.production_id])
