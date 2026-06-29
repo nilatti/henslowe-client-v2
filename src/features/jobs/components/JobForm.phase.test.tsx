@@ -103,7 +103,20 @@ const stageMgrSpec = {
   description: null,
 }
 
-const specializations = [directorSpec, stageMgrSpec]
+const actorSpec = {
+  id: 3,
+  title: 'Actor',
+  default_start_phase_id: null,
+  default_end_phase_id: null,
+  default_start_phase: null,
+  default_end_phase: null,
+  production_admin: false,
+  theater_admin: false,
+  context: 'production' as const,
+  description: null,
+}
+
+const specializations = [directorSpec, stageMgrSpec, actorSpec]
 
 const productionSkeleton = {
   id: 5,
@@ -314,15 +327,26 @@ describe('JobForm — payment warning for admin roles', () => {
     expect(screen.queryByText(/subscription required/i)).not.toBeInTheDocument()
   })
 
-  it('does not show a warning for a non-admin role', async () => {
+  it('does not show a warning for actor/auditioner roles', async () => {
     setupQueries([unpaidUser, fakeUser])
     const ue = userEvent.setup()
     render(
-      // specializationId 2 = Stage Manager (production_admin: false, theater_admin: false)
-      <JobForm productionId={5} theaterId={1} specializationId={2} invalidateKey={['jobs']} onSuccess={vi.fn()} onCancel={vi.fn()} />
+      // specializationId 3 = Actor (free role — no payment required)
+      <JobForm productionId={5} theaterId={1} specializationId={3} invalidateKey={['jobs']} onSuccess={vi.fn()} onCancel={vi.fn()} />
     )
     await ue.click(screen.getByRole('button', { name: /select user/i }))
     expect(screen.queryByText(/subscription required/i)).not.toBeInTheDocument()
+  })
+
+  it('shows a warning for non-admin, non-free roles (e.g. Stage Manager)', async () => {
+    setupQueries([unpaidUser, fakeUser])
+    const ue = userEvent.setup()
+    render(
+      // specializationId 2 = Stage Manager (not actor/auditioner → requires payment)
+      <JobForm productionId={5} theaterId={1} specializationId={2} invalidateKey={['jobs']} onSuccess={vi.fn()} onCancel={vi.fn()} />
+    )
+    await ue.click(screen.getByRole('button', { name: /select user/i }))
+    expect(await screen.findByText(/subscription required/i)).toBeInTheDocument()
   })
 })
 

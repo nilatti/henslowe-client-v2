@@ -81,7 +81,9 @@ export function AddJobToUserForm({ userId, invalidateKey, onSuccess, onCancel, t
     : adminProductions
 
   const selectedSpec = specializations.find(s => s.id === specializationId)
-  const isAdminRole = selectedSpec ? (selectedSpec.production_admin || selectedSpec.theater_admin) : false
+  const requiresPayment = selectedSpec
+    ? selectedSpec.title !== 'Actor' && selectedSpec.title !== 'Auditioner'
+    : false
   const targetUserPaid = targetUserPaidOverride || targetUserSubscriptionStatus === 'active'
 
   const [type, idStr] = context.split(':')
@@ -90,7 +92,7 @@ export function AddJobToUserForm({ userId, invalidateKey, onSuccess, onCancel, t
   const contextTheaterFake = contextTheater?.fake === true ||
     (contextProduction ? (contextProduction as any).theater?.fake === true : false)
 
-  const showPaymentWarning = isAdminRole && !contextTheaterFake && !targetUserPaid && !!context && !!specializationId
+  const showPaymentWarning = requiresPayment && !contextTheaterFake && !targetUserPaid && !!context && !!specializationId
 
   async function doCreate() {
     await create.mutateAsync({

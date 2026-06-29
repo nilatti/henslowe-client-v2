@@ -109,8 +109,8 @@ export function JobForm({
 
   const effectiveSpecId = specializationId ?? selectedSpecializationId
   const effectiveSpec = specializations?.find(s => s.id === effectiveSpecId)
-  const isAdminRole = effectiveSpec
-    ? (effectiveSpec.production_admin || effectiveSpec.theater_admin)
+  const requiresPayment = effectiveSpec
+    ? effectiveSpec.title !== 'Actor' && effectiveSpec.title !== 'Auditioner'
     : false
 
   const usersTyped = users as (typeof users[number] & { fake?: boolean; subscription_status?: string; paid_override?: boolean })[]
@@ -141,7 +141,7 @@ export function JobForm({
   // Show payment warning when: real user selected, admin role, not a dream theater, user isn't paid
   const showPaymentWarning = !isEditing
     && !isDreamTheater
-    && isAdminRole
+    && requiresPayment
     && selectedUserId > 0
     && selectedUser != null
     && !selectedUser.fake
