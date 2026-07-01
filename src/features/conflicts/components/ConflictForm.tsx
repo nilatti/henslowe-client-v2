@@ -2,7 +2,7 @@ import { useForm } from '@tanstack/react-form'
 import { format } from 'date-fns'
 import { useCreateConflict, useUpdateConflict } from '../api/conflicts'
 import type { Conflict } from '../types/conflict'
-import { FormField, FormActions, inputClass } from '../../../components/ui'
+import { Button, FormField, inputClass } from '../../../components/ui'
 import { USER_CONFLICT_REASONS, SPACE_CONFLICT_REASONS } from '../../../utils/constants'
 import { firstLetterUpcase } from '../../../utils/stringUtils'
 
@@ -57,8 +57,7 @@ export function ConflictForm({
   })
 
   return (
-    <form
-      onSubmit={e => { e.preventDefault(); form.handleSubmit() }}
+    <div
       className="space-y-4"
     >
       <div className="grid grid-cols-2 gap-4">
@@ -131,7 +130,18 @@ export function ConflictForm({
         )}
       </form.Field>
 
-      <FormActions isSubmitting={form.state.isSubmitting} isEditing={isEditing} onCancel={onCancel} submitLabel="Add conflict" />
-    </form>
+      <div className="flex gap-3 justify-end pt-2">
+        <Button variant="secondary" type="button" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button
+          type="button"
+          onClick={() => form.handleSubmit()}
+          disabled={form.state.isSubmitting}
+        >
+          {form.state.isSubmitting ? 'Saving...' : isEditing ? 'Save' : 'Add conflict'}
+        </Button>
+      </div>
+    </div>
   )
 }
