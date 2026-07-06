@@ -41,6 +41,7 @@ export interface UserDetail {
   created_at?: string
   updated_at?: string
   headshot_url?: string | null
+  resume_url?: string | null
   // Relationship level between the viewer and this user
   overlap?: string
   // Included when overlap level is sufficient

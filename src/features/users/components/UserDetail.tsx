@@ -9,6 +9,7 @@ import { useIsSuperAdmin } from '../../../hooks/useUserRole'
 import { buildUserName } from '../../../utils/actorUtils'
 import { ConflictsManager } from '../../conflicts/components/ConflictsManager'
 import { HeadshotUpload } from './HeadshotUpload'
+import { ResumeUpload } from './ResumeUpload'
 import { AddJobToUserForm } from './AddJobToUserForm'
 import {
   Button,
@@ -140,6 +141,25 @@ export function UserDetail({ userId }: UserDetailProps) {
                       >
                         {user.website}
                       </a>
+                    </dd>
+                  </div>
+                )}
+                {(canEdit || user.resume_url) && (
+                  <div>
+                    <dt className="font-medium text-gray-700">Resume</dt>
+                    <dd className="mt-1">
+                      {canEdit ? (
+                        <ResumeUpload userId={userId} currentUrl={user.resume_url} />
+                      ) : (
+                        <a
+                          href={user.resume_url!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          View resume
+                        </a>
+                      )}
                     </dd>
                   </div>
                 )}

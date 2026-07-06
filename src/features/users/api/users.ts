@@ -52,6 +52,21 @@ export function useUploadHeadshot(userId: number) {
   })
 }
 
+export function useUploadResume(userId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (formData: FormData) =>
+      import('../../../api/client').then(m =>
+        m.default.put(`/api/v1/users/${userId}/upload_resume`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }).then(r => r.data)
+      ),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['users', userId] })
+    },
+  })
+}
+
 export function useUpdatePaidOverride() {
   const qc = useQueryClient()
   return useMutation({

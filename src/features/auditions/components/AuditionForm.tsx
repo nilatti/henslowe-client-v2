@@ -7,6 +7,8 @@ import { useAuth } from '../../../hooks/useAuth'
 import { userQueryOptions } from '../../users/api/users'
 import { useCreateAuditionerJob, useUpdateAuditionerContact } from '../api/auditions'
 import { ConflictsManager } from '../../conflicts/components/ConflictsManager'
+import { HeadshotUpload } from '../../users/components/HeadshotUpload'
+import { ResumeUpload } from '../../users/components/ResumeUpload'
 import { Button, FormField, inputClass } from '../../../components/ui'
 import { US_STATES_ARRAY, USER_GENDER_DESCRIPTORS } from '../../../utils/constants'
 
@@ -205,6 +207,14 @@ export function AuditionForm({ productionId, playTitle, theaterName, rehearsalSt
       <div>
         <h3 className="text-sm font-semibold text-gray-900 mb-3">Audition materials</h3>
         <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <FormField label="Headshot">
+              <HeadshotUpload userId={user!.id} currentUrl={profile.headshot_url} />
+            </FormField>
+            <FormField label="Resume">
+              <ResumeUpload userId={user!.id} currentUrl={profile.resume_url} />
+            </FormField>
+          </div>
           {textField('video_url', 'Video audition link', 'https://')}
           <form.Field name="notes">
             {field => (
