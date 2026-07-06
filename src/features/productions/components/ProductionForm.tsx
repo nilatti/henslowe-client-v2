@@ -1,4 +1,5 @@
 import { useForm } from '@tanstack/react-form'
+import { useStore } from '@tanstack/react-store'
 import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
 import { canonicalPlaysQueryOptions } from '../../plays/api/plays'
 import { theatersQueryOptions, theaterSkeletonQueryOptions } from '../../theaters/api/theaters'
@@ -75,6 +76,11 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
       }
     },
   })
+
+  const selectedTheaterId = useStore(form.store, state => state.values.theater_id)
+  const isDreamTheater = isEditing
+    ? !!production.theater.fake
+    : (theaters.find(t => String(t.id) === selectedTheaterId)?.fake ?? false)
 
   return (
     <form
@@ -160,20 +166,22 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
         </form.Field>
       </div>
 
-      <form.Field name="audition_information">
-        {field => (
-          <FormField label="Audition information">
-            <textarea
-              value={field.state.value}
-              onChange={e => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-              rows={4}
-              placeholder="What should auditioners know? (requirements, what to prepare, dates, etc.)"
-              className={inputClass}
-            />
-          </FormField>
-        )}
-      </form.Field>
+      {!isDreamTheater && (
+        <form.Field name="audition_information">
+          {field => (
+            <FormField label="Audition information">
+              <textarea
+                value={field.state.value}
+                onChange={e => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+                rows={4}
+                placeholder="What should auditioners know? (requirements, what to prepare, dates, etc.)"
+                className={inputClass}
+              />
+            </FormField>
+          )}
+        </form.Field>
+      )}
 
       <form.Field name="lines_per_minute">
         {field => (

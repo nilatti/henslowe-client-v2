@@ -1,4 +1,5 @@
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 const { mockUseSuspenseQuery, mockUseQuery, mockUseAdminTheaterIds } = vi.hoisted(() => ({
   mockUseSuspenseQuery: vi.fn(),
@@ -37,11 +38,16 @@ import { ProductionForm } from './ProductionForm'
 
 const noop = () => {}
 
+const theaters = [
+  { id: 10, name: 'City Theater', fake: false },
+  { id: 42, name: "Verify's Dream Theater", fake: true },
+]
+
 function setup(props: Partial<React.ComponentProps<typeof ProductionForm>> = {}) {
   mockUseAdminTheaterIds.mockReturnValue(null)
   mockUseSuspenseQuery.mockImplementation(({ queryKey }: { queryKey: unknown[] }) => {
     if (queryKey[0] === 'plays') return { data: [] }
-    if (queryKey[0] === 'theaters') return { data: [] }
+    if (queryKey[0] === 'theaters') return { data: theaters }
     throw new Error(`Unexpected suspense queryKey: ${JSON.stringify(queryKey)}`)
   })
   mockUseQuery.mockReturnValue({ data: undefined })
@@ -94,5 +100,72 @@ describe('ProductionForm — theater skeleton query', () => {
     const call = theaterSkeletonCall()
     expect(call.queryKey).toEqual(['theaters', 7, 'skeleton'])
     expect(call.enabled).toBe(true)
+  })
+})
+
+describe('ProductionForm — audition information visibility', () => {
+  it('shows audition information by default when creating a production with no theater selected', () => {
+    setup()
+    expect(screen.getByText('Audition information')).toBeInTheDocument()
+  })
+
+  it('hides audition information when creating a production for a fake/dream theater', async () => {
+    const user = userEvent.setup()
+    setup()
+    const theaterSelect = screen.getAllByRole('combobox')[1]
+    await user.selectOptions(theaterSelect, "Verify's Dream Theater")
+    expect(screen.queryByText('Audition information')).not.toBeInTheDocument()
+  })
+
+  it('shows audition information when creating a production for a real theater', async () => {
+    const user = userEvent.setup()
+    setup()
+    const theaterSelect = screen.getAllByRole('combobox')[1]
+    await user.selectOptions(theaterSelect, 'City Theater')
+    expect(screen.getByText('Audition information')).toBeInTheDocument()
+  })
+
+  it('hides audition information when editing a production that belongs to a fake/dream theater', () => {
+    const production = {
+      id: 1,
+      theater_id: 42,
+      start_date: null,
+      end_date: null,
+      lines_per_minute: null,
+      audition_information: null,
+      created_at: '',
+      updated_at: '',
+      play: { id: 1, title: 'Hamlet', has_lines: true },
+      theater: { id: 42, name: "Verify's Dream Theater", fake: true },
+      default_space_id: null,
+      default_space: null,
+      default_call_users: [],
+      default_call_user_ids: [],
+      production_phases: [],
+    }
+    setup({ production })
+    expect(screen.queryByText('Audition information')).not.toBeInTheDocument()
+  })
+
+  it('shows audition information when editing a production that belongs to a real theater', () => {
+    const production = {
+      id: 1,
+      theater_id: 10,
+      start_date: null,
+      end_date: null,
+      lines_per_minute: null,
+      audition_information: null,
+      created_at: '',
+      updated_at: '',
+      play: { id: 1, title: 'Hamlet', has_lines: true },
+      theater: { id: 10, name: 'City Theater', fake: false },
+      default_space_id: null,
+      default_space: null,
+      default_call_users: [],
+      default_call_user_ids: [],
+      production_phases: [],
+    }
+    setup({ production })
+    expect(screen.getByText('Audition information')).toBeInTheDocument()
   })
 })
