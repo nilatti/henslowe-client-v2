@@ -63,6 +63,13 @@ export interface ActSkeleton {
   scenes: SceneSkeleton[]
 }
 
+export interface PlaySkeletonProduction {
+  id: number
+  start_date: string | null
+  end_date: string | null
+  theater: { id: number; name: string }
+}
+
 export interface PlaySkeleton {
   id: number
   title: string
@@ -74,6 +81,7 @@ export interface PlaySkeleton {
   characters: PlayCharacter[]
   character_groups: PlayCharacterGroup[]
   acts: ActSkeleton[]
+  productions: PlaySkeletonProduction[]
 }
 
 // Lines returned by the play show action (characters with their lines aggregated)
@@ -126,6 +134,10 @@ export function getScenes(skeleton: PlaySkeleton): SceneSkeleton[] {
 
 export function getFrenchScenes(skeleton: PlaySkeleton): FrenchSceneSkeleton[] {
   return getScenes(skeleton).flatMap(scene => scene.french_scenes)
+}
+
+export function productionYear(production: { start_date: string | null; end_date: string | null }) {
+  return (production.end_date ?? production.start_date)?.slice(0, 4)
 }
 
 export function getAllCharacters(skeleton: PlaySkeleton) {

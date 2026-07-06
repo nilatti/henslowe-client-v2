@@ -8,13 +8,14 @@ import { productionSkeletonQueryOptions } from '../../productions/api/production
 import { PlayForm } from './PlayForm'
 import CharactersBreakdown from '../../script/components/Characters/CharactersBreakdown'
 import { ActsTab } from '../../acts/components/ActsTab'
-import { getScenes, getAllCharacters } from '../types/play'
+import { getScenes, getAllCharacters, productionYear } from '../types/play'
 import { useIsPlayAdmin } from '../../../hooks/useUserRole'
 import {
   Button,
   Card,
   ConfirmDialog,
   InfoCard,
+  LinkedItemList,
   LoadingSpinner,
   PageHeader,
   Tabs,
@@ -107,11 +108,31 @@ export function PlayDetail({ playId }: PlayDetailProps) {
                       params={{ productionId: String(play.production_id) }}
                       className="text-blue-600 hover:text-blue-800"
                     >
-                      {productionSkeleton?.theater.name ?? 'View production'}
+                      {productionSkeleton
+                        ? `${productionSkeleton.theater.name}${
+                            productionYear(productionSkeleton) ? `, ${productionYear(productionSkeleton)}` : ''
+                          }`
+                        : 'View production'}
                     </Link>
                   ),
                 },
               ]} />
+              {play.canonical && (
+                <div className="mt-4">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-2">
+                    Productions ({play.productions.length})
+                  </h3>
+                  <LinkedItemList
+                    emptyMessage="No productions yet."
+                    items={play.productions.map(p => ({
+                      key: p.id,
+                      to: '/productions/$productionId',
+                      params: { productionId: String(p.id) },
+                      label: `${p.theater.name}${productionYear(p) ? `, ${productionYear(p)}` : ''}`,
+                    }))}
+                  />
+                </div>
+              )}
               <div className="flex gap-3 flex-wrap mt-4">
                   {hasLines && (
                     <Link
