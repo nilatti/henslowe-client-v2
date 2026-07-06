@@ -26,7 +26,11 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
   const create = useCreateProduction()
   const update = useUpdateProduction(production?.id ?? 0)
   const isEditing = !!production
-  const { data: theater } = useQuery(theaterSkeletonQueryOptions(production?.theater_id ?? 0))
+  const theaterIdForSkeleton = production?.theater_id ?? defaultTheaterId
+  const { data: theater } = useQuery({
+    ...theaterSkeletonQueryOptions(theaterIdForSkeleton ?? 0),
+    enabled: !!theaterIdForSkeleton,
+  })
   const { data: productionJobs } = useQuery({
     ...productionJobsQueryOptions(production?.id ?? 0),
     enabled: isEditing,
