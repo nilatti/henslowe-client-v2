@@ -4,6 +4,8 @@ import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 import { useDeleteJob } from '../api/jobs'
 import type { JobWithDetails } from '../types/job'
 import { JobForm } from './JobForm'
+import { InviteForm } from './InviteForm'
+import { PendingInvitationsList } from '../../invitations/components/PendingInvitationsList'
 import { Button, Card, ConfirmDialog } from '../../../components/ui'
 import { buildUserName } from '../../../utils/actorUtils'
 
@@ -25,15 +27,22 @@ export function StaffJobsList({
   invalidateKey,
 }: StaffJobsListProps) {
   const deleteJob = useDeleteJob(invalidateKey)
-  const [showForm, setShowForm] = useState(false)
+  const [showForm, setShowForm] = useState<'add' | 'invite' | null>(null)
   const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete<number>()
 
   return (
     <div>
+      {isAdmin && !isDreamTheater && (
+        <PendingInvitationsList productionId={productionId} theaterId={theaterId} />
+      )}
+
       {isAdmin && !isDreamTheater && !showForm && (
-        <div className="mb-3">
-          <Button type="button" onClick={() => setShowForm(true)}>
+        <div className="mb-3 flex gap-2">
+          <Button type="button" onClick={() => setShowForm('add')}>
             Add Job
+          </Button>
+          <Button type="button" variant="secondary" onClick={() => setShowForm('invite')}>
+            Invite someone
           </Button>
         </div>
       )}
@@ -44,15 +53,27 @@ export function StaffJobsList({
         </p>
       )}
 
-      {showForm && (
+      {showForm === 'add' && (
         <Card className="p-4 mb-4">
           <JobForm
             productionId={productionId}
             theaterId={theaterId}
             isDreamTheater={isDreamTheater}
             invalidateKey={invalidateKey}
-            onSuccess={() => setShowForm(false)}
-            onCancel={() => setShowForm(false)}
+            onSuccess={() => setShowForm(null)}
+            onCancel={() => setShowForm(null)}
+          />
+        </Card>
+      )}
+
+      {showForm === 'invite' && (
+        <Card className="p-4 mb-4">
+          <InviteForm
+            productionId={productionId}
+            theaterId={theaterId}
+            invalidateKey={['invitations', { theaterId, productionId }]}
+            onSuccess={() => setShowForm(null)}
+            onCancel={() => setShowForm(null)}
           />
         </Card>
       )}
