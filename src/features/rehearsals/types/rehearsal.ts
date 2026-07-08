@@ -19,6 +19,7 @@ export interface RehearsalUser {
   email: string
   fake: boolean
   preferred_name?: string | null
+  job_title?: string | null
 }
 
 export interface RehearsalTextUnit {

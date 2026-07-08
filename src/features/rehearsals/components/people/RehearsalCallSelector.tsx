@@ -139,7 +139,8 @@ export default function RehearsalCallSelector({
                 className="rounded border-gray-300"
               />
               {buildUserName(u)}
-              {formatConflicts(conflictMap.get(u.id) ?? [])} - {u.email}
+              {u.job_title ? ` (${u.job_title})` : null}
+              {formatConflicts(conflictMap.get(u.id) ?? [])}
             </label>
           ))}
       </div>

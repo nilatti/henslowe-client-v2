@@ -28,3 +28,6 @@ dist-ssr
 
 # TanStack router codegen cache
 .tanstack/
+
+# Playwright
+test-results/

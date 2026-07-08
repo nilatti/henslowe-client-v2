@@ -148,11 +148,15 @@ export function AddJobToUserForm({ userId, invalidateKey, onSuccess, onCancel, t
           )}
           {overlapProductions.length > 0 && (
             <optgroup label="Productions">
-              {overlapProductions.map(p => (
-                <option key={p.id} value={`production:${p.id}`}>
-                  {p.play?.title ?? `Production ${p.id}`}
-                </option>
-              ))}
+              {[...overlapProductions]
+                .sort((a, b) => (a.play?.title ?? '').localeCompare(b.play?.title ?? ''))
+                .map(p => (
+                  <option key={p.id} value={`production:${p.id}`}>
+                    {p.play?.title && p.theater?.name && p.end_date
+                      ? `${p.play.title} at ${p.theater.name} (${format(new Date(p.end_date), 'yyyy')})`
+                      : p.play?.title ?? `Production ${p.id}`}
+                  </option>
+                ))}
             </optgroup>
           )}
         </select>

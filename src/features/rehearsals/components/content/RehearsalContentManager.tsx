@@ -58,6 +58,18 @@ export function RehearsalContentManager({
     );
   }, [jobs]);
 
+  const characterGroupToUserIdsMap = useMemo(() => {
+    const map = new Map<number, number[]>();
+    if (!jobs) return map;
+    jobs
+      .filter((j) => j.character_group_id != null && j.user_id != null)
+      .forEach((j) => {
+        const existing = map.get(j.character_group_id!) ?? [];
+        map.set(j.character_group_id!, [...existing, j.user_id!]);
+      });
+    return map;
+  }, [jobs]);
+
   const actsQuery = useQuery({
     ...playActOnStagesQueryOptions(playId),
     enabled: rehearsal.text_unit === "acts",
@@ -109,15 +121,15 @@ export function RehearsalContentManager({
     if (!rawPlayContent) return [];
 
     let processed: TextUnitWithOnStages[] = rawPlayContent.map((item) => ({ ...item }));
-    processed = markContentRecommended(processed, unavailableActors, characterToUserMap);
+    processed = markContentRecommended(processed, unavailableActors, characterToUserMap, characterGroupToUserIdsMap);
     processed = processed.map((item) => ({
       ...item,
-      furtherInfo: buildCallList(item, actors, characterToUserMap),
+      furtherInfo: buildCallList(item, actors, characterToUserMap, characterGroupToUserIdsMap),
       isScheduled: selectedIds.includes(item.id),
     }));
 
     return processed;
-  }, [rawPlayContent, unavailableActors, actors, selectedIds]);
+  }, [rawPlayContent, unavailableActors, actors, selectedIds, characterToUserMap, characterGroupToUserIdsMap]);
 
   const handleToggle = (id: number) => {
     setSelectedIds((prev) =>
@@ -137,7 +149,7 @@ export function RehearsalContentManager({
 
   const handleSchedule = () => {
     const selected = playContent.filter((item) => item.isScheduled);
-    const newCalledActors = getCalledActors(selected, actors, characterToUserMap);
+    const newCalledActors = getCalledActors(selected, actors, characterToUserMap, characterGroupToUserIdsMap);
 
     const rehearsalActors = rehearsal.users.filter((u) =>
       actors.some((a) => a.id === u.id),
@@ -154,7 +166,7 @@ export function RehearsalContentManager({
 
   const submitContent = (confirmedExtraUsers: RehearsalUser[]) => {
     const selected = playContent.filter((item) => item.isScheduled);
-    const calledActors = getCalledActors(selected, actors, characterToUserMap);
+    const calledActors = getCalledActors(selected, actors, characterToUserMap, characterGroupToUserIdsMap);
     const calledStaff = productionStaff.filter((s) =>
       rehearsal.users.some((u) => u.id === s.id),
     );

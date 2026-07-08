@@ -155,6 +155,7 @@ export function RehearsalSchedule({
 
   const toRehearsalUser = (
     u: NonNullable<(typeof jobs)[number]["user"]>,
+    jobTitle?: string | null,
   ): RehearsalUser => ({
     id: u.id,
     first_name: u.first_name ?? "",
@@ -162,15 +163,26 @@ export function RehearsalSchedule({
     email: u.email ?? "",
     fake: u.fake,
     preferred_name: u.preferred_name ?? null,
+    job_title: jobTitle ?? null,
   });
 
   const actors = getActors(jobs)
     .filter((u) => !u.fake)
-    .map(toRehearsalUser);
+    .map((u) => toRehearsalUser(u));
+
+  const staffJobs = getStaffJobs(jobs).filter((j) => j.user && !j.user.fake);
+  const staffTitlesByUserId = new Map<number, string[]>();
+  staffJobs.forEach((j) => {
+    if (!j.user || !j.specialization?.title) return;
+    const existing = staffTitlesByUserId.get(j.user.id) ?? [];
+    if (!existing.includes(j.specialization.title)) {
+      staffTitlesByUserId.set(j.user.id, [...existing, j.specialization.title]);
+    }
+  });
   const productionStaff = _.uniqBy(
-    getStaffJobs(jobs)
-      .filter((j) => j.user && !j.user.fake)
-      .map((j) => toRehearsalUser(j.user!)),
+    staffJobs.map((j) =>
+      toRehearsalUser(j.user!, staffTitlesByUserId.get(j.user!.id)?.join(", ")),
+    ),
     "id",
   );
 
