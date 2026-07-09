@@ -12,6 +12,7 @@ export interface Theater {
   logo: string | null
   fake: boolean
   subscription_status?: string | null
+  reserved_seats?: number
   created_at: string
   updated_at: string
 }
@@ -54,4 +55,5 @@ export interface TheaterSkeleton extends Theater {
   spaces: TheaterSpace[]
   productions: TheaterProduction[]
   jobs: TheaterJob[]
+  sponsored_seats_count: number
 }
