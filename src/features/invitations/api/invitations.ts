@@ -28,9 +28,12 @@ export function useCreateInvitation(invalidateKey: unknown[]) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateInvitationPayload): Promise<InvitationSummary> => {
-      const path = data.theater_id
-        ? `/api/v1/theaters/${data.theater_id}/invitations`
-        : `/api/v1/productions/${data.production_id}/invitations`
+      // production_id takes priority: a production-scoped invite (e.g. from
+      // StaffJobsList in a production context) also carries the parent theater's
+      // id, but the invite itself is scoped to the production.
+      const path = data.production_id
+        ? `/api/v1/productions/${data.production_id}/invitations`
+        : `/api/v1/theaters/${data.theater_id}/invitations`
       return api.post(path, { invitation: data }).then(r => r.data)
     },
     onSuccess: () => {
