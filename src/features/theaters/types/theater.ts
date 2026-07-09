@@ -11,6 +11,7 @@ export interface Theater {
   calendar_url: string | null
   logo: string | null
   fake: boolean
+  subscription_status?: string | null
   created_at: string
   updated_at: string
 }

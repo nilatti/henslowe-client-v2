@@ -64,6 +64,11 @@ function InvitationAcceptRoute() {
         setState('unavailable')
         return
       }
+      if (messages.includes('theater_billing_not_configured')) {
+        // Not something a short retry loop can resolve — the theater admin needs to set up billing separately.
+        setState('payment_required_theater')
+        return
+      }
       if (messages.includes('payment_required')) {
         if (retriesLeft > 1) {
           await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL_MS))
