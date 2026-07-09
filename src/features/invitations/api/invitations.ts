@@ -58,3 +58,13 @@ export function useRevokeInvitation(invalidateKey: unknown[]) {
     },
   })
 }
+
+export function useResendInvitation(invalidateKey: unknown[]) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (token: string) => api.post(`/api/v1/invitations/${token}/resend`).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: invalidateKey })
+    },
+  })
+}

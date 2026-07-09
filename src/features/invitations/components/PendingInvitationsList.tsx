@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { invitationsQueryOptions, useRevokeInvitation } from '../api/invitations'
+import { invitationsQueryOptions, useRevokeInvitation, useResendInvitation } from '../api/invitations'
 import { Card, Button, ConfirmDialog } from '../../../components/ui'
 import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
 
@@ -12,25 +12,40 @@ export function PendingInvitationsList({ productionId, theaterId }: PendingInvit
   const invalidateKey = ['invitations', { theaterId, productionId }]
   const { data: invitations } = useQuery(invitationsQueryOptions({ theaterId, productionId }))
   const revoke = useRevokeInvitation(invalidateKey)
+  const resend = useResendInvitation(invalidateKey)
   const { target: confirmToken, open: requestRevoke, close: clearRevoke } = useConfirmDelete<string>()
 
-  const pending = (invitations ?? []).filter(i => i.status === 'pending')
-  if (pending.length === 0) return null
+  const outstanding = (invitations ?? []).filter(i => i.status === 'pending' || i.status === 'expired')
+  if (outstanding.length === 0) return null
 
   return (
     <div className="mb-4">
       <h3 className="text-sm font-medium text-gray-700 mb-2">Pending invitations</h3>
       <Card>
         <ul className="divide-y divide-gray-100">
-          {pending.map(invitation => (
+          {outstanding.map(invitation => (
             <li key={invitation.id} className="flex items-center justify-between px-4 py-3 text-sm">
               <div>
                 <span className="font-medium text-gray-900">{invitation.specialization.title}</span>
                 <span className="text-gray-500 ml-2">{invitation.email}</span>
+                {invitation.status === 'expired' && (
+                  <span className="ml-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5">
+                    Expired
+                  </span>
+                )}
               </div>
-              <Button variant="danger" onClick={() => requestRevoke(invitation.token)}>
-                Revoke
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="secondary"
+                  onClick={() => resend.mutate(invitation.token)}
+                  disabled={resend.isPending}
+                >
+                  Resend
+                </Button>
+                <Button variant="danger" onClick={() => requestRevoke(invitation.token)}>
+                  Revoke
+                </Button>
+              </div>
             </li>
           ))}
         </ul>
