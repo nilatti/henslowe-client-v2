@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import api from '../../../api/client'
 import {
   listQueryOptions,
   createMutationFn,
@@ -33,6 +34,22 @@ export function useUpdateTheater() {
       qc.invalidateQueries({ queryKey: ['theaters'] })
       qc.invalidateQueries({ queryKey: ['theaters', vars.id, 'skeleton'] })
     },
+  })
+}
+
+export function useCreateSeatSubscriptionCheckout(theaterId: number) {
+  return useMutation({
+    mutationFn: ({ price, quantity }: { price: string; quantity: number }): Promise<{ stripeUrl: string }> =>
+      api.post(`/api/v1/theaters/${theaterId}/create_seat_subscription_checkout_session`, { price, quantity }).then(r => r.data),
+  })
+}
+
+export function useUpdateReservedSeats(theaterId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (reservedSeats: number): Promise<{ id: number; reserved_seats: number }> =>
+      api.patch(`/api/v1/theaters/${theaterId}/update_reserved_seats`, { reserved_seats: reservedSeats }).then(r => r.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['theaters', theaterId, 'skeleton'] }),
   })
 }
 

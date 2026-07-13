@@ -22,6 +22,11 @@ export async function redirectToBillingPortal(): Promise<void> {
   window.location.href = res.data.stripeUrl
 }
 
+export async function redirectToCheckout(price: string, returnTo?: string): Promise<void> {
+  const res = await api.post('/api/v1/charges/create_checkout_session', { price, return_to: returnTo })
+  window.location.href = res.data.stripeUrl
+}
+
 export function useCancelSubscription(userId: number) {
   const queryClient = useQueryClient()
   return useMutation({

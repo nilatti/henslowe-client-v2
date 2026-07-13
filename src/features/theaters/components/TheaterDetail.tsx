@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useConfirmDelete } from '../../../hooks/useConfirmDelete'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, Link } from '@tanstack/react-router'
 import { usePageTitle } from '../../../hooks/usePageTitle'
 import { theaterSkeletonQueryOptions, useDeleteTheater } from '../api/theaters'
 import { TheaterForm } from './TheaterForm'
@@ -62,6 +62,9 @@ export function TheaterDetail({ theaterId }: TheaterDetailProps) {
         action={
           isAdmin ? (
             <div className="flex gap-2">
+              <Link to="/theaters/$theaterId/billing" params={{ theaterId: String(theaterId) }}>
+                <Button variant="secondary">Billing</Button>
+              </Link>
               <Button variant="secondary" onClick={() => setIsEditing(true)}>
                 Edit
               </Button>
