@@ -122,6 +122,7 @@ export function useCreateRehearsal(productionId: number) {
         title: data.title ?? null,
         notes: data.notes ?? null,
         text_unit: data.text_unit ?? null,
+        published_at: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         users: [],
@@ -232,6 +233,23 @@ export function useBuildRehearsalSchedule(productionId: number) {
         })
         .then((r) => r.data),
     onSuccess: () => {
+      setTimeout(() => {
+        qc.invalidateQueries({ queryKey: ["rehearsals", { productionId }] });
+      }, 5000);
+    },
+  });
+}
+
+export function usePublishRehearsalCalendar(productionId: number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () =>
+      api
+        .post(`/api/v1/productions/${productionId}/publish_rehearsal_calendar`)
+        .then((r) => r.data),
+    onSuccess: () => {
+      // Sending happens asynchronously on the backend (Sidekiq), so give it a
+      // moment before refetching published_at — mirrors useBuildRehearsalSchedule.
       setTimeout(() => {
         qc.invalidateQueries({ queryKey: ["rehearsals", { productionId }] });
       }, 5000);

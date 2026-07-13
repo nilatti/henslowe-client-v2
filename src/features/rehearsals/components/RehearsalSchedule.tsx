@@ -14,6 +14,7 @@ import {
   productionRehearsalsQueryOptions,
   productionUserConflictsQueryOptions,
   productionSpaceConflictsQueryOptions,
+  usePublishRehearsalCalendar,
 } from "../api/rehearsals";
 import { productionJobsQueryOptions } from "../../jobs/api/jobs";
 import { productionSkeletonQueryOptions } from "../../productions/api/productions";
@@ -25,7 +26,8 @@ import {
   useUserRoleForProduction,
   useIsSuperAdmin,
 } from "../../../hooks/useUserRole";
-import { Button, Card } from "../../../components/ui";
+import { Button, Card, ConfirmDialog } from "../../../components/ui";
+import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
 import type { RehearsalUser, RehearsalWithDetails } from "../types/rehearsal";
 import { buildUserName } from "../../../utils/actorUtils";
 
@@ -123,6 +125,13 @@ export function RehearsalSchedule({
   const [showPatternCreator, setShowPatternCreator] = useState(false);
   const [addFormDate, setAddFormDate] = useState<string | null>(null);
 
+  const publishCalendar = usePublishRehearsalCalendar(productionId);
+  const {
+    target: confirmingPublish,
+    open: requestPublish,
+    close: clearPublish,
+  } = useConfirmDelete<boolean>();
+
   const currentWeekEnd = endOfWeek(currentWeekStart);
 
   const weekRehearsals = rehearsals.filter((r) =>
@@ -204,10 +213,26 @@ export function RehearsalSchedule({
           >
             Pattern generator
           </Button>
+          <Button variant="secondary" onClick={() => requestPublish()}>
+            Publish rehearsal calendar
+          </Button>
           <Button onClick={() => setShowForm(!showForm)}>
             Add Rehearsal
           </Button>
         </div>
+      )}
+
+      {confirmingPublish && (
+        <ConfirmDialog
+          message="This will email calendar invites to everyone on the call list for any new or changed rehearsals, and cancellations to anyone removed. Continue?"
+          confirmLabel="Publish"
+          pendingLabel="Publishing…"
+          onConfirm={async () => {
+            await publishCalendar.mutateAsync();
+            clearPublish();
+          }}
+          onCancel={clearPublish}
+        />
       )}
 
       {showPatternCreator && (
