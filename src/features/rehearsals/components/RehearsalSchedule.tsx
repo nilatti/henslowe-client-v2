@@ -132,20 +132,6 @@ export function RehearsalSchedule({
     }),
   );
 
-  const hasLastWeek = rehearsals.some((r) =>
-    isWithinInterval(parseISO(r.start_time), {
-      start: subWeeks(currentWeekStart, 1),
-      end: subWeeks(currentWeekEnd, 1),
-    }),
-  );
-
-  const hasNextWeek = rehearsals.some((r) =>
-    isWithinInterval(parseISO(r.start_time), {
-      start: addWeeks(currentWeekStart, 1),
-      end: addWeeks(currentWeekEnd, 1),
-    }),
-  );
-
   const rehearsalsWithDate = weekRehearsals.map((r) => ({
     ...r,
     date: format(parseISO(r.start_time), "yyyy-MM-dd"),
@@ -255,7 +241,6 @@ export function RehearsalSchedule({
         <Button
           variant="secondary"
           onClick={() => setCurrentWeekStart(subWeeks(currentWeekStart, 1))}
-          disabled={!hasLastWeek}
         >
           ← Last week
         </Button>
@@ -270,7 +255,6 @@ export function RehearsalSchedule({
           <Button
             variant="secondary"
             onClick={() => setCurrentWeekStart(addWeeks(currentWeekStart, 1))}
-            disabled={!hasNextWeek}
           >
             Next week →
           </Button>
