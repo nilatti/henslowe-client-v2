@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import type { TextUnitWithOnStages } from '../api/rehearsals'
 import type { RehearsalUser } from '../types/rehearsal'
-import { buildUserName } from '../../../utils/actorUtils'
+import { buildUserName, sortUsers } from '../../../utils/actorUtils'
 
 export function onStageUserIds(
   findOnStages: { user_id: number | null; character_id: number | null; character_group_id: number | null }[],
@@ -58,8 +58,8 @@ export function buildCallList(
   characterGroupToUserIdsMap = new Map<number, number[]>()
 ): string {
   const userIds = onStageUserIds(item.find_on_stages, characterToUserMap, characterGroupToUserIdsMap)
-  const calledActors = _.compact(userIds.map(id => actors.find(a => a.id === id)))
-  return _.uniq(calledActors.map(a => buildUserName(a))).sort().join(', ')
+  const calledActors = _.uniqBy(_.compact(userIds.map(id => actors.find(a => a.id === id))), 'id')
+  return sortUsers(calledActors).map(a => buildUserName(a)).join(', ')
 }
 
 export function getCalledActors(
