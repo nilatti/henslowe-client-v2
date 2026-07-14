@@ -8,6 +8,7 @@ import {
   endOfWeek,
   addWeeks,
   subWeeks,
+  addMinutes,
   isWithinInterval,
 } from "date-fns";
 import {
@@ -321,14 +322,18 @@ export function RehearsalSchedule({
                   {isAdmin && addFormDate === date && (() => {
                     const sorted = [...groupedRehearsals[date]].sort((a, b) => a.start_time.localeCompare(b.start_time));
                     const last = sorted[sorted.length - 1];
+                    const breakLength = productionSkeleton?.default_rehearsal_break_length ?? 0;
+                    const blockLength = productionSkeleton?.default_rehearsal_block_length ?? 0;
+                    const defaultStart = addMinutes(parseISO(last.end_time), breakLength);
+                    const defaultEnd = addMinutes(defaultStart, blockLength);
                     return (
                       <div className="pt-2 border-t border-gray-100 mt-2">
                         <RehearsalForm
                           productionId={productionId}
                           theaterId={theaterId}
                           defaultSpaceId={productionSkeleton?.default_space_id}
-                          defaultStartTime={last.end_time}
-                          defaultEndTime={last.end_time}
+                          defaultStartTime={defaultStart.toISOString()}
+                          defaultEndTime={defaultEnd.toISOString()}
                           onSuccess={() => setAddFormDate(null)}
                           onCancel={() => setAddFormDate(null)}
                         />

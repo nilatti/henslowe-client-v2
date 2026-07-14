@@ -54,6 +54,12 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
         : '',
       default_space_id: production?.default_space_id ?? null as number | null,
       default_call_user_ids: production?.default_call_user_ids ?? [] as number[],
+      default_rehearsal_block_length: production?.default_rehearsal_block_length
+        ? String(production.default_rehearsal_block_length)
+        : '',
+      default_rehearsal_break_length: production?.default_rehearsal_break_length
+        ? String(production.default_rehearsal_break_length)
+        : '',
     },
     onSubmit: async ({ value }) => {
       const data: Record<string, unknown> = {
@@ -69,6 +75,12 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
       if (isEditing) {
         data.default_space_id = value.default_space_id
         data.default_call_user_ids = value.default_call_user_ids
+        data.default_rehearsal_block_length = value.default_rehearsal_block_length
+          ? Number(value.default_rehearsal_block_length)
+          : null
+        data.default_rehearsal_break_length = value.default_rehearsal_break_length
+          ? Number(value.default_rehearsal_break_length)
+          : null
         await update.mutateAsync(data)
         onSuccess()
       } else {
@@ -301,6 +313,40 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
             )
           }}
         </form.Field>
+      )}
+
+      {isEditing && (
+        <div className="grid grid-cols-2 gap-4">
+          <form.Field name="default_rehearsal_block_length">
+            {field => (
+              <FormField label="Default rehearsal block length (min)">
+                <input
+                  type="number"
+                  value={field.state.value}
+                  onChange={e => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  min={0}
+                  className={inputClass}
+                />
+              </FormField>
+            )}
+          </form.Field>
+
+          <form.Field name="default_rehearsal_break_length">
+            {field => (
+              <FormField label="Default rehearsal break length (min)">
+                <input
+                  type="number"
+                  value={field.state.value}
+                  onChange={e => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  min={0}
+                  className={inputClass}
+                />
+              </FormField>
+            )}
+          </form.Field>
+        </div>
       )}
 
       <FormActions isSubmitting={form.state.isSubmitting} isEditing={isEditing} onCancel={onCancel} submitLabel="Create production" />
