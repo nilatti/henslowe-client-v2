@@ -9,11 +9,18 @@ function pageCount(startPage: number | null | undefined, endPage: number | null 
   return Math.max(1, endPage - startPage + 1)
 }
 
-function totalRehearsalMinutes(rehearsals: { start_time: string; end_time: string }[]): number {
+export function totalRehearsalMinutes(rehearsals: { start_time: string; end_time: string }[]): number {
   return rehearsals.reduce((sum, r) => {
     const ms = new Date(r.end_time).getTime() - new Date(r.start_time).getTime()
     return sum + ms / 60000
   }, 0)
+}
+
+export function formatHoursAndMinutes(totalMinutes: number): string {
+  const minutes = Math.round(totalMinutes)
+  const hours = Math.floor(minutes / 60)
+  const remainder = minutes % 60
+  return `${hours}:${String(remainder).padStart(2, '0')}`
 }
 
 export function minutesPerPage(item: TextUnitPageInfo): number | null {

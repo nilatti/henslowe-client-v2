@@ -20,6 +20,7 @@ import {
 import { productionJobsQueryOptions } from "../../jobs/api/jobs";
 import { productionSkeletonQueryOptions } from "../../productions/api/productions";
 import { getActors, getStaffJobs, getCastings } from "../../jobs/utils/jobUtils";
+import { totalRehearsalMinutes, formatHoursAndMinutes } from "../utils/rehearsalMetrics";
 import { RehearsalShow } from "./RehearsalShow";
 import { RehearsalForm } from "./RehearsalForm";
 import { RehearsalPatternCreator } from "./RehearsalPatternCreator";
@@ -203,9 +204,14 @@ export function RehearsalSchedule({
   });
 
   const weekLabel = `${format(currentWeekStart, "MMMM d")} – ${format(currentWeekEnd, "MMMM d, yyyy")}`;
+  const weekTotal = formatHoursAndMinutes(totalRehearsalMinutes(weekRehearsals));
 
   return (
     <div>
+      <p className="text-sm text-gray-600 mb-4">
+        Total rehearsal time: <span className="font-medium text-gray-900">{weekTotal}</span>
+      </p>
+
       {isAdmin && (
         <div className="flex justify-end gap-2 mb-6">
           <Button

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { minutesPerPage } from './rehearsalMetrics'
+import { minutesPerPage, totalRehearsalMinutes, formatHoursAndMinutes } from './rehearsalMetrics'
 
 describe('minutesPerPage', () => {
   it('returns null when rehearsals is undefined', () => {
@@ -53,5 +53,36 @@ describe('minutesPerPage', () => {
       start_page: 5,
       end_page: 3,
     })).toBe(60)
+  })
+})
+
+describe('totalRehearsalMinutes', () => {
+  it('returns 0 for an empty list', () => {
+    expect(totalRehearsalMinutes([])).toBe(0)
+  })
+
+  it('sums durations across multiple rehearsals', () => {
+    expect(totalRehearsalMinutes([
+      { start_time: '2024-01-01T10:00:00Z', end_time: '2024-01-01T11:30:00Z' },
+      { start_time: '2024-01-02T10:00:00Z', end_time: '2024-01-02T11:45:00Z' },
+    ])).toBe(195)
+  })
+})
+
+describe('formatHoursAndMinutes', () => {
+  it('formats 195 minutes as 3:15', () => {
+    expect(formatHoursAndMinutes(195)).toBe('3:15')
+  })
+
+  it('pads minutes under 10', () => {
+    expect(formatHoursAndMinutes(65)).toBe('1:05')
+  })
+
+  it('formats 0 minutes as 0:00', () => {
+    expect(formatHoursAndMinutes(0)).toBe('0:00')
+  })
+
+  it('formats exact hours with no remainder', () => {
+    expect(formatHoursAndMinutes(120)).toBe('2:00')
   })
 })
