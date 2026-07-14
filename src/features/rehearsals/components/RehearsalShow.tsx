@@ -12,7 +12,7 @@ import { RehearsalForm } from "./RehearsalForm";
 import { RehearsalContentManager } from "./content/RehearsalContentManager";
 import { RehearsalPeopleManager } from "./people/RehearsalPeopleManager";
 import { Button, ConfirmDialog } from "../../../components/ui";
-import { buildUserName } from "../../../utils/actorUtils";
+import { buildUserName, sortUsers } from "../../../utils/actorUtils";
 import { getConflictedUserIds } from "../../conflicts/utils/conflictUtils";
 
 interface RehearsalShowProps {
@@ -164,7 +164,7 @@ export function RehearsalShow({
             <div className="text-sm text-gray-600">
               <span className="font-medium">Actors Called: </span>
               <ul className="list-disc list-inside">
-                {rehearsal.users
+                {sortUsers(rehearsal.users)
                   .filter((u) => actors.some((a) => a.id === u.id))
                   .map((u) => (
                     <li
@@ -185,7 +185,7 @@ export function RehearsalShow({
             <div className="text-sm text-gray-600">
               <span className="font-medium">Production Staff Called: </span>
               <ul className="list-disc list-inside">
-                {rehearsal.users
+                {sortUsers(rehearsal.users)
                   .filter((u) => productionStaff.some((ps) => ps.id === u.id))
                   .map((u) => (
                     <li

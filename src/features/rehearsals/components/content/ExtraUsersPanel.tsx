@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { RehearsalUser } from "../../types/rehearsal";
 import { Button, Card } from "../../../../components/ui";
-import { buildUserName } from "../../../../utils/actorUtils";
+import { buildUserName, sortUsers } from "../../../../utils/actorUtils";
 
 interface ExtraUsersPanelProps {
   extraUsers: RehearsalUser[];
@@ -38,7 +38,7 @@ export function ExtraUsersPanel({
         Should they still be called? (e.g. designers watching a run)
       </p>
       <div className="space-y-2 mb-4">
-        {extraUsers.map((user) => (
+        {sortUsers(extraUsers).map((user) => (
           <label
             key={user.id}
             className="flex items-center gap-2 text-sm text-gray-700"

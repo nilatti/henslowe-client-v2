@@ -302,11 +302,11 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
                 <div className="border border-gray-300 rounded-md max-h-96 overflow-y-auto">
                   <h5 className="px-3 py-1.5 text-xs font-semibold text-gray-500 bg-gray-50">Actors</h5>
                   {[...actors]
-                    .sort((a, b) => a.last_name.localeCompare(b.last_name))
+                    .sort((a, b) => a.last_name.localeCompare(b.last_name) || a.first_name.localeCompare(b.first_name))
                     .map(u => renderRow(u, actorCharacterNames.get(u.id)?.join(', ')))}
                   <h5 className="px-3 py-1.5 text-xs font-semibold text-gray-500 bg-gray-50">Production staff</h5>
                   {[...productionStaff]
-                    .sort((a, b) => a.last_name.localeCompare(b.last_name))
+                    .sort((a, b) => a.last_name.localeCompare(b.last_name) || a.first_name.localeCompare(b.first_name))
                     .map(u => renderRow(u, staffTitlesByUserId.get(u.id)?.join(', ')))}
                 </div>
               </FormField>

@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { useFreePlayStore } from '../store/freePlayStore'
 import { SelectPlay } from './SelectPlay'
 import { Button, LoadingSpinner } from '../../../components/ui'
-import { buildUserName } from '../../../utils/actorUtils'
+import { buildUserName, sortUsers } from '../../../utils/actorUtils'
 import type { FakeActorCounts, FreeCasting, FakeActor } from '../types/freePlay'
 
 interface FakeActorsPanelProps {
@@ -120,7 +120,7 @@ function CastingItem({ casting, availableActors, onFormSubmit }: CastingRowProps
               className="px-2 py-1 border border-gray-300 rounded text-sm"
             >
               <option value="">Select actor</option>
-              {availableActors.map(a => (
+              {sortUsers(availableActors).map(a => (
                 <option key={a.id} value={a.id}>
                   {buildUserName(a)}
                 </option>

@@ -141,7 +141,14 @@ export function CharacterGroupCastingSection({
             <CharacterGroupRow
               key={group.id}
               group={group}
-              groupJobs={jobs.filter(j => j.character_group_id === group.id)}
+              groupJobs={jobs
+                .filter(j => j.character_group_id === group.id)
+                .sort((a, b) => {
+                  const lastA = a.user?.last_name ?? ''
+                  const lastB = b.user?.last_name ?? ''
+                  if (lastA !== lastB) return lastA.localeCompare(lastB)
+                  return (a.user?.first_name ?? '').localeCompare(b.user?.first_name ?? '')
+                })}
               auditioners={auditioners}
               isAdmin={isAdmin}
               invalidateKey={invalidateKey}

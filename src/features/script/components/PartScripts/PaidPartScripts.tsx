@@ -27,7 +27,7 @@ function PaidPartScriptsInner({
     const users = actorJobs
       .map(j => j.user)
       .filter((u): u is NonNullable<JobWithDetails['user']> => u != null)
-    return _.uniqBy(users, 'id').map(u => ({
+    return _.sortBy(_.uniqBy(users, 'id'), 'last_name', 'first_name', 'email').map(u => ({
       ...u,
       jobs: actorJobs
         .filter(j => j.user_id === u.id)

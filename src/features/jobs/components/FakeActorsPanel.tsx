@@ -5,6 +5,7 @@ import type { FakeActorCount, JobWithDetails } from '../types/job'
 import { Button, Card, ErrorMessage } from '../../../components/ui'
 import { AUDITIONER_SPECIALIZATION_ID } from '../../../utils/constants'
 import { getFakeActorCount } from '../utils/jobUtils'
+import { sortUsers } from '../../../utils/actorUtils'
 
 interface FakeActorsPanelProps {
   jobs: JobWithDetails[]
@@ -23,10 +24,12 @@ export function FakeActorsPanel({
   const generateFakeUser = useGenerateFakeUser()
   const { data: allFakeUsers = [], isLoading: fakeUsersLoading } = useQuery(fakeUsersQueryOptions())
   const currentCount = getFakeActorCount(jobs)
-  const fakeActors = jobs
-    .filter(j => j.user?.fake)
-    .map(j => j.user!)
-    .filter((u, i, arr) => arr.findIndex(a => a.id === u.id) === i)
+  const fakeActors = sortUsers(
+    jobs
+      .filter(j => j.user?.fake)
+      .map(j => j.user!)
+      .filter((u, i, arr) => arr.findIndex(a => a.id === u.id) === i)
+  )
 
   const [counts, setCounts] = useState<FakeActorCount>({
     female: currentCount.female,

@@ -103,7 +103,7 @@ export default function RehearsalCallSelector({
           {allActorsSelected ? "Clear All Actors" : "Call All Actors"}
         </Button>
         {[...actors]
-          .sort((a, b) => a.last_name.localeCompare(b.last_name))
+          .sort((a, b) => a.last_name.localeCompare(b.last_name) || a.first_name.localeCompare(b.first_name))
           .map((u) => (
             <label
               key={u.id}
@@ -126,7 +126,7 @@ export default function RehearsalCallSelector({
       <h5>Production staff</h5>
       <div className="space-y-1 mb-4">
         {[...productionStaff]
-          .sort((a, b) => a.last_name.localeCompare(b.last_name))
+          .sort((a, b) => a.last_name.localeCompare(b.last_name) || a.first_name.localeCompare(b.first_name))
           .map((u) => (
             <label
               key={u.id}

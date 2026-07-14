@@ -31,7 +31,7 @@ import {
 import { Button, Card, ConfirmDialog } from "../../../components/ui";
 import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
 import type { RehearsalUser, RehearsalWithDetails } from "../types/rehearsal";
-import { buildUserName } from "../../../utils/actorUtils";
+import { buildUserName, sortUsers } from "../../../utils/actorUtils";
 
 function tsvEscape(val: string): string {
   return val.replace(/\t/g, " ").replace(/\n/g, " ");
@@ -60,7 +60,7 @@ function downloadRehearsalTSV(rehearsals: RehearsalWithDetails[]) {
       ...r.scenes.map((s) => withPages(s.pretty_name ?? "", s)),
       ...r.french_scenes.map((fs) => withPages(fs.pretty_name ?? "", fs)),
     ].filter(Boolean).join(", ");
-    const callList = r.users.map((u) => buildUserName(u)).join(", ");
+    const callList = sortUsers(r.users).map((u) => buildUserName(u)).join(", ");
     return [date, startTime, endTime, location, title, notes, content, callList];
   });
 

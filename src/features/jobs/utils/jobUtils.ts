@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { sortUsers } from '../../../utils/actorUtils'
 import type { JobWithDetails, FakeActorCount } from '../types/job'
 
 export function getCastings(jobs: JobWithDetails[]) {
@@ -21,12 +22,12 @@ export function getStaffJobs(jobs: JobWithDetails[]) {
       j.specialization?.title !== 'Actor' &&
       j.specialization?.title !== 'Auditioner'
   )
-  return _.sortBy(filtered, j => j.user?.last_name)
+  return _.sortBy(filtered, j => j.user?.last_name, j => j.user?.first_name, j => j.user?.email)
 }
 
 export function getActors(jobs: JobWithDetails[]) {
   const actingJobs = jobs.filter(j => j.specialization?.title === 'Actor')
-  return _.uniqBy(_.compact(actingJobs.map(j => j.user)), 'id')
+  return sortUsers(_.uniqBy(_.compact(actingJobs.map(j => j.user)), 'id'))
 }
 
 export function getAuditioners(jobs: JobWithDetails[]) {
