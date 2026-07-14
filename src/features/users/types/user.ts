@@ -33,6 +33,7 @@ export interface UserDetail {
   website?: string | null
   emergency_contact_name?: string | null
   emergency_contact_number?: string | null
+  receive_rehearsal_calendar_invites?: boolean
   fake?: boolean
   role?: string
   subscription_status?: string
@@ -110,6 +111,7 @@ export interface UserEditableFields {
   phone_number: string
   preferred_name: string
   program_name: string
+  receive_rehearsal_calendar_invites: boolean
   state: string
   street_address: string
   timezone: string
