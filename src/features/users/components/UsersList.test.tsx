@@ -203,6 +203,13 @@ describe('UsersList paid override column', () => {
     expect(screen.getByText('subscribed')).toBeInTheDocument()
   })
 
+  it('hides the toggle for a user with an active subscription', () => {
+    mockUseIsSuperAdmin.mockReturnValue(true)
+    mockUseSuspenseQuery.mockReturnValue({ data: [withSub] })
+    render(<UsersList />)
+    expect(screen.queryByRole('switch')).not.toBeInTheDocument()
+  })
+
   it('shows "free" label for user with neither', () => {
     mockUseIsSuperAdmin.mockReturnValue(true)
     mockUseSuspenseQuery.mockReturnValue({ data: [withNeither] })

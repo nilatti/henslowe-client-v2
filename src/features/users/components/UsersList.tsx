@@ -68,15 +68,17 @@ export function UsersList() {
           const hasOverride = u.paid_override === true
           return (
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                role="switch"
-                aria-checked={hasOverride}
-                onClick={() => updatePaidOverride.mutate({ id: u.id, paid_override: !hasOverride })}
-                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 ${hasOverride ? 'bg-purple-600' : 'bg-gray-300'}`}
-              >
-                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${hasOverride ? 'translate-x-4' : 'translate-x-1'}`} />
-              </button>
+              {!isActive && (
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={hasOverride}
+                  onClick={() => updatePaidOverride.mutate({ id: u.id, paid_override: !hasOverride })}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 ${hasOverride ? 'bg-purple-600' : 'bg-gray-300'}`}
+                >
+                  <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${hasOverride ? 'translate-x-4' : 'translate-x-1'}`} />
+                </button>
+              )}
               <span className="text-xs text-gray-500">
                 {isActive ? 'subscribed' : hasOverride ? 'override' : 'free'}
               </span>
