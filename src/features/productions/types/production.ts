@@ -40,5 +40,7 @@ export interface Production {
   default_space: { id: number; name: string } | null
   default_call_users: ProductionDefaultCallUser[]
   default_call_user_ids: number[]
+  default_rehearsal_block_length: number | null
+  default_rehearsal_break_length: number | null
   production_phases: ProductionPhase[]
 }

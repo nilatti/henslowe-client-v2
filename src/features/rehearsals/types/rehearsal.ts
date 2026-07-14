@@ -8,6 +8,7 @@ export interface Rehearsal {
   title: string | null
   notes: string | null
   text_unit: 'acts' | 'scenes' | 'french_scenes' | null
+  published_at: string | null
   created_at: string
   updated_at: string
 }

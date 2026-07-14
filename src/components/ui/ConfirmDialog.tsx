@@ -5,6 +5,7 @@ interface ConfirmDialogProps {
   onConfirm: () => void | Promise<void>
   onCancel: () => void
   confirmLabel?: string
+  pendingLabel?: string
   isDestructive?: boolean
 }
 export function ConfirmDialog({
@@ -12,6 +13,7 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
   confirmLabel = 'Confirm',
+  pendingLabel = 'Deleting…',
   isDestructive = false,
 }: ConfirmDialogProps) {
   const [isPending, setIsPending] = useState(false)
@@ -54,7 +56,7 @@ export function ConfirmDialog({
               isDestructive ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
-            {isPending ? 'Deleting…' : confirmLabel}
+            {isPending ? pendingLabel : confirmLabel}
           </button>
         </div>
       </div>

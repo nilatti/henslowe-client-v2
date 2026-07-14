@@ -12,10 +12,13 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
   return { ...actual, useSuspenseQuery: mockUseSuspenseQuery }
 })
 
+const mockPublishMutateAsync = vi.fn()
+
 vi.mock('../api/rehearsals', () => ({
   productionRehearsalsQueryOptions: (id: number) => ({ queryKey: ['rehearsals', { productionId: id }] }),
   productionUserConflictsQueryOptions: (id: number) => ({ queryKey: ['productions', id, 'user_conflicts'] }),
   productionSpaceConflictsQueryOptions: (id: number) => ({ queryKey: ['productions', id, 'space_conflicts'] }),
+  usePublishRehearsalCalendar: () => ({ mutateAsync: mockPublishMutateAsync, isPending: false }),
 }))
 
 vi.mock('../../jobs/api/jobs', () => ({
@@ -52,6 +55,13 @@ vi.mock('../../../components/ui', () => ({
     <button onClick={onClick} disabled={disabled}>{children}</button>
   ),
   Card: ({ children, className }: any) => <div className={className}>{children}</div>,
+  ConfirmDialog: ({ message, onConfirm, onCancel }: any) => (
+    <div data-testid="confirm-dialog">
+      <p>{message}</p>
+      <button onClick={onConfirm}>Confirm</button>
+      <button onClick={onCancel}>Cancel</button>
+    </div>
+  ),
 }))
 
 import { RehearsalSchedule } from './RehearsalSchedule'
@@ -80,6 +90,8 @@ beforeEach(() => {
   mockUseSuspenseQuery.mockReset()
   ;(useUserRoleForProduction as Mock).mockReset()
   ;(useIsSuperAdmin as Mock).mockReset()
+  mockPublishMutateAsync.mockReset()
+  mockPublishMutateAsync.mockResolvedValue(undefined)
 })
 
 describe('RehearsalSchedule — admin controls', () => {
@@ -87,12 +99,42 @@ describe('RehearsalSchedule — admin controls', () => {
     renderSchedule({ isAdmin: true })
     expect(screen.getByRole('button', { name: /add rehearsal/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /pattern generator/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /publish rehearsal calendar/i })).toBeInTheDocument()
   })
 
   it('hides admin buttons for non-admins', () => {
     renderSchedule({ isAdmin: false })
     expect(screen.queryByRole('button', { name: /add rehearsal/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /pattern generator/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /publish rehearsal calendar/i })).not.toBeInTheDocument()
+  })
+})
+
+describe('RehearsalSchedule — publish calendar', () => {
+  it('opens a confirm dialog when Publish rehearsal calendar is clicked', async () => {
+    const user = userEvent.setup()
+    renderSchedule({ isAdmin: true })
+    expect(screen.queryByTestId('confirm-dialog')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /publish rehearsal calendar/i }))
+    expect(screen.getByTestId('confirm-dialog')).toBeInTheDocument()
+  })
+
+  it('publishes and closes the dialog on confirm', async () => {
+    const user = userEvent.setup()
+    renderSchedule({ isAdmin: true })
+    await user.click(screen.getByRole('button', { name: /publish rehearsal calendar/i }))
+    await user.click(screen.getByRole('button', { name: /^confirm$/i }))
+    expect(mockPublishMutateAsync).toHaveBeenCalledTimes(1)
+    expect(screen.queryByTestId('confirm-dialog')).not.toBeInTheDocument()
+  })
+
+  it('closes the dialog without publishing on cancel', async () => {
+    const user = userEvent.setup()
+    renderSchedule({ isAdmin: true })
+    await user.click(screen.getByRole('button', { name: /publish rehearsal calendar/i }))
+    await user.click(screen.getByRole('button', { name: /^cancel$/i }))
+    expect(mockPublishMutateAsync).not.toHaveBeenCalled()
+    expect(screen.queryByTestId('confirm-dialog')).not.toBeInTheDocument()
   })
 })
 
