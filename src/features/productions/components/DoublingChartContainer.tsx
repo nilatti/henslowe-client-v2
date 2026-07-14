@@ -100,7 +100,16 @@ export function DoublingChartContainer({
                       </Link>
                     )}
                     <ul className="list-disc list-inside ml-4">
-                      {actorCastings.map((casting) => {
+                      {[...actorCastings]
+                        .sort((a, b) => {
+                          const typeA = a.character_id != null ? 0 : 1;
+                          const typeB = b.character_id != null ? 0 : 1;
+                          if (typeA !== typeB) return typeA - typeB;
+                          const nameA = a.character?.name ?? a.character_group?.name ?? "";
+                          const nameB = b.character?.name ?? b.character_group?.name ?? "";
+                          return nameA.localeCompare(nameB);
+                        })
+                        .map((casting) => {
                         const charName =
                           casting.character?.name ??
                           casting.character_group?.name;

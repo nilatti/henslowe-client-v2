@@ -68,14 +68,33 @@ describe('CharacterCombobox', () => {
     expect(screen.getByText('Ophelia')).toBeInTheDocument()
   })
 
-  it('shows character groups with "(group)" label', async () => {
+  it('shows character groups under a "Character Groups" header, separate from characters', async () => {
     const user = userEvent.setup()
     const { input } = renderCombobox()
 
     await user.click(input)
 
     expect(screen.getByText('Guards')).toBeInTheDocument()
-    expect(screen.getByText('(group)')).toBeInTheDocument()
+    expect(screen.getByText('Character Groups')).toBeInTheDocument()
+  })
+
+  it('sorts characters and character groups alphabetically', async () => {
+    const user = userEvent.setup()
+    const { input } = renderCombobox({
+      characters: [
+        { id: 1, name: 'Zed' },
+        { id: 2, name: 'Anna' },
+      ],
+      characterGroups: [
+        { id: 10, name: 'Zealots' },
+        { id: 11, name: 'Attendants' },
+      ],
+    })
+
+    await user.click(input)
+
+    const items = screen.getAllByRole('listitem').map(li => li.textContent)
+    expect(items).toEqual(['Anna', 'Zed', 'Character GroupsAttendants', 'Zealots'])
   })
 
   it('calls onSelect("character", id) when Enter is pressed on a highlighted character', async () => {

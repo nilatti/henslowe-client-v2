@@ -312,12 +312,13 @@ export const selectCharacterGroups = (s: FreePlayStore) =>
   s.play?.character_groups ?? [];
 export const selectCharactersAll = (s: FreePlayStore) => {
   if (!s.play) return [];
+  const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name);
   return [
-    ...(s.play.characters ?? []).map((c) => ({
+    ...[...(s.play.characters ?? [])].sort(byName).map((c) => ({
       ...c,
       type: "character" as const,
     })),
-    ...(s.play.character_groups ?? []).map((cg) => ({
+    ...[...(s.play.character_groups ?? [])].sort(byName).map((cg) => ({
       ...cg,
       type: "character_group" as const,
     })),

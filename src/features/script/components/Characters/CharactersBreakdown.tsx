@@ -25,9 +25,12 @@ export default function CharactersBreakdown({ playId, embedded = false }: Props)
   const [view, setView] = useState<'details' | 'matrix'>('details')
   const [activeKey, setActiveKey] = useState<string | null>(null)
 
+  const sortedCharacters = [...play.characters].sort((a, b) => a.name.localeCompare(b.name))
+  const sortedCharacterGroups = [...play.character_groups].sort((a, b) => a.name.localeCompare(b.name))
+
   const charactersAll: CharacterEntry[] = [
-    ...play.characters.map(c => ({ ...c, type: 'character' as const })),
-    ...play.character_groups.map(cg => ({ ...cg, type: 'character_group' as const })),
+    ...sortedCharacters.map(c => ({ ...c, type: 'character' as const })),
+    ...sortedCharacterGroups.map(cg => ({ ...cg, type: 'character_group' as const })),
   ]
 
   // Fall back to first character (or 'new' if empty) if activeKey is stale or unset
@@ -96,19 +99,48 @@ export default function CharactersBreakdown({ playId, embedded = false }: Props)
         <div className="flex min-h-0">
           {/* Sidebar */}
           <div className="w-52 shrink-0 border-r border-gray-200 overflow-y-auto max-h-[70vh]">
-            {charactersAll.map(c => (
-              <button
-                key={tabKey(c)}
-                onClick={() => setActiveKey(tabKey(c))}
-                className={`w-full text-left px-3 py-2 text-sm truncate border-b border-gray-100 ${
-                  selectedKey === tabKey(c)
-                    ? 'bg-blue-50 text-blue-700 font-medium border-r-2 border-blue-600'
-                    : 'text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                {c.name}
-              </button>
-            ))}
+            {sortedCharacters.length > 0 && (
+              <p className="px-3 pt-2 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                Characters
+              </p>
+            )}
+            {sortedCharacters.map(c => {
+              const entry: CharacterEntry = { ...c, type: 'character' as const }
+              return (
+                <button
+                  key={tabKey(entry)}
+                  onClick={() => setActiveKey(tabKey(entry))}
+                  className={`w-full text-left px-3 py-2 text-sm truncate border-b border-gray-100 ${
+                    selectedKey === tabKey(entry)
+                      ? 'bg-blue-50 text-blue-700 font-medium border-r-2 border-blue-600'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {c.name}
+                </button>
+              )
+            })}
+            {sortedCharacterGroups.length > 0 && (
+              <p className="px-3 pt-2 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                Character Groups
+              </p>
+            )}
+            {sortedCharacterGroups.map(cg => {
+              const entry: CharacterEntry = { ...cg, type: 'character_group' as const }
+              return (
+                <button
+                  key={tabKey(entry)}
+                  onClick={() => setActiveKey(tabKey(entry))}
+                  className={`w-full text-left px-3 py-2 text-sm truncate border-b border-gray-100 ${
+                    selectedKey === tabKey(entry)
+                      ? 'bg-blue-50 text-blue-700 font-medium border-r-2 border-blue-600'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {cg.name}
+                </button>
+              )
+            })}
             <button
               onClick={() => setActiveKey('new')}
               className={`w-full text-left px-3 py-2 text-sm ${

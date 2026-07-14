@@ -50,12 +50,16 @@ export function CharacterCombobox({
   const availableChars = characters.filter(c => !excludeCharacterIds.has(c.id))
   const availableGroups = characterGroups.filter(cg => !excludeGroupIds.has(cg.id))
 
-  const filteredChars = q
+  const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name)
+
+  const filteredChars = (q
     ? availableChars.filter(c => c.name.toLowerCase().includes(q))
     : availableChars
-  const filteredGroups = q
+  ).slice().sort(byName)
+  const filteredGroups = (q
     ? availableGroups.filter(cg => cg.name.toLowerCase().includes(q))
     : availableGroups
+  ).slice().sort(byName)
 
   const options: Option[] = [
     ...filteredChars.map(c => ({ kind: 'item' as const, id: c.id, name: c.name, type: 'character' as const })),
@@ -170,6 +174,8 @@ export function CharacterCombobox({
           {options.map((option, i) => {
             const key = option.kind === 'create' ? '__create__' : `${option.type}-${option.id}`
             const isHighlighted = i === clampedHighlighted
+            const isFirstGroupOption =
+              filteredChars.length > 0 && filteredGroups.length > 0 && i === filteredChars.length
             return (
               <li
                 key={key}
@@ -182,15 +188,15 @@ export function CharacterCombobox({
                 }}
                 onMouseEnter={() => setHighlighted(i)}
               >
+                {isFirstGroupOption && (
+                  <p className="-mx-3 -mt-2 mb-1.5 px-3 pt-2 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wide border-t border-gray-100">
+                    Character Groups
+                  </p>
+                )}
                 {option.kind === 'create' ? (
                   <>Add &ldquo;<strong>{option.name}</strong>&rdquo; as new character</>
                 ) : (
-                  <>
-                    {option.name}
-                    {option.type === 'character_group' && (
-                      <span className="ml-1.5 text-xs text-gray-400">(group)</span>
-                    )}
-                  </>
+                  option.name
                 )}
               </li>
             )

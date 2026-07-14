@@ -55,7 +55,9 @@ export function ProductionJobs({
   const staffJobs = getStaffJobs(jobs);
   const actorsAndAuditioners = getActorsAndAuditioners(jobs);
   const auditioners = getAuditioners(jobs);
-  const characterGroups = playSkeleton.character_groups ?? [];
+  const characterGroups = [...(playSkeleton.character_groups ?? [])].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
 
   return (
     <div className="space-y-8">

@@ -82,9 +82,12 @@ export function EntranceExitForm({
           <FormField label="Characters" required>
             {field.state.value.length > 0 && (
               <ul className="mb-2 flex flex-wrap gap-1.5">
-                {field.state.value.map(id => {
-                  const char = characters.find(c => c.id === id)
-                  if (!char) return null
+                {[...field.state.value]
+                  .map(id => characters.find(c => c.id === id))
+                  .filter((c): c is PlayCharacter => !!c)
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map(char => {
+                  const id = char.id
                   return (
                     <li key={id} className="flex items-center gap-1 text-sm bg-gray-100 rounded-full px-2 py-0.5 text-gray-700">
                       {char.name}

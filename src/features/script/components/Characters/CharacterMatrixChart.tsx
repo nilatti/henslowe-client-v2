@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { playScriptQueryOptions } from '../../api/script'
@@ -60,10 +60,13 @@ export function CharacterMatrixChart({ playId }: Props) {
 
   const acts = script.acts as unknown as MatrixAct[]
 
-  const rows: MatrixRow[] = [
-    ...script.characters.map(c => ({ kind: 'character' as const, id: c.id, name: c.name })),
-    ...script.character_groups.map(cg => ({ kind: 'character_group' as const, id: cg.id, name: cg.name })),
-  ].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
+  const characterRows: MatrixRow[] = script.characters
+    .map(c => ({ kind: 'character' as const, id: c.id, name: c.name }))
+    .sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
+  const characterGroupRows: MatrixRow[] = script.character_groups
+    .map(cg => ({ kind: 'character_group' as const, id: cg.id, name: cg.name }))
+    .sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
+  const rows: MatrixRow[] = [...characterRows, ...characterGroupRows]
 
   function getAllOnStages(fss: MatrixFrenchScene[]): MatrixOnStage[] {
     return fss.flatMap(fs => fs.on_stages ?? [])
@@ -185,33 +188,46 @@ export function CharacterMatrixChart({ playId }: Props) {
             </tr>
           </thead>
           <tbody>
-            {rows.map(row => {
+            {rows.map((row, i) => {
               const cells = columns.map(col => getCellValue(row, col.onStages))
+              const isFirstGroupRow = row.kind === 'character_group' && rows[i - 1]?.kind !== 'character_group'
               return (
-                <tr key={`${row.kind}-${row.id}`} className="odd:bg-white even:bg-teal-50 hover:bg-blue-50 transition-colors">
-                  <td
-                    className="border border-gray-400 px-2 py-1 text-sm font-medium sticky left-0 bg-inherit z-10"
-                    style={{ width: '200px', minWidth: '200px' }}
-                  >
-                    {row.kind === 'character' ? (
-                      <Link
-                        to="/plays/$playId/characters/$characterId"
-                        params={{ playId: String(playId), characterId: String(row.id) }}
-                        className="text-blue-600 hover:text-blue-800"
+                <Fragment key={`${row.kind}-${row.id}`}>
+                  {isFirstGroupRow && (
+                    <tr key="character-groups-divider">
+                      <td
+                        colSpan={columns.length + 1}
+                        className="border border-gray-400 px-2 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wide bg-gray-50 sticky left-0"
                       >
-                        {row.name}
-                      </Link>
-                    ) : row.name}
-                  </td>
-                  {cells.map((val, i) => (
+                        Character Groups
+                      </td>
+                    </tr>
+                  )}
+                  <tr className="odd:bg-white even:bg-teal-50 hover:bg-blue-50 transition-colors">
                     <td
-                      key={i}
-                      className="border border-gray-400 px-2 py-1 text-xs text-center"
+                      className="border border-gray-400 px-2 py-1 text-sm font-medium sticky left-0 bg-inherit z-10"
+                      style={{ width: '200px', minWidth: '200px' }}
                     >
-                      {val}
+                      {row.kind === 'character' ? (
+                        <Link
+                          to="/plays/$playId/characters/$characterId"
+                          params={{ playId: String(playId), characterId: String(row.id) }}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          {row.name}
+                        </Link>
+                      ) : row.name}
                     </td>
-                  ))}
-                </tr>
+                    {cells.map((val, i) => (
+                      <td
+                        key={i}
+                        className="border border-gray-400 px-2 py-1 text-xs text-center"
+                      >
+                        {val}
+                      </td>
+                    ))}
+                  </tr>
+                </Fragment>
               )
             })}
           </tbody>

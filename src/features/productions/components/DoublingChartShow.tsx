@@ -72,6 +72,13 @@ interface BlockCell {
   doublingProblem: boolean
 }
 
+function sortOnStagesByTypeThenName(onStages: ChartOnStage[]): ChartOnStage[] {
+  return _.sortBy(onStages, [
+    os => (os.character_id != null ? 0 : 1),
+    os => (os.character?.name ?? os.character_group?.name ?? '').toLowerCase(),
+  ])
+}
+
 export function DoublingChartShow({ level, play, castings, actors }: DoublingChartShowProps) {
   if (!play.acts.length || !castings.length) {
     return <p className="text-sm text-gray-500 py-4">No casting data available yet.</p>
@@ -187,9 +194,9 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
         (os.character_id != null && _.includes(actorCharacterIds, os.character_id)) ||
         (os.character_group_id != null && _.includes(actorCharacterGroupIds, os.character_group_id))
       )
-      const uniqChars = _.uniqBy(matching, os =>
+      const uniqChars = sortOnStagesByTypeThenName(_.uniqBy(matching, os =>
         os.character?.id != null ? `char-${os.character.id}` : `group-${os.character_group?.id}`
-      )
+      ))
       return {
         characters: uniqChars.map(os => ({
           cellKey: os.character?.id != null ? `char-${os.character.id}` : `group-${os.character_group?.id}`,
@@ -267,13 +274,13 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
       .filter((id): id is number => id !== null)
 
     const rowData = blocks.map((block, i) => {
-      const uniqChars = _.uniqBy(
+      const uniqChars = sortOnStagesByTypeThenName(_.uniqBy(
         block.filter(os =>
           (os.character_id != null && _.includes(uncastCharacterIds, os.character_id)) ||
           (os.character_group_id != null && _.includes(uncastCharacterGroupIds, os.character_group_id))
         ),
         os => os.character?.id != null ? `char-${os.character.id}` : `group-${os.character_group?.id}`,
-      )
+      ))
       return (
         <td key={i} className="border border-gray-400 px-2 py-1 text-xs break-words">
           {uniqChars.map((os, j) => (
@@ -336,13 +343,13 @@ export function DoublingChartShow({ level, play, castings, actors }: DoublingCha
       .filter((id): id is number => id !== null)
 
     const uncastCells = blocks.map(block => {
-      const uniqChars = _.uniqBy(
+      const uniqChars = sortOnStagesByTypeThenName(_.uniqBy(
         block.filter(os =>
           (os.character_id != null && _.includes(uncastCharacterIds, os.character_id)) ||
           (os.character_group_id != null && _.includes(uncastCharacterGroupIds, os.character_group_id))
         ),
         os => os.character?.id != null ? `char-${os.character.id}` : `group-${os.character_group?.id}`,
-      )
+      ))
       return _.join(uniqChars.map(os => os.character?.name ?? os.character_group?.name ?? ''), ', ')
     })
 

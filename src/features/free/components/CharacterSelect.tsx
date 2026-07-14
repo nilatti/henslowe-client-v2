@@ -23,6 +23,10 @@ export function CharacterSelect({ characters, onBlur, selectedCharacter }: Chara
     return <div className="text-sm text-gray-500">Loading characters…</div>
   }
 
+  const sorted = [...available].sort((a, b) => a.name.localeCompare(b.name))
+  const chars = sorted.filter(c => c.type !== 'character_group')
+  const groups = sorted.filter(c => c.type === 'character_group')
+
   function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     setValue(e.target.value)
   }
@@ -43,11 +47,30 @@ export function CharacterSelect({ characters, onBlur, selectedCharacter }: Chara
         className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         <option value="">Choose a character…</option>
-        {available.map(c => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
+        {groups.length > 0 ? (
+          <>
+            <optgroup label="Characters">
+              {chars.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </optgroup>
+            <optgroup label="Character Groups">
+              {groups.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </optgroup>
+          </>
+        ) : (
+          chars.map(c => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))
+        )}
       </select>
     </div>
   )

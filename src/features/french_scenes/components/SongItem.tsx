@@ -96,7 +96,7 @@ export function SongItem({ song, frenchSceneId, playId, sceneId, playSkeleton, i
 
           {(song.characters.length > 0 || (song.character_groups?.length ?? 0) > 0) && (
             <ul className="mt-1.5 flex flex-wrap gap-1.5">
-              {song.characters.map(c => (
+              {[...song.characters].sort((a, b) => a.name.localeCompare(b.name)).map(c => (
                 <li key={`c-${c.id}`} className="flex items-center gap-1 text-sm bg-gray-100 rounded-full px-2 py-0.5 text-gray-700">
                   {c.name}
                   {isAdmin && (
@@ -110,7 +110,7 @@ export function SongItem({ song, frenchSceneId, playId, sceneId, playSkeleton, i
                   )}
                 </li>
               ))}
-              {(song.character_groups ?? []).map(g => (
+              {[...(song.character_groups ?? [])].sort((a, b) => a.name.localeCompare(b.name)).map(g => (
                 <li key={`g-${g.id}`} className="flex items-center gap-1 text-sm bg-blue-50 rounded-full px-2 py-0.5 text-blue-700">
                   {g.name}
                   <span className="text-blue-400">(group)</span>

@@ -48,11 +48,18 @@ export function OnStagesManager({
     setOffstage(false);
   };
 
-  const sortedOnStages = [...frenchScene.on_stages].sort((a, b) => {
+  const byOnStageName = (a: typeof frenchScene.on_stages[number], b: typeof frenchScene.on_stages[number]) => {
     const nameA = a.character?.name ?? a.character_group?.name ?? "";
     const nameB = b.character?.name ?? b.character_group?.name ?? "";
     return nameA.localeCompare(nameB);
-  });
+  };
+
+  const sortedCharacterOnStages = frenchScene.on_stages
+    .filter((os) => os.character_id != null)
+    .sort(byOnStageName);
+  const sortedGroupOnStages = frenchScene.on_stages
+    .filter((os) => os.character_group_id != null)
+    .sort(byOnStageName);
 
   return (
     <div>
@@ -111,23 +118,51 @@ export function OnStagesManager({
       )}
 
       <Card>
-        {sortedOnStages.length === 0 ? (
+        {frenchScene.on_stages.length === 0 ? (
           <p className="px-4 py-3 text-sm text-gray-500">
             No characters on stage yet.
           </p>
         ) : (
-          <ul>
-            {sortedOnStages.map((os) => (
-              <OnStageItem
-                key={os.id}
-                onStage={os}
-                frenchSceneId={frenchScene.id}
-                playId={playId}
-                sceneId={sceneId}
-                isAdmin={isAdmin}
-              />
-            ))}
-          </ul>
+          <>
+            {sortedCharacterOnStages.length > 0 && (
+              <p className="px-4 pt-2 pb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                Characters
+              </p>
+            )}
+            {sortedCharacterOnStages.length > 0 && (
+              <ul>
+                {sortedCharacterOnStages.map((os) => (
+                  <OnStageItem
+                    key={os.id}
+                    onStage={os}
+                    frenchSceneId={frenchScene.id}
+                    playId={playId}
+                    sceneId={sceneId}
+                    isAdmin={isAdmin}
+                  />
+                ))}
+              </ul>
+            )}
+            {sortedGroupOnStages.length > 0 && (
+              <p className="px-4 pt-2 pb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                Character Groups
+              </p>
+            )}
+            {sortedGroupOnStages.length > 0 && (
+              <ul>
+                {sortedGroupOnStages.map((os) => (
+                  <OnStageItem
+                    key={os.id}
+                    onStage={os}
+                    frenchSceneId={frenchScene.id}
+                    playId={playId}
+                    sceneId={sceneId}
+                    isAdmin={isAdmin}
+                  />
+                ))}
+              </ul>
+            )}
+          </>
         )}
       </Card>
     </div>

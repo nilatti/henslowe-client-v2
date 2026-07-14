@@ -53,7 +53,9 @@ export default function WordCloudSelector({ play, onFormSubmit }: WordCloudSelec
     formatPlayContent(play)
   )
   const [selectedChars, setSelectedChars] = useState<CharItem[]>(
-    play.characters.map(c => ({ ...c, isSelected: false }))
+    [...play.characters]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(c => ({ ...c, isSelected: false }))
   )
 
   function submitSelection() {
