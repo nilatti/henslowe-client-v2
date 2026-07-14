@@ -8,6 +8,8 @@ import { InviteForm } from './InviteForm'
 import { PendingInvitationsList } from '../../invitations/components/PendingInvitationsList'
 import { Button, Card, ConfirmDialog } from '../../../components/ui'
 import { buildUserName } from '../../../utils/actorUtils'
+import { groupJobsByDepartment } from '../utils/jobUtils'
+import _ from 'lodash'
 
 interface StaffJobsListProps {
   jobs: JobWithDetails[]
@@ -82,39 +84,52 @@ export function StaffJobsList({
         {jobs.length === 0 ? (
           <p className="px-4 py-3 text-sm text-gray-500">No jobs yet.</p>
         ) : (
-          <ul className="divide-y divide-gray-100">
-            {jobs.map(job => (
-              <li
-                key={job.id}
-                className="flex items-center justify-between px-4 py-3 text-sm"
-              >
-                <div>
-                  <span className="font-medium text-gray-900">
-                    {job.specialization?.title ?? 'Unknown role'}
-                  </span>
-                  {job.user && job.user_id ? (
-                    <Link
-                      to="/users/$userId"
-                      params={{ userId: String(job.user_id) }}
-                      className="text-gray-500 ml-2 hover:text-blue-600"
-                    >
-                      {buildUserName(job.user)}
-                    </Link>
-                  ) : (
-                    <span className="text-gray-500 ml-2">Unfilled</span>
-                  )}
-                </div>
-                {isAdmin && (
-                  <Button
-                    variant="danger"
-                    onClick={() => requestDelete(job.id)}
-                  >
-                    Remove
-                  </Button>
-                )}
-              </li>
+          <div className="divide-y divide-gray-100">
+            {groupJobsByDepartment(jobs, js => _.sortBy(js, j => j.user?.last_name)).map(deptGroup => (
+              <div key={deptGroup.departmentName} className="px-4 py-3">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  {deptGroup.departmentName}
+                </h3>
+                {deptGroup.specializations.map(specGroup => (
+                  <div key={specGroup.title} className="mb-3 last:mb-0">
+                    <h4 className="text-sm font-medium text-gray-700 mb-1">
+                      {specGroup.title}
+                    </h4>
+                    <ul className="divide-y divide-gray-50">
+                      {specGroup.jobs.map(job => (
+                        <li
+                          key={job.id}
+                          className="flex items-center justify-between py-2 text-sm"
+                        >
+                          <div>
+                            {job.user && job.user_id ? (
+                              <Link
+                                to="/users/$userId"
+                                params={{ userId: String(job.user_id) }}
+                                className="text-gray-700 hover:text-blue-600"
+                              >
+                                {buildUserName(job.user)}
+                              </Link>
+                            ) : (
+                              <span className="text-gray-500">Unfilled</span>
+                            )}
+                          </div>
+                          {isAdmin && (
+                            <Button
+                              variant="danger"
+                              onClick={() => requestDelete(job.id)}
+                            >
+                              Remove
+                            </Button>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </Card>
 

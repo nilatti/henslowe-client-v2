@@ -58,7 +58,7 @@ export interface UserJob {
   theater_id: number | null
   start_date: string | null
   end_date: string | null
-  specialization?: { title: string }
+  specialization?: { title: string; department?: { id: number; name: string } | null }
   theater?: { id: number, name: string }
   production?: {
     id: number

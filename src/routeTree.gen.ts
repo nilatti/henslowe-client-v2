@@ -33,6 +33,7 @@ import { Route as AuthenticatedSpacesIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedProductionsIndexRouteImport } from './routes/_authenticated/productions/index'
 import { Route as AuthenticatedPlaysIndexRouteImport } from './routes/_authenticated/plays/index'
 import { Route as AuthenticatedPhasesIndexRouteImport } from './routes/_authenticated/phases/index'
+import { Route as AuthenticatedDepartmentsIndexRouteImport } from './routes/_authenticated/departments/index'
 import { Route as AuthenticatedAuthorsIndexRouteImport } from './routes/_authenticated/authors/index'
 import { Route as PublicInvitationsTokenRouteImport } from './routes/_public/invitations.$token'
 import { Route as AuthenticatedUsersNewRouteImport } from './routes/_authenticated/users/new'
@@ -42,6 +43,8 @@ import { Route as AuthenticatedSpecializationsSpecializationIdRouteImport } from
 import { Route as AuthenticatedProductionsProductionIdRouteImport } from './routes/_authenticated/productions/$productionId'
 import { Route as AuthenticatedPhasesNewRouteImport } from './routes/_authenticated/phases/new'
 import { Route as AuthenticatedPhasesPhaseIdRouteImport } from './routes/_authenticated/phases/$phaseId'
+import { Route as AuthenticatedDepartmentsNewRouteImport } from './routes/_authenticated/departments/new'
+import { Route as AuthenticatedDepartmentsDepartmentIdRouteImport } from './routes/_authenticated/departments/$departmentId'
 import { Route as AuthenticatedAuditionsJobIdRouteImport } from './routes/_authenticated/auditions/$jobId'
 import { Route as AuthenticatedUsersUserIdIndexRouteImport } from './routes/_authenticated/users/$userId/index'
 import { Route as AuthenticatedTheatersTheaterIdIndexRouteImport } from './routes/_authenticated/theaters/$theaterId/index'
@@ -189,6 +192,12 @@ const AuthenticatedPhasesIndexRoute =
     path: '/phases/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDepartmentsIndexRoute =
+  AuthenticatedDepartmentsIndexRouteImport.update({
+    id: '/departments/',
+    path: '/departments/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAuthorsIndexRoute =
   AuthenticatedAuthorsIndexRouteImport.update({
     id: '/authors/',
@@ -238,6 +247,18 @@ const AuthenticatedPhasesPhaseIdRoute =
   AuthenticatedPhasesPhaseIdRouteImport.update({
     id: '/phases/$phaseId',
     path: '/phases/$phaseId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDepartmentsNewRoute =
+  AuthenticatedDepartmentsNewRouteImport.update({
+    id: '/departments/new',
+    path: '/departments/new',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDepartmentsDepartmentIdRoute =
+  AuthenticatedDepartmentsDepartmentIdRouteImport.update({
+    id: '/departments/$departmentId',
+    path: '/departments/$departmentId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAuditionsJobIdRoute =
@@ -400,6 +421,8 @@ export interface FileRoutesByFullPath {
   '/free/word-cloud': typeof FreeWordCloudRoute
   '/free/': typeof FreeIndexRoute
   '/auditions/$jobId': typeof AuthenticatedAuditionsJobIdRoute
+  '/departments/$departmentId': typeof AuthenticatedDepartmentsDepartmentIdRoute
+  '/departments/new': typeof AuthenticatedDepartmentsNewRoute
   '/phases/$phaseId': typeof AuthenticatedPhasesPhaseIdRoute
   '/phases/new': typeof AuthenticatedPhasesNewRoute
   '/productions/$productionId': typeof AuthenticatedProductionsProductionIdRouteWithChildren
@@ -409,6 +432,7 @@ export interface FileRoutesByFullPath {
   '/users/new': typeof AuthenticatedUsersNewRoute
   '/invitations/$token': typeof PublicInvitationsTokenRoute
   '/authors/': typeof AuthenticatedAuthorsIndexRoute
+  '/departments/': typeof AuthenticatedDepartmentsIndexRoute
   '/phases/': typeof AuthenticatedPhasesIndexRoute
   '/plays/': typeof AuthenticatedPlaysIndexRoute
   '/productions/': typeof AuthenticatedProductionsIndexRoute
@@ -455,6 +479,8 @@ export interface FileRoutesByTo {
   '/free/word-cloud': typeof FreeWordCloudRoute
   '/free': typeof FreeIndexRoute
   '/auditions/$jobId': typeof AuthenticatedAuditionsJobIdRoute
+  '/departments/$departmentId': typeof AuthenticatedDepartmentsDepartmentIdRoute
+  '/departments/new': typeof AuthenticatedDepartmentsNewRoute
   '/phases/$phaseId': typeof AuthenticatedPhasesPhaseIdRoute
   '/phases/new': typeof AuthenticatedPhasesNewRoute
   '/specializations/$specializationId': typeof AuthenticatedSpecializationsSpecializationIdRoute
@@ -463,6 +489,7 @@ export interface FileRoutesByTo {
   '/users/new': typeof AuthenticatedUsersNewRoute
   '/invitations/$token': typeof PublicInvitationsTokenRoute
   '/authors': typeof AuthenticatedAuthorsIndexRoute
+  '/departments': typeof AuthenticatedDepartmentsIndexRoute
   '/phases': typeof AuthenticatedPhasesIndexRoute
   '/plays': typeof AuthenticatedPlaysIndexRoute
   '/productions': typeof AuthenticatedProductionsIndexRoute
@@ -513,6 +540,8 @@ export interface FileRoutesById {
   '/free/word-cloud': typeof FreeWordCloudRoute
   '/free/': typeof FreeIndexRoute
   '/_authenticated/auditions/$jobId': typeof AuthenticatedAuditionsJobIdRoute
+  '/_authenticated/departments/$departmentId': typeof AuthenticatedDepartmentsDepartmentIdRoute
+  '/_authenticated/departments/new': typeof AuthenticatedDepartmentsNewRoute
   '/_authenticated/phases/$phaseId': typeof AuthenticatedPhasesPhaseIdRoute
   '/_authenticated/phases/new': typeof AuthenticatedPhasesNewRoute
   '/_authenticated/productions/$productionId': typeof AuthenticatedProductionsProductionIdRouteWithChildren
@@ -522,6 +551,7 @@ export interface FileRoutesById {
   '/_authenticated/users/new': typeof AuthenticatedUsersNewRoute
   '/_public/invitations/$token': typeof PublicInvitationsTokenRoute
   '/_authenticated/authors/': typeof AuthenticatedAuthorsIndexRoute
+  '/_authenticated/departments/': typeof AuthenticatedDepartmentsIndexRoute
   '/_authenticated/phases/': typeof AuthenticatedPhasesIndexRoute
   '/_authenticated/plays/': typeof AuthenticatedPlaysIndexRoute
   '/_authenticated/productions/': typeof AuthenticatedProductionsIndexRoute
@@ -571,6 +601,8 @@ export interface FileRouteTypes {
     | '/free/word-cloud'
     | '/free/'
     | '/auditions/$jobId'
+    | '/departments/$departmentId'
+    | '/departments/new'
     | '/phases/$phaseId'
     | '/phases/new'
     | '/productions/$productionId'
@@ -580,6 +612,7 @@ export interface FileRouteTypes {
     | '/users/new'
     | '/invitations/$token'
     | '/authors/'
+    | '/departments/'
     | '/phases/'
     | '/plays/'
     | '/productions/'
@@ -626,6 +659,8 @@ export interface FileRouteTypes {
     | '/free/word-cloud'
     | '/free'
     | '/auditions/$jobId'
+    | '/departments/$departmentId'
+    | '/departments/new'
     | '/phases/$phaseId'
     | '/phases/new'
     | '/specializations/$specializationId'
@@ -634,6 +669,7 @@ export interface FileRouteTypes {
     | '/users/new'
     | '/invitations/$token'
     | '/authors'
+    | '/departments'
     | '/phases'
     | '/plays'
     | '/productions'
@@ -683,6 +719,8 @@ export interface FileRouteTypes {
     | '/free/word-cloud'
     | '/free/'
     | '/_authenticated/auditions/$jobId'
+    | '/_authenticated/departments/$departmentId'
+    | '/_authenticated/departments/new'
     | '/_authenticated/phases/$phaseId'
     | '/_authenticated/phases/new'
     | '/_authenticated/productions/$productionId'
@@ -692,6 +730,7 @@ export interface FileRouteTypes {
     | '/_authenticated/users/new'
     | '/_public/invitations/$token'
     | '/_authenticated/authors/'
+    | '/_authenticated/departments/'
     | '/_authenticated/phases/'
     | '/_authenticated/plays/'
     | '/_authenticated/productions/'
@@ -902,6 +941,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPhasesIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/departments/': {
+      id: '/_authenticated/departments/'
+      path: '/departments'
+      fullPath: '/departments/'
+      preLoaderRoute: typeof AuthenticatedDepartmentsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/authors/': {
       id: '/_authenticated/authors/'
       path: '/authors'
@@ -963,6 +1009,20 @@ declare module '@tanstack/react-router' {
       path: '/phases/$phaseId'
       fullPath: '/phases/$phaseId'
       preLoaderRoute: typeof AuthenticatedPhasesPhaseIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/departments/new': {
+      id: '/_authenticated/departments/new'
+      path: '/departments/new'
+      fullPath: '/departments/new'
+      preLoaderRoute: typeof AuthenticatedDepartmentsNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/departments/$departmentId': {
+      id: '/_authenticated/departments/$departmentId'
+      path: '/departments/$departmentId'
+      fullPath: '/departments/$departmentId'
+      preLoaderRoute: typeof AuthenticatedDepartmentsDepartmentIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/auditions/$jobId': {
@@ -1162,6 +1222,8 @@ const AuthenticatedProductionsProductionIdRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAuditionsJobIdRoute: typeof AuthenticatedAuditionsJobIdRoute
+  AuthenticatedDepartmentsDepartmentIdRoute: typeof AuthenticatedDepartmentsDepartmentIdRoute
+  AuthenticatedDepartmentsNewRoute: typeof AuthenticatedDepartmentsNewRoute
   AuthenticatedPhasesPhaseIdRoute: typeof AuthenticatedPhasesPhaseIdRoute
   AuthenticatedPhasesNewRoute: typeof AuthenticatedPhasesNewRoute
   AuthenticatedProductionsProductionIdRoute: typeof AuthenticatedProductionsProductionIdRouteWithChildren
@@ -1170,6 +1232,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTheatersNewRoute: typeof AuthenticatedTheatersNewRoute
   AuthenticatedUsersNewRoute: typeof AuthenticatedUsersNewRoute
   AuthenticatedAuthorsIndexRoute: typeof AuthenticatedAuthorsIndexRoute
+  AuthenticatedDepartmentsIndexRoute: typeof AuthenticatedDepartmentsIndexRoute
   AuthenticatedPhasesIndexRoute: typeof AuthenticatedPhasesIndexRoute
   AuthenticatedPlaysIndexRoute: typeof AuthenticatedPlaysIndexRoute
   AuthenticatedProductionsIndexRoute: typeof AuthenticatedProductionsIndexRoute
@@ -1197,6 +1260,9 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAuditionsJobIdRoute: AuthenticatedAuditionsJobIdRoute,
+  AuthenticatedDepartmentsDepartmentIdRoute:
+    AuthenticatedDepartmentsDepartmentIdRoute,
+  AuthenticatedDepartmentsNewRoute: AuthenticatedDepartmentsNewRoute,
   AuthenticatedPhasesPhaseIdRoute: AuthenticatedPhasesPhaseIdRoute,
   AuthenticatedPhasesNewRoute: AuthenticatedPhasesNewRoute,
   AuthenticatedProductionsProductionIdRoute:
@@ -1207,6 +1273,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTheatersNewRoute: AuthenticatedTheatersNewRoute,
   AuthenticatedUsersNewRoute: AuthenticatedUsersNewRoute,
   AuthenticatedAuthorsIndexRoute: AuthenticatedAuthorsIndexRoute,
+  AuthenticatedDepartmentsIndexRoute: AuthenticatedDepartmentsIndexRoute,
   AuthenticatedPhasesIndexRoute: AuthenticatedPhasesIndexRoute,
   AuthenticatedPlaysIndexRoute: AuthenticatedPlaysIndexRoute,
   AuthenticatedProductionsIndexRoute: AuthenticatedProductionsIndexRoute,

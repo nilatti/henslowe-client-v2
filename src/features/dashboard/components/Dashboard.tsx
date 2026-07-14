@@ -6,6 +6,7 @@ import { buildUserName } from '../../../utils/actorUtils'
 import { upcomingRehearsalsList } from '../../../utils/rehearsalUtils'
 import { ConflictsManager } from '../../conflicts/components/ConflictsManager'
 import { userDashboardQueryOptions } from '../api/dashboard'
+import { groupJobsByDepartment } from '../../jobs/utils/jobUtils'
 
 export function Dashboard() {
   const { user } = useAuth()
@@ -46,37 +47,50 @@ export function Dashboard() {
       <div>
         <h4 className="pt-4 text-lg font-medium">Current Jobs &amp; Productions</h4>
         {currentJobs.length > 0 ? (
-          <ul className="list-disc list-inside space-y-1">
-            {currentJobs.map((job) => (
-              <li key={job.id}>
-                  {job.specialization?.title}{' '}
-                  {job.production && (
-                    <span>
-                      on{' '}
-                      <Link
-                        to="/productions/$productionId"
-                        params={{ productionId: String(job.production.id) }}
-                        className="text-blue-600 hover:underline"
-                      >
-                        {job.production.play?.title}
-                      </Link>{' '}
-                    </span>
-                  )}
-                  {job.theater_id !== null && (
-                    <span>
-                      at{' '}
-                      <Link
-                        to="/theaters/$theaterId"
-                        params={{ theaterId: String(job.theater_id) }}
-                        className="text-blue-600 hover:underline"
-                      >
-                        {job.theater?.name ?? 'Theater'}
-                      </Link>
-                    </span>
-                  )}
-                </li>
-              ))}
-          </ul>
+          <div className="space-y-3">
+            {groupJobsByDepartment(currentJobs).map(deptGroup => (
+              <div key={deptGroup.departmentName}>
+                <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  {deptGroup.departmentName}
+                </h5>
+                {deptGroup.specializations.map(specGroup => (
+                  <div key={specGroup.title} className="mt-1">
+                    <div className="text-sm font-medium text-gray-700">{specGroup.title}</div>
+                    <ul className="list-disc list-inside space-y-1">
+                      {specGroup.jobs.map((job) => (
+                        <li key={job.id}>
+                            {job.production && (
+                              <span>
+                                on{' '}
+                                <Link
+                                  to="/productions/$productionId"
+                                  params={{ productionId: String(job.production.id) }}
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  {job.production.play?.title}
+                                </Link>{' '}
+                              </span>
+                            )}
+                            {job.theater_id !== null && (
+                              <span>
+                                at{' '}
+                                <Link
+                                  to="/theaters/$theaterId"
+                                  params={{ theaterId: String(job.theater_id) }}
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  {job.theater?.name ?? 'Theater'}
+                                </Link>
+                              </span>
+                            )}
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="text-gray-500">No current jobs or productions.</div>
         )}

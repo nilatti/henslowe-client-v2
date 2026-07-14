@@ -46,6 +46,30 @@ export function getActorsAndAuditioners(jobs: JobWithDetails[]) {
   ])
 }
 
+export interface JobWithSpecialization {
+  specialization?: { title: string; department?: { name: string } | null } | null
+}
+
+export interface DepartmentJobGroup<T> {
+  departmentName: string
+  specializations: { title: string; jobs: T[] }[]
+}
+
+export function groupJobsByDepartment<T extends JobWithSpecialization>(
+  jobs: T[],
+  sortJobs: (jobs: T[]) => T[] = jobs => jobs
+): DepartmentJobGroup<T>[] {
+  const byDept = _.groupBy(jobs, j => j.specialization?.department?.name ?? 'Unassigned')
+  return _.sortBy(Object.keys(byDept), name => name).map(departmentName => {
+    const bySpec = _.groupBy(byDept[departmentName], j => j.specialization?.title ?? 'Unassigned')
+    const specializations = _.sortBy(Object.keys(bySpec), title => title).map(title => ({
+      title,
+      jobs: sortJobs(bySpec[title]),
+    }))
+    return { departmentName, specializations }
+  })
+}
+
 export function getFakeActorCount(jobs: JobWithDetails[]): FakeActorCount {
   const fakeActors = getActorsAndAuditioners(jobs).filter(u => u.fake)
   const count: FakeActorCount = { female: 0, male: 0, nonbinary: 0 }

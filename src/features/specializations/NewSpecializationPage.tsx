@@ -1,18 +1,21 @@
 import { useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { Button, PageHeader } from '../../components/ui'
 import { createSpecializationFn } from './queries'
+import { departmentsQueryOptions } from '../departments/queries'
 import type { SpecializationContext } from './types'
 
 export function NewSpecializationPage() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { data: departments } = useSuspenseQuery(departmentsQueryOptions())
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [context, setContext] = useState<SpecializationContext>('both')
   const [productionAdmin, setProductionAdmin] = useState(false)
   const [theaterAdmin, setTheaterAdmin] = useState(false)
+  const [departmentId, setDepartmentId] = useState<number | null>(null)
 
   const createMutation = useMutation({
     mutationFn: createSpecializationFn,
@@ -27,7 +30,7 @@ export function NewSpecializationPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    createMutation.mutate({ title, description: description || null, context, production_admin: productionAdmin, theater_admin: theaterAdmin })
+    createMutation.mutate({ title, description: description || null, context, production_admin: productionAdmin, theater_admin: theaterAdmin, department_id: departmentId })
   }
 
   return (
@@ -69,6 +72,19 @@ export function NewSpecializationPage() {
               <option value="theater">Theater only</option>
               <option value="production">Production only</option>
               <option value="both">Both</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+            <select
+              className="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              value={departmentId ?? ''}
+              onChange={e => setDepartmentId(e.target.value ? Number(e.target.value) : null)}
+            >
+              <option value="">No department</option>
+              {departments.map(d => (
+                <option key={d.id} value={d.id}>{d.name}</option>
+              ))}
             </select>
           </div>
           <div className="space-y-2">

@@ -23,7 +23,7 @@ export interface JobCharacter {
 }
 
 export interface JobWithDetails extends Job {
-  specialization: { id: number; title: string } | null
+  specialization: { id: number; title: string; department: { id: number; name: string } | null } | null
   theater: { id: number; name: string } | null
   character: JobCharacter | null
   character_group: { id: number; name: string } | null

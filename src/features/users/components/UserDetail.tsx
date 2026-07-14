@@ -19,6 +19,7 @@ import {
   Tabs,
 } from '../../../components/ui'
 import { format, parseISO } from 'date-fns'
+import { groupJobsByDepartment } from '../../jobs/utils/jobUtils'
 
 interface UserDetailProps {
   userId: number
@@ -277,60 +278,70 @@ export function UserDetail({ userId }: UserDetailProps) {
               {user.jobs.length === 0 ? (
                 <p className="px-4 py-3 text-sm text-gray-500">No jobs yet.</p>
               ) : (
-                <ul className="divide-y divide-gray-100 mt-3">
-                  {user.jobs.map(job => (
-                    <li
-                      key={job.id}
-                      className="px-4 py-3 text-sm"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="font-medium text-gray-900">
-                            {job.specialization?.title ?? 'Unknown role'}
-                          </span>
-                          {job.character && (
-                            <span className="text-gray-500 ml-2">
-                              as {job.character.name}
-                            </span>
-                          )}
-                          {job.character_group && (
-                            <span className="text-gray-500 ml-2">
-                              as {job.character_group.name}
-                            </span>
-                          )}
+                <div className="divide-y divide-gray-100 mt-3">
+                  {groupJobsByDepartment(user.jobs).map(deptGroup => (
+                    <div key={deptGroup.departmentName} className="px-4 py-3">
+                      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                        {deptGroup.departmentName}
+                      </h3>
+                      {deptGroup.specializations.map(specGroup => (
+                        <div key={specGroup.title} className="mb-3 last:mb-0">
+                          <h4 className="text-sm font-medium text-gray-700 mb-1">
+                            {specGroup.title}
+                          </h4>
+                          <ul className="divide-y divide-gray-50">
+                            {specGroup.jobs.map(job => (
+                              <li key={job.id} className="py-2 text-sm">
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    {job.character && (
+                                      <span className="text-gray-500">
+                                        as {job.character.name}
+                                      </span>
+                                    )}
+                                    {job.character_group && (
+                                      <span className="text-gray-500">
+                                        as {job.character_group.name}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="text-right text-gray-400 text-xs">
+                                    {job.production ? (
+                                      <Link
+                                        to={'/productions/$productionId' as never}
+                                        params={{
+                                          productionId: String(job.production.id),
+                                        } as never}
+                                        className="text-blue-600 hover:text-blue-800"
+                                      >
+                                        {job.production.play?.title}
+                                      </Link>
+                                    ) : job.theater ? (
+                                      <Link
+                                        to={'/theaters/$theaterId' as never}
+                                        params={{ theaterId: String(job.theater_id) } as never}
+                                        className="text-blue-600 hover:text-blue-800"
+                                      >
+                                        {job.theater.name}
+                                      </Link>
+                                    ) : null}
+                                    {job.start_date && (
+                                      <div>
+                                        {format(parseISO(job.start_date), 'MMM yyyy')}
+                                        {job.end_date &&
+                                          ` → ${format(parseISO(job.end_date), 'MMM yyyy')}`}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
-                        <div className="text-right text-gray-400 text-xs">
-                          {job.production ? (
-                            <Link
-                              to={'/productions/$productionId' as never}
-                              params={{
-                                productionId: String(job.production.id),
-                              } as never}
-                              className="text-blue-600 hover:text-blue-800"
-                            >
-                              {job.production.play?.title}
-                            </Link>
-                          ) : job.theater ? (
-                            <Link
-                              to={'/theaters/$theaterId' as never}
-                              params={{ theaterId: String(job.theater_id) } as never}
-                              className="text-blue-600 hover:text-blue-800"
-                            >
-                              {job.theater.name}
-                            </Link>
-                          ) : null}
-                          {job.start_date && (
-                            <div>
-                              {format(parseISO(job.start_date), 'MMM yyyy')}
-                              {job.end_date &&
-                                ` → ${format(parseISO(job.end_date), 'MMM yyyy')}`}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </li>
+                      ))}
+                    </div>
                   ))}
-                </ul>
+                </div>
               )}
             </Card>
           )}
