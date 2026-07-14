@@ -155,7 +155,7 @@ export function ConflictPatternForm({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Category *
+          Category
         </label>
         <div className="flex flex-wrap gap-3">
           {reasons.map(reason => (

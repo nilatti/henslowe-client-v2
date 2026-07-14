@@ -107,7 +107,7 @@ export function ConflictForm({
 
       <form.Field name="category">
         {field => (
-          <FormField label="Category" required>
+          <FormField label="Category">
             <div className="flex flex-wrap gap-3">
               {reasons.map(reason => (
                 <label
