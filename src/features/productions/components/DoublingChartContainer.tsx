@@ -86,6 +86,11 @@ export function DoublingChartContainer({
                 const actorCastings = castings.filter(
                   (c) => c.user_id === actor.id,
                 );
+                const actorLineCount = actorCastings.reduce(
+                  (sum, c) =>
+                    sum + (c.character?.new_line_count ?? c.character?.original_line_count ?? 0),
+                  0,
+                );
                 return (
                   <li key={actor.id}>
                     {actor.fake ? (
@@ -98,6 +103,11 @@ export function DoublingChartContainer({
                       >
                         {buildUserName(actor)}
                       </Link>
+                    )}
+                    {actorLineCount > 0 && (
+                      <span className="text-xs text-gray-400 ml-1">
+                        ({actorLineCount} lines)
+                      </span>
                     )}
                     <ul className="list-disc list-inside ml-4">
                       {[...actorCastings]
@@ -114,6 +124,9 @@ export function DoublingChartContainer({
                           casting.character?.name ??
                           casting.character_group?.name;
                         const charId = casting.character_id;
+                        const groupId = casting.character_group_id;
+                        const lineCount =
+                          casting.character?.new_line_count ?? casting.character?.original_line_count;
                         return (
                           <li key={casting.id}>
                             {charId && playId ? (
@@ -127,8 +140,24 @@ export function DoublingChartContainer({
                               >
                                 {charName}
                               </Link>
+                            ) : groupId && playId ? (
+                              <Link
+                                to="/plays/$playId/characters/$characterId"
+                                params={{
+                                  playId: String(playId),
+                                  characterId: String(groupId),
+                                }}
+                                className="text-blue-600 hover:text-blue-800"
+                              >
+                                {charName}
+                              </Link>
                             ) : (
                               charName
+                            )}
+                            {lineCount != null && lineCount > 0 && (
+                              <span className="text-xs text-gray-400 ml-1">
+                                ({lineCount} lines)
+                              </span>
                             )}
                           </li>
                         );
