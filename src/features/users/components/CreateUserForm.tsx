@@ -33,6 +33,7 @@ export function CreateUserForm() {
       timezone: '',
       emergency_contact_name: '',
       emergency_contact_number: '',
+      receive_rehearsal_calendar_invites: true,
     } as UserEditableFields,
     onSubmit: async ({ value }) => {
       const user = await create.mutateAsync(value)
@@ -41,7 +42,7 @@ export function CreateUserForm() {
   })
 
   const textField = (
-    name: keyof UserEditableFields,
+    name: Exclude<keyof UserEditableFields, 'receive_rehearsal_calendar_invites'>,
     label: string,
     required = false,
     placeholder?: string

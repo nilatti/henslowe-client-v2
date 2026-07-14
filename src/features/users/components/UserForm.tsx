@@ -37,6 +37,7 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
       timezone: user.timezone ?? '',
       emergency_contact_name: user.emergency_contact_name ?? '',
       emergency_contact_number: user.emergency_contact_number ?? '',
+      receive_rehearsal_calendar_invites: user.receive_rehearsal_calendar_invites ?? true,
     } as UserEditableFields,
     onSubmit: async ({ value }) => {
       await update.mutateAsync({ ...value, id: user.id })
@@ -45,7 +46,7 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
   })
 
   const textField = (
-    name: keyof UserEditableFields,
+    name: Exclude<keyof UserEditableFields, 'receive_rehearsal_calendar_invites'>,
     label: string,
     placeholder?: string
   ) => (
@@ -208,6 +209,24 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
           {textField('emergency_contact_name', 'Name')}
           {textField('emergency_contact_number', 'Phone number')}
         </div>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-gray-900 mb-3">
+          Notifications
+        </h3>
+        <form.Field name="receive_rehearsal_calendar_invites">
+          {field => (
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={field.state.value}
+                onChange={e => field.handleChange(e.target.checked)}
+              />
+              Email me calendar invites for rehearsals
+            </label>
+          )}
+        </form.Field>
       </div>
 
       <FormActions isSubmitting={form.state.isSubmitting} isEditing={true} onCancel={onCancel} className="border-t border-gray-200" />
