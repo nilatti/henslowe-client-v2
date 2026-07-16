@@ -16,6 +16,44 @@ export function onStageUserIds(
   }))
 }
 
+// A scene's rehearsal time also counts time spent rehearsing its french scenes,
+// and an act's also counts time spent on its scenes and their french scenes —
+// rehearsing a piece of a text unit still moves the whole unit forward.
+export function withInheritedRehearsals(
+  items: TextUnitWithOnStages[],
+  granularity: 'acts' | 'scenes' | 'french_scenes',
+  scenes: TextUnitWithOnStages[] = [],
+  frenchScenes: TextUnitWithOnStages[] = []
+): TextUnitWithOnStages[] {
+  if (granularity === 'french_scenes') return items
+
+  if (granularity === 'scenes') {
+    return items.map(scene => ({
+      ...scene,
+      rehearsals: [
+        ...(scene.rehearsals ?? []),
+        ...frenchScenes.filter(fs => fs.scene_id === scene.id).flatMap(fs => fs.rehearsals ?? []),
+      ],
+    }))
+  }
+
+  return items.map(act => {
+    const childScenes = scenes.filter(s => s.act_id === act.id)
+    const childSceneIds = new Set(childScenes.map(s => s.id))
+    const childFrenchScenes = frenchScenes.filter(
+      fs => fs.scene_id != null && childSceneIds.has(fs.scene_id)
+    )
+    return {
+      ...act,
+      rehearsals: [
+        ...(act.rehearsals ?? []),
+        ...childScenes.flatMap(s => s.rehearsals ?? []),
+        ...childFrenchScenes.flatMap(fs => fs.rehearsals ?? []),
+      ],
+    }
+  })
+}
+
 export function markContentScheduled(
   playContent: TextUnitWithOnStages[],
   rehearsalContentIds: number[]

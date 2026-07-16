@@ -26,6 +26,8 @@ export interface TextUnitWithOnStages {
   summary?: string | null;
   start_page?: number | null;
   end_page?: number | null;
+  act_id?: number | null;
+  scene_id?: number | null;
   find_on_stages: {
     user_id: number | null;
     character_id: number | null;

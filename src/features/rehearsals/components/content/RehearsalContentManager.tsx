@@ -24,6 +24,7 @@ import {
   getCalledActors,
   detectExtraUsers,
   buildFinalUserIds,
+  withInheritedRehearsals,
 } from "../../utils/contentUtils";
 import { getConflictedUserIds } from "../../../conflicts/utils/conflictUtils";
 
@@ -70,17 +71,20 @@ export function RehearsalContentManager({
     return map;
   }, [jobs]);
 
+  // Scenes need french scene rehearsals to fold in, and acts need both scene
+  // and french scene rehearsals, so those collections are fetched even when
+  // not the one being displayed.
   const actsQuery = useQuery({
     ...playActOnStagesQueryOptions(playId),
     enabled: rehearsal.text_unit === "acts",
   });
   const scenesQuery = useQuery({
     ...playSceneOnStagesQueryOptions(playId),
-    enabled: rehearsal.text_unit === "scenes",
+    enabled: rehearsal.text_unit === "scenes" || rehearsal.text_unit === "acts",
   });
   const frenchScenesQuery = useQuery({
     ...playFrenchSceneOnStagesQueryOptions(playId),
-    enabled: rehearsal.text_unit === "french_scenes",
+    enabled: rehearsal.text_unit != null,
   });
 
   const rawPlayContent =
@@ -92,9 +96,9 @@ export function RehearsalContentManager({
 
   const isLoading =
     rehearsal.text_unit === "acts"
-      ? actsQuery.isLoading
+      ? actsQuery.isLoading || scenesQuery.isLoading || frenchScenesQuery.isLoading
       : rehearsal.text_unit === "scenes"
-        ? scenesQuery.isLoading
+        ? scenesQuery.isLoading || frenchScenesQuery.isLoading
         : frenchScenesQuery.isLoading;
 
   const [selectedIds, setSelectedIds] = useState<number[]>(() => {
@@ -120,7 +124,17 @@ export function RehearsalContentManager({
   const playContent = useMemo(() => {
     if (!rawPlayContent) return [];
 
-    let processed: TextUnitWithOnStages[] = rawPlayContent.map((item) => ({ ...item }));
+    const granularity = (rehearsal.text_unit ?? "acts") as
+      | "acts"
+      | "scenes"
+      | "french_scenes";
+
+    let processed: TextUnitWithOnStages[] = withInheritedRehearsals(
+      rawPlayContent,
+      granularity,
+      scenesQuery.data,
+      frenchScenesQuery.data,
+    );
     processed = markContentRecommended(processed, unavailableActors, characterToUserMap, characterGroupToUserIdsMap);
     processed = processed.map((item) => ({
       ...item,
@@ -129,7 +143,17 @@ export function RehearsalContentManager({
     }));
 
     return processed;
-  }, [rawPlayContent, unavailableActors, actors, selectedIds, characterToUserMap, characterGroupToUserIdsMap]);
+  }, [
+    rawPlayContent,
+    rehearsal.text_unit,
+    scenesQuery.data,
+    frenchScenesQuery.data,
+    unavailableActors,
+    actors,
+    selectedIds,
+    characterToUserMap,
+    characterGroupToUserIdsMap,
+  ]);
 
   const handleToggle = (id: number) => {
     setSelectedIds((prev) =>
