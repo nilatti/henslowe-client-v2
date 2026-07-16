@@ -39,13 +39,9 @@ vi.mock('../../../components/ui', async (importOriginal) => {
 
 import { ConflictPatternForm } from './ConflictPatternForm'
 
-// Returns the browser's UTC offset in "+HH:MM" / "-HH:MM" format,
-// exactly as the component computes it.
-function expectedTzOffset(): string {
-  const offset = new Date().getTimezoneOffset()
-  const sign = offset <= 0 ? '+' : '-'
-  const abs = Math.abs(offset)
-  return `${sign}${String(Math.floor(abs / 60)).padStart(2, '0')}:${String(abs % 60).padStart(2, '0')}`
+// Returns the browser's IANA time zone name, exactly as the component computes it.
+function expectedTimeZone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone
 }
 
 const defaultProps = {
@@ -148,23 +144,23 @@ describe('ConflictPatternForm', () => {
     mockUseBuildConflictSchedule.mockClear()
   })
 
-  it('sends start_time and end_time as plain HH:MM and utc_offset separately', async () => {
+  it('sends start_time and end_time as plain HH:MM and time_zone separately', async () => {
     await fillAndSubmitForm('19:00', '21:00')
 
     expect(mockMutateAsync).toHaveBeenCalledOnce()
     const payload = (mockMutateAsync as Mock).mock.calls[0][0]
-    const tz = expectedTzOffset()
     expect(payload.start_time).toBe('19:00')
     expect(payload.end_time).toBe('21:00')
-    expect(payload.utc_offset).toBe(tz)
+    expect(payload.time_zone).toBe(expectedTimeZone())
   })
 
-  it('utc_offset is a valid UTC-offset string', async () => {
+  it('time_zone is the browser IANA zone name, not a fixed UTC offset', async () => {
     await fillAndSubmitForm('10:30', '12:00')
 
     const payload = (mockMutateAsync as Mock).mock.calls[0][0]
-    // Must match ±HH:MM
-    expect(payload.utc_offset).toMatch(/^[+-]\d{2}:\d{2}$/)
+    // Must be an IANA zone name (e.g. "America/New_York"), not a "+HH:MM" offset —
+    // a fixed offset can't represent DST correctly across a whole recurring pattern.
+    expect(payload.time_zone).not.toMatch(/^[+-]\d{2}:\d{2}$/)
     // Times must be plain HH:MM with no suffix
     expect(payload.start_time).toBe('10:30')
     expect(payload.end_time).toBe('12:00')

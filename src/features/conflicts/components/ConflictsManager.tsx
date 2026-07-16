@@ -52,6 +52,15 @@ export function ConflictsManager({
 
   const individualConflicts = conflicts.filter((c) => !c.regular);
   const regularConflicts = conflicts.filter((c) => c.regular);
+  const occurrencesByPattern = regularConflicts.reduce<Record<number, Conflict[]>>(
+    (acc, c) => {
+      if (c.conflict_pattern_id != null) {
+        (acc[c.conflict_pattern_id] ??= []).push(c);
+      }
+      return acc;
+    },
+    {},
+  );
 
   return (
     <div className="space-y-6">
@@ -136,6 +145,7 @@ export function ConflictsManager({
                 <ConflictPatternItem
                   key={pattern.id}
                   pattern={pattern}
+                  occurrences={occurrencesByPattern[pattern.id] ?? []}
                   canEdit={canEdit}
                   invalidateKey={patternKey}
                 />

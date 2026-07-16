@@ -45,17 +45,13 @@ export function ConflictPatternForm({
     )
   }
 
-  const tzOffset = (() => {
-    const offset = new Date().getTimezoneOffset()
-    const sign = offset <= 0 ? '+' : '-'
-    const abs = Math.abs(offset)
-    return `${sign}${String(Math.floor(abs / 60)).padStart(2, '0')}:${String(abs % 60).padStart(2, '0')}`
-  })()
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
   const handleSubmit = async () => {
     // Send days_of_week as array — server stores it as JSON string
-    // start_time/end_time are plain "HH:MM" for display; utc_offset is sent separately
-    // so the worker can compute correct UTC datetimes without polluting the display string
+    // start_time/end_time are plain "HH:MM" for display; time_zone is an IANA zone
+    // name (not a fixed offset) so the server can resolve the correct standard/
+    // daylight offset per occurrence instead of baking in one offset for the year
     await buildSchedule.mutateAsync({
       category,
       days_of_week: daysOfWeek,
@@ -63,7 +59,7 @@ export function ConflictPatternForm({
       end_date: endDate,
       start_time: startTime,
       end_time: endTime,
-      utc_offset: tzOffset,
+      time_zone: timeZone,
       user_id: userId ?? null,
       space_id: spaceId ?? null,
     })

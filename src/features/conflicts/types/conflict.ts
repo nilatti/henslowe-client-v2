@@ -22,6 +22,7 @@ export interface ConflictPattern {
   end_date: string
   category: string
   days_of_week: string  // JSON string: '["monday","tuesday"]'
+  time_zone: string | null  // IANA zone, e.g. "America/New_York"
   created_at: string
   updated_at: string
 }
