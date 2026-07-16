@@ -47,7 +47,7 @@ export function RehearsalContentManager({
   onClose,
   productionUserConflicts,
 }: RehearsalContentManagerProps) {
-  const updateRehearsal = useUpdateRehearsal(productionId);
+  const updateRehearsal = useUpdateRehearsal(productionId, playId);
   const { data: jobs } = useQuery(productionJobsQueryOptions(productionId));
 
   const characterToUserMap = useMemo(() => {
@@ -218,6 +218,7 @@ export function RehearsalContentManager({
       <TextUnitSelector
         rehearsal={rehearsal}
         productionId={productionId}
+        playId={playId}
         onClose={onClose}
       />
     );

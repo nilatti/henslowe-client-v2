@@ -13,6 +13,7 @@ import RehearsalCallSelector from "./RehearsalCallSelector";
 interface RehearsalPeopleManagerProps {
   rehearsal: RehearsalWithDetails;
   productionId: number;
+  playId: number;
   actors: RehearsalUser[];
   productionStaff: RehearsalUser[];
   setShowPeopleManager: (show: boolean) => void;
@@ -23,13 +24,14 @@ interface RehearsalPeopleManagerProps {
 export function RehearsalPeopleManager({
   rehearsal,
   productionId,
+  playId,
   actors,
   productionStaff,
   setShowPeopleManager,
   productionUserConflicts,
   actorCharacterNames,
 }: RehearsalPeopleManagerProps) {
-  const update = useUpdateRehearsal(productionId);
+  const update = useUpdateRehearsal(productionId, playId);
   const [selectedIds, setSelectedIds] = useState<number[]>(
     rehearsal.users.map((u) => u.id),
   );

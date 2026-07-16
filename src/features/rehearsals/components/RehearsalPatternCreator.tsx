@@ -9,6 +9,7 @@ import { theaterSkeletonQueryOptions } from "../../theaters/api/theaters";
 
 interface RehearsalPatternCreatorProps {
   productionId: number;
+  playId: number;
   theaterId: number;
   actors: RehearsalUser[];
   productionStaff: RehearsalUser[];
@@ -20,6 +21,7 @@ interface RehearsalPatternCreatorProps {
 
 export function RehearsalPatternCreator({
   productionId,
+  playId,
   theaterId,
   actors,
   productionStaff,
@@ -28,7 +30,7 @@ export function RehearsalPatternCreator({
   defaultSpaceId,
   defaultCallUserIds,
 }: RehearsalPatternCreatorProps) {
-  const buildSchedule = useBuildRehearsalSchedule(productionId);
+  const buildSchedule = useBuildRehearsalSchedule(productionId, playId);
   const { data: theater } = useQuery(theaterSkeletonQueryOptions(theaterId));
   const [submitted, setSubmitted] = useState(false);
 

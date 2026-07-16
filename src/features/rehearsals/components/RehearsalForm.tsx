@@ -8,6 +8,7 @@ import { FormField, FormActions, inputClass } from "../../../components/ui";
 
 interface RehearsalFormProps {
   productionId: number;
+  playId: number;
   theaterId: number;
   rehearsal?: RehearsalWithDetails;
   defaultSpaceId?: number | null;
@@ -23,6 +24,7 @@ function toLocalInput(iso: string) {
 
 export function RehearsalForm({
   productionId,
+  playId,
   theaterId,
   rehearsal,
   defaultSpaceId,
@@ -31,8 +33,8 @@ export function RehearsalForm({
   onSuccess,
   onCancel,
 }: RehearsalFormProps) {
-  const create = useCreateRehearsal(productionId);
-  const update = useUpdateRehearsal(productionId);
+  const create = useCreateRehearsal(productionId, playId);
+  const update = useUpdateRehearsal(productionId, playId);
   const isEditing = !!rehearsal;
   const { data: theater } = useQuery(theaterSkeletonQueryOptions(theaterId));
 

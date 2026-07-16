@@ -5,6 +5,7 @@ import { Button, Card } from '../../../../components/ui'
 interface TextUnitSelectorProps {
   rehearsal: RehearsalWithDetails
   productionId: number
+  playId: number
   onClose: () => void
 }
 
@@ -17,9 +18,10 @@ const OPTIONS = [
 export function TextUnitSelector({
   rehearsal,
   productionId,
+  playId,
   onClose,
 }: TextUnitSelectorProps) {
-  const update = useUpdateRehearsal(productionId)
+  const update = useUpdateRehearsal(productionId, playId)
 
   const handleSelect = async (textUnit: 'acts' | 'scenes' | 'french_scenes') => {
     await update.mutateAsync({ id: rehearsal.id, text_unit: textUnit })

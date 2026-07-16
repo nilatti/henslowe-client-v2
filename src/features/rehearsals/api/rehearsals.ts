@@ -97,7 +97,26 @@ type UpdateRehearsalPayload = Partial<Rehearsal> & {
   french_scene_ids?: number[];
 };
 
-export function useCreateRehearsal(productionId: number) {
+function invalidateRehearsalRelatedQueries(
+  qc: ReturnType<typeof useQueryClient>,
+  productionId: number,
+  playId: number,
+) {
+  qc.invalidateQueries({ queryKey: ["rehearsals", { productionId }] });
+  qc.invalidateQueries({
+    queryKey: ["productions", productionId, "user_conflicts"],
+  });
+  qc.invalidateQueries({
+    queryKey: ["productions", productionId, "space_conflicts"],
+  });
+  qc.invalidateQueries({ queryKey: ["plays", playId, "act_on_stages"] });
+  qc.invalidateQueries({ queryKey: ["plays", playId, "scene_on_stages"] });
+  qc.invalidateQueries({
+    queryKey: ["plays", playId, "french_scene_on_stages"],
+  });
+}
+
+export function useCreateRehearsal(productionId: number, playId: number) {
   const qc = useQueryClient();
   const key = ["rehearsals", { productionId }] as const;
   return useMutation({
@@ -141,12 +160,12 @@ export function useCreateRehearsal(productionId: number) {
       }
     },
     onSettled: () => {
-      qc.invalidateQueries({ queryKey: key });
+      invalidateRehearsalRelatedQueries(qc, productionId, playId);
     },
   });
 }
 
-export function useUpdateRehearsal(productionId: number) {
+export function useUpdateRehearsal(productionId: number, playId: number) {
   const qc = useQueryClient();
   const key = ["rehearsals", { productionId }] as const;
   return useMutation({
@@ -194,12 +213,12 @@ export function useUpdateRehearsal(productionId: number) {
       }
     },
     onSettled: () => {
-      qc.invalidateQueries({ queryKey: key });
+      invalidateRehearsalRelatedQueries(qc, productionId, playId);
     },
   });
 }
 
-export function useDeleteRehearsal(productionId: number) {
+export function useDeleteRehearsal(productionId: number, playId: number) {
   const qc = useQueryClient();
   const key = ["rehearsals", { productionId }] as const;
   return useMutation({
@@ -220,12 +239,12 @@ export function useDeleteRehearsal(productionId: number) {
       }
     },
     onSettled: () => {
-      qc.invalidateQueries({ queryKey: key });
+      invalidateRehearsalRelatedQueries(qc, productionId, playId);
     },
   });
 }
 
-export function useBuildRehearsalSchedule(productionId: number) {
+export function useBuildRehearsalSchedule(productionId: number, playId: number) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (pattern: object) =>
@@ -236,7 +255,7 @@ export function useBuildRehearsalSchedule(productionId: number) {
         .then((r) => r.data),
     onSuccess: () => {
       setTimeout(() => {
-        qc.invalidateQueries({ queryKey: ["rehearsals", { productionId }] });
+        invalidateRehearsalRelatedQueries(qc, productionId, playId);
       }, 5000);
     },
   });

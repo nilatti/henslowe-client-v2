@@ -246,6 +246,7 @@ export function RehearsalSchedule({
         <div className="mb-6">
           <RehearsalPatternCreator
             productionId={productionId}
+            playId={playId}
             theaterId={theaterId}
             actors={actors}
             productionStaff={productionStaff}
@@ -261,6 +262,7 @@ export function RehearsalSchedule({
         <Card className="p-6 mb-6">
           <RehearsalForm
             productionId={productionId}
+            playId={playId}
             theaterId={theaterId}
             defaultSpaceId={productionSkeleton?.default_space_id}
             onSuccess={() => setShowForm(false)}
@@ -336,6 +338,7 @@ export function RehearsalSchedule({
                       <div className="pt-2 border-t border-gray-100 mt-2">
                         <RehearsalForm
                           productionId={productionId}
+                          playId={playId}
                           theaterId={theaterId}
                           defaultSpaceId={productionSkeleton?.default_space_id}
                           defaultStartTime={defaultStart.toISOString()}

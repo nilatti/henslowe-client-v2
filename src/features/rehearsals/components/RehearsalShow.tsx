@@ -40,7 +40,7 @@ export function RehearsalShow({
   productionSpaceConflicts,
   actorCharacterNames,
 }: RehearsalShowProps) {
-  const deleteRehearsal = useDeleteRehearsal(productionId);
+  const deleteRehearsal = useDeleteRehearsal(productionId, playId);
   const [isEditing, setIsEditing] = useState(false);
   const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete();
   const [showContentManager, setShowContentManager] = useState(false);
@@ -109,6 +109,7 @@ export function RehearsalShow({
       <div className="py-3">
         <RehearsalForm
           productionId={productionId}
+          playId={playId}
           theaterId={theaterId}
           rehearsal={rehearsal}
           onSuccess={() => setIsEditing(false)}
@@ -258,6 +259,7 @@ export function RehearsalShow({
           <RehearsalPeopleManager
             rehearsal={rehearsal}
             productionId={productionId}
+            playId={playId}
             actors={actors}
             productionStaff={productionStaff}
             setShowPeopleManager={setShowPeopleManager}
