@@ -29,3 +29,8 @@ export function minutesPerPage(item: TextUnitPageInfo): number | null {
   if (minutes <= 0) return null
   return minutes / pageCount(item.start_page, item.end_page)
 }
+
+export function rehearsalTimeLabel(item: TextUnitPageInfo): string | null {
+  const mpp = minutesPerPage(item)
+  return mpp == null ? null : `Rehearsal time: ${mpp.toFixed(1)} minutes per page`
+}

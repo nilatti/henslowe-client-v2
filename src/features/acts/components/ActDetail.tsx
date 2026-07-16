@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { actQueryOptions, useDeleteAct } from "../api/acts";
@@ -14,6 +14,8 @@ import {
   LinkedItemList,
   PageHeader,
 } from "../../../components/ui";
+import { playSceneOnStagesQueryOptions } from "../../rehearsals/api/rehearsals";
+import { rehearsalTimeLabel } from "../../rehearsals/utils/rehearsalMetrics";
 
 interface ActDetailProps {
   playId: number;
@@ -23,6 +25,10 @@ interface ActDetailProps {
 export function ActDetail({ playId, actId }: ActDetailProps) {
   const { data: act } = useSuspenseQuery(actQueryOptions(actId));
   const { data: playSkeleton } = useSuspenseQuery(playSkeletonQueryOptions(playId));
+  const { data: sceneOnStages } = useQuery(playSceneOnStagesQueryOptions(playId));
+  const sceneRehearsalTimeById = new Map(
+    (sceneOnStages ?? []).map((s) => [s.id, rehearsalTimeLabel(s)]),
+  );
   const deleteAct = useDeleteAct(playId);
   const isAdmin = useIsPlayAdmin(playId);
   const navigate = useNavigate();
@@ -146,6 +152,7 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
                 params: { playId: String(playId), actId: String(actId), sceneId: String(scene.id) },
                 label: `Scene ${scene.number}`,
                 sublabel: songs.length > 0 ? songs.map(s => s.title).join(' · ') : undefined,
+                meta: sceneRehearsalTimeById.get(scene.id) ?? undefined,
               }
             })}
           />

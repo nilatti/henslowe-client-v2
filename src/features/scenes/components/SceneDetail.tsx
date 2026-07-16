@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { sceneQueryOptions, useDeleteScene } from "../api/scenes";
@@ -15,6 +15,8 @@ import {
   InfoCard,
   PageHeader,
 } from "../../../components/ui";
+import { playFrenchSceneOnStagesQueryOptions } from "../../rehearsals/api/rehearsals";
+import { rehearsalTimeLabel } from "../../rehearsals/utils/rehearsalMetrics";
 
 interface SceneDetailProps {
   playId: number;
@@ -26,6 +28,10 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
   const { data: scene } = useSuspenseQuery(sceneQueryOptions(sceneId));
   const { data: act } = useSuspenseQuery(actQueryOptions(actId));
   const { data: playSkeleton } = useSuspenseQuery(playSkeletonQueryOptions(playId));
+  const { data: frenchSceneOnStages } = useQuery(playFrenchSceneOnStagesQueryOptions(playId));
+  const frenchSceneRehearsalTimeById = new Map(
+    (frenchSceneOnStages ?? []).map((fs) => [fs.id, rehearsalTimeLabel(fs)]),
+  );
   const deleteScene = useDeleteScene(playId, actId);
   const isAdmin = useIsPlayAdmin(playId);
   const navigate = useNavigate();
@@ -169,9 +175,11 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
                             p. {fs.start_page}{fs.end_page ? `–${fs.end_page}` : ''}
                           </p>
                         )}
-                        <p className="text-xs text-gray-400">
-                          {fs.on_stages.length} on stage{fs.on_stages.length !== 1 ? "s" : ""}
-                        </p>
+                        {frenchSceneRehearsalTimeById.get(fs.id) && (
+                          <p className="text-xs text-gray-400">
+                            {frenchSceneRehearsalTimeById.get(fs.id)}
+                          </p>
+                        )}
                       </div>
                     </Link>
                   </li>

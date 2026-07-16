@@ -1,11 +1,17 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
 import { useDeleteAct } from "../api/acts";
 import { ActForm } from "./ActForm";
 import type { PlaySkeleton } from "../../plays/types/play";
 import { useIsPlayAdmin } from "../../../hooks/useUserRole";
 import { Button, Card, ConfirmDialog } from "../../../components/ui";
+import {
+  playActOnStagesQueryOptions,
+  playSceneOnStagesQueryOptions,
+} from "../../rehearsals/api/rehearsals";
+import { rehearsalTimeLabel } from "../../rehearsals/utils/rehearsalMetrics";
 
 interface ActsTabProps {
   play: PlaySkeleton;
@@ -15,6 +21,14 @@ interface ActsTabProps {
 export function ActsTab({ play, playId }: ActsTabProps) {
   const deleteAct = useDeleteAct(playId);
   const isAdmin = useIsPlayAdmin(playId);
+  const { data: actOnStages } = useQuery(playActOnStagesQueryOptions(playId));
+  const { data: sceneOnStages } = useQuery(playSceneOnStagesQueryOptions(playId));
+  const actRehearsalTimeById = new Map(
+    (actOnStages ?? []).map((a) => [a.id, rehearsalTimeLabel(a)]),
+  );
+  const sceneRehearsalTimeById = new Map(
+    (sceneOnStages ?? []).map((s) => [s.id, rehearsalTimeLabel(s)]),
+  );
 
   const [showForm, setShowForm] = useState(false);
   const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete<number>();
@@ -36,6 +50,11 @@ export function ActsTab({ play, playId }: ActsTabProps) {
               </Link>
               {act.summary && (
                 <p className="text-xs text-gray-500 mt-0.5">{act.summary}</p>
+              )}
+              {actRehearsalTimeById.get(act.id) && (
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {actRehearsalTimeById.get(act.id)}
+                </p>
               )}
             </div>
             {isAdmin && (
@@ -79,10 +98,11 @@ export function ActsTab({ play, playId }: ActsTabProps) {
                       ) : null
                     })()}
                   </div>
-                  <span className="text-gray-400 text-xs shrink-0 ml-4">
-                    {scene.french_scenes?.length ?? 0} french scene
-                    {scene.french_scenes?.length !== 1 ? "s" : ""}
-                  </span>
+                  {sceneRehearsalTimeById.get(scene.id) && (
+                    <span className="text-gray-400 text-xs shrink-0 ml-4">
+                      {sceneRehearsalTimeById.get(scene.id)}
+                    </span>
+                  )}
                 </Link>
               </li>
             ))}
