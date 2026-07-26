@@ -18,8 +18,8 @@ export interface Job {
 export interface JobCharacter {
   id: number
   name: string
-  new_line_count: number | null
-  original_line_count: number | null
+  new_line_count: number
+  original_line_count: number
 }
 
 export interface JobWithDetails extends Job {

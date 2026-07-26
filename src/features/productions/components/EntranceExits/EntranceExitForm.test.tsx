@@ -23,9 +23,9 @@ import { EntranceExitForm } from './EntranceExitForm'
 import type { PlayCharacter } from '../../../plays/types/play'
 
 const characters: PlayCharacter[] = [
-  { id: 1, name: 'Hamlet', age: null, gender: null, description: null, original_line_count: null, new_line_count: null, character_group_id: null, play_id: 10 },
-  { id: 2, name: 'Ophelia', age: null, gender: null, description: null, original_line_count: null, new_line_count: null, character_group_id: null, play_id: 10 },
-  { id: 5, name: 'Horatio', age: null, gender: null, description: null, original_line_count: null, new_line_count: null, character_group_id: null, play_id: 10 },
+  { id: 1, name: 'Hamlet', age: null, gender: null, description: null, original_line_count: 0, new_line_count: 0, character_group_id: null, play_id: 10 },
+  { id: 2, name: 'Ophelia', age: null, gender: null, description: null, original_line_count: 0, new_line_count: 0, character_group_id: null, play_id: 10 },
+  { id: 5, name: 'Horatio', age: null, gender: null, description: null, original_line_count: 0, new_line_count: 0, character_group_id: null, play_id: 10 },
 ]
 
 const stageExits = [{ id: 1, name: 'Stage Left', production_id: 1 }]

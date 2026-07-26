@@ -61,10 +61,10 @@ const play: ChartPlay = {
 // Alice plays Hamlet (speaking) and Ghost (nonspeaking).
 // Claudius is uncast (user_id: null).
 const castings: any[] = [
-  { id: 1, user_id: 10, character_id: 1, character: { id: 1, name: 'Hamlet', new_line_count: null, original_line_count: null }, production_id: 1, theater_id: null, specialization_id: null, character_group_id: null, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: null, production: null, user: null },
-  { id: 2, user_id: 10, character_id: 2, character: { id: 2, name: 'Ghost', new_line_count: null, original_line_count: null }, production_id: 1, theater_id: null, specialization_id: null, character_group_id: null, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: null, production: null, user: null },
-  { id: 3, user_id: null, character_id: 3, character: { id: 3, name: 'Claudius', new_line_count: null, original_line_count: null }, production_id: 1, theater_id: null, specialization_id: null, character_group_id: null, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: null, production: null, user: null },
-  { id: 4, user_id: 10, character_id: 4, character: { id: 4, name: 'Horatio', new_line_count: null, original_line_count: null }, production_id: 1, theater_id: null, specialization_id: null, character_group_id: null, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: null, production: null, user: null },
+  { id: 1, user_id: 10, character_id: 1, character: { id: 1, name: 'Hamlet', new_line_count: 0, original_line_count: 0 }, production_id: 1, theater_id: null, specialization_id: null, character_group_id: null, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: null, production: null, user: null },
+  { id: 2, user_id: 10, character_id: 2, character: { id: 2, name: 'Ghost', new_line_count: 0, original_line_count: 0 }, production_id: 1, theater_id: null, specialization_id: null, character_group_id: null, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: null, production: null, user: null },
+  { id: 3, user_id: null, character_id: 3, character: { id: 3, name: 'Claudius', new_line_count: 0, original_line_count: 0 }, production_id: 1, theater_id: null, specialization_id: null, character_group_id: null, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: null, production: null, user: null },
+  { id: 4, user_id: 10, character_id: 4, character: { id: 4, name: 'Horatio', new_line_count: 0, original_line_count: 0 }, production_id: 1, theater_id: null, specialization_id: null, character_group_id: null, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: null, production: null, user: null },
 ]
 
 const actors: any[] = [
@@ -261,7 +261,7 @@ const playWithGroups: ChartPlay = {
 
 // Alice (id 10) plays Hamlet AND is in Ensemble; Townspeople is uncast
 const castingsWithGroups: any[] = [
-  { id: 1, user_id: 10, character_id: 1, character: { id: 1, name: 'Hamlet', new_line_count: null, original_line_count: null }, production_id: 1, theater_id: null, specialization_id: null, character_group_id: null, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: null, production: null, user: null },
+  { id: 1, user_id: 10, character_id: 1, character: { id: 1, name: 'Hamlet', new_line_count: 0, original_line_count: 0 }, production_id: 1, theater_id: null, specialization_id: null, character_group_id: null, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: null, production: null, user: null },
   { id: 2, user_id: 10, character_id: null, character: null, production_id: 1, theater_id: null, specialization_id: null, character_group_id: 10, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: { id: 10, name: 'Ensemble' }, production: null, user: null },
   { id: 3, user_id: null, character_id: null, character: null, production_id: 1, theater_id: null, specialization_id: null, character_group_id: 20, start_date: null, end_date: null, created_at: '', updated_at: '', specialization: null, theater: null, character_group: { id: 20, name: 'Townspeople' }, production: null, user: null },
 ]

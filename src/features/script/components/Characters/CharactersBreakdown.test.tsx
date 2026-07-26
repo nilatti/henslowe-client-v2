@@ -40,8 +40,8 @@ const mockPlay: any = {
   canonical: false,
   author: { id: 1, first_name: 'William', last_name: 'Shakespeare' },
   characters: [
-    { id: 1, name: 'Hamlet', age: null, gender: null, description: null, play_id: 1, lines: [], character_group_id: null, original_line_count: null, new_line_count: null, xml_id: null },
-    { id: 2, name: 'Gertrude', age: null, gender: null, description: null, play_id: 1, lines: [], character_group_id: null, original_line_count: null, new_line_count: null, xml_id: null },
+    { id: 1, name: 'Hamlet', age: null, gender: null, description: null, play_id: 1, lines: [], character_group_id: null, original_line_count: 0, new_line_count: 0, xml_id: null },
+    { id: 2, name: 'Gertrude', age: null, gender: null, description: null, play_id: 1, lines: [], character_group_id: null, original_line_count: 0, new_line_count: 0, xml_id: null },
   ],
   character_groups: [],
 }

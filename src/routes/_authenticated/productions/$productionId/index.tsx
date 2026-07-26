@@ -5,6 +5,7 @@ import { productionSkeletonQueryOptions } from '../../../../features/productions
 import { ProductionPhasesSection } from '../../../../features/productions/components/ProductionPhasesSection'
 import { useIsSuperAdmin, useUserRoleForProduction } from '../../../../hooks/useUserRole'
 import { Card } from '../../../../components/ui'
+import { formatHoursAndMinutes } from '../../../../features/rehearsals/utils/rehearsalMetrics'
 
 function formatDate(d: string | null): string {
   if (!d) return '—'
@@ -58,6 +59,19 @@ export const Route = createFileRoute('/_authenticated/productions/$productionId/
               <dd className="text-gray-600 mt-1">{production.lines_per_minute}</dd>
             </div>
           )}
+          {production.lines_per_minute != null &&
+            production.lines_per_minute !== 0 &&
+            production.play.new_line_count > 0 && (
+              <div>
+                <dt className="font-medium text-gray-700">Estimated run time</dt>
+                <dd className="text-gray-600 mt-1">
+                  at {production.lines_per_minute} lines per minute:{' '}
+                  {formatHoursAndMinutes(
+                    production.play.new_line_count / production.lines_per_minute,
+                  )}
+                </dd>
+              </div>
+            )}
         </dl>
         <ProductionPhasesSection
           productionId={pid}

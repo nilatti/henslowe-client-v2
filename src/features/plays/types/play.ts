@@ -18,8 +18,8 @@ export interface PlayCharacter {
   age: string | null
   gender: string | null
   description: string | null
-  original_line_count: number | null
-  new_line_count: number | null
+  original_line_count: number
+  new_line_count: number
   character_group_id: number | null
   play_id: number
 }
@@ -106,6 +106,8 @@ export interface CharacterWithLines {
   description: string | null
   play_id: number
   lines: CharacterBreakdownLine[]
+  original_line_count: number
+  new_line_count: number
 }
 
 export interface CharacterGroupWithLines {
@@ -114,6 +116,8 @@ export interface CharacterGroupWithLines {
   xml_id?: string | null
   play_id: number
   lines: CharacterBreakdownLine[]
+  original_line_count: number
+  new_line_count: number
 }
 
 // Returned by GET /api/v1/plays/:id (the full show action)

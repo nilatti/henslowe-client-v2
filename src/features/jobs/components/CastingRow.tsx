@@ -25,8 +25,7 @@ export function CastingRow({
   const [isEditing, setIsEditing] = useState(false)
   const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete()
 
-  const lineCount =
-    casting.character?.new_line_count ?? casting.character?.original_line_count
+  const lineCount = casting.character?.new_line_count
 
   const handleCast = (userId: number) => {
     const user = actorsAndAuditioners.find(a => a.id === userId) ?? null

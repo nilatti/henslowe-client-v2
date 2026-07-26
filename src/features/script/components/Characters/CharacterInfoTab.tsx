@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import { useConfirmDelete } from '../../../../hooks/useConfirmDelete'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { calculateLineCount } from '../../../../utils/playScriptUtils'
 import { isLineCut } from '../../utils/scriptUtils'
 import {
   useUpdateCharacter,
@@ -295,7 +294,10 @@ export default function CharacterInfoTab({ character, playId }: Props) {
         <p className="text-sm text-gray-600">
           Lines:{' '}
           <span className="font-medium">
-            {calculateLineCount(character.lines as Parameters<typeof calculateLineCount>[0])}
+            {character.new_line_count}
+            {character.new_line_count !== character.original_line_count && (
+              <span className="text-gray-400 ml-1">(originally {character.original_line_count})</span>
+            )}
           </span>
         </p>
         <Button variant="secondary" onClick={() => setShowCut(v => !v)}>

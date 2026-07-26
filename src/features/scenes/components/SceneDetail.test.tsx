@@ -46,8 +46,8 @@ import { SceneDetail } from './SceneDetail'
 function makeSceneData(id: number, number: number, actId: number) {
   return {
     id, number, act_id: actId, summary: null, heading: null,
-    start_page: null, end_page: null, original_line_count: null,
-    new_line_count: null, pretty_name: `${Math.ceil(actId / 10)}.${number}`,
+    start_page: null, end_page: null, original_line_count: 0,
+    new_line_count: 0, pretty_name: `${Math.ceil(actId / 10)}.${number}`,
     created_at: '', updated_at: '', french_scenes: [],
   }
 }
@@ -55,8 +55,8 @@ function makeSceneData(id: number, number: number, actId: number) {
 function makeActData(id: number, number: number) {
   return {
     id, number, play_id: 1, summary: null, heading: null,
-    start_page: null, end_page: null, original_line_count: null,
-    new_line_count: null, created_at: '', updated_at: '', scenes: [],
+    start_page: null, end_page: null, original_line_count: 0,
+    new_line_count: 0, created_at: '', updated_at: '', scenes: [],
   }
 }
 

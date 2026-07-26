@@ -49,7 +49,7 @@ describe('buildContactSheetRows', () => {
   it('labels a character casting with the character name', () => {
     const ann = user({ id: 1, first_name: 'Ann', last_name: 'Actor', email: 'ann@example.com', phone_number: '555-1111', emergency_contact_name: 'Bob', emergency_contact_number: '555-2222' })
     const jobs = [
-      job({ id: 1, character_id: 10, character: { id: 10, name: 'Hamlet', new_line_count: null, original_line_count: null }, user: ann, user_id: 1 }),
+      job({ id: 1, character_id: 10, character: { id: 10, name: 'Hamlet', new_line_count: 0, original_line_count: 0 }, user: ann, user_id: 1 }),
     ]
     expect(buildContactSheetRows(jobs)).toEqual([
       ['Name', 'Pronouns', 'Job(s)', 'Email', 'Phone', 'Emergency Contact Name', 'Emergency Contact Phone'],
@@ -72,7 +72,7 @@ describe('buildContactSheetRows', () => {
       job({
         id: 1,
         character_id: 10,
-        character: { id: 10, name: 'Hamlet', new_line_count: null, original_line_count: null },
+        character: { id: 10, name: 'Hamlet', new_line_count: 0, original_line_count: 0 },
         user: sam,
         user_id: 3,
       }),
@@ -94,7 +94,7 @@ describe('buildContactSheetRows', () => {
     const fake = user({ id: 5, email: 'fake@example.com', fake: true })
     const jobs = [
       job({ id: 1, specialization: { id: 3, title: 'Auditioner', department: null }, user: auditioner, user_id: 4 }),
-      job({ id: 2, character_id: 11, character: { id: 11, name: 'Ghost', new_line_count: null, original_line_count: null }, user: fake, user_id: 5 }),
+      job({ id: 2, character_id: 11, character: { id: 11, name: 'Ghost', new_line_count: 0, original_line_count: 0 }, user: fake, user_id: 5 }),
       job({ id: 3, specialization: { id: 2, title: 'Director', department: null }, user: null, user_id: null }),
     ]
     expect(buildContactSheetRows(jobs)).toHaveLength(1)

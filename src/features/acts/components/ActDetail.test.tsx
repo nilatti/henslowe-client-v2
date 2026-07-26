@@ -42,8 +42,8 @@ import { ActDetail } from './ActDetail'
 function makeActData(id: number, number: number) {
   return {
     id, number, play_id: 1, summary: null, heading: null,
-    start_page: null, end_page: null, original_line_count: null,
-    new_line_count: null, created_at: '', updated_at: '', scenes: [],
+    start_page: null, end_page: null, original_line_count: 0,
+    new_line_count: 0, created_at: '', updated_at: '', scenes: [],
   }
 }
 

@@ -121,20 +121,6 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
                   </dd>
                 </div>
               )}
-              {act.original_line_count != null && (
-                <div>
-                  <dt className="font-medium text-gray-700">Lines</dt>
-                  <dd className="text-gray-600 mt-1">
-                    {act.new_line_count ?? act.original_line_count}
-                    {act.new_line_count != null &&
-                      act.new_line_count !== act.original_line_count && (
-                        <span className="text-gray-400 ml-1">
-                          (originally {act.original_line_count})
-                        </span>
-                      )}
-                  </dd>
-                </div>
-              )}
             </dl>
           </Card>
         )}

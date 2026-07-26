@@ -29,13 +29,13 @@ function job(overrides: Partial<JobWithDetails>): JobWithDetails {
 describe('getCastings', () => {
   it('excludes jobs that only have a character_group_id (no character_id)', () => {
     const groupJob = job({ id: 1, character_group_id: 5, character: null })
-    const charJob = job({ id: 2, character_id: 10, character: { id: 10, name: 'Hamlet', new_line_count: null, original_line_count: null } })
+    const charJob = job({ id: 2, character_id: 10, character: { id: 10, name: 'Hamlet', new_line_count: 0, original_line_count: 0 } })
     expect(getCastings([groupJob, charJob])).toEqual([charJob])
   })
 
   it('sorts by character name', () => {
-    const zed = job({ id: 1, character_id: 1, character: { id: 1, name: 'Zed', new_line_count: null, original_line_count: null } })
-    const anna = job({ id: 2, character_id: 2, character: { id: 2, name: 'Anna', new_line_count: null, original_line_count: null } })
+    const zed = job({ id: 1, character_id: 1, character: { id: 1, name: 'Zed', new_line_count: 0, original_line_count: 0 } })
+    const anna = job({ id: 2, character_id: 2, character: { id: 2, name: 'Anna', new_line_count: 0, original_line_count: 0 } })
     expect(getCastings([zed, anna]).map(j => j.id)).toEqual([2, 1])
   })
 })

@@ -121,12 +121,12 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
             label: 'Pages',
             value: `${scene.start_page}${scene.end_page ? ` – ${scene.end_page}` : ''}`,
           },
-          scene.original_line_count != null && {
+          scene.original_line_count > 0 && {
             label: 'Lines',
             value: (
               <>
-                {scene.new_line_count ?? scene.original_line_count}
-                {scene.new_line_count != null && scene.new_line_count !== scene.original_line_count && (
+                {scene.new_line_count}
+                {scene.new_line_count !== scene.original_line_count && (
                   <span className="text-gray-400 ml-1">(originally {scene.original_line_count})</span>
                 )}
               </>

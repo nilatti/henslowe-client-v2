@@ -53,7 +53,7 @@ export function FrenchSceneDetail({
     .flatMap(a => a.scenes)
     .find(s => s.id === sceneId)?.number
 
-  const hasLines = playSkeleton.characters.some(c => (c.original_line_count ?? 0) > 0)
+  const hasLines = playSkeleton.characters.some(c => c.original_line_count > 0)
 
   const allFrenchScenes = playSkeleton.acts.flatMap(a =>
     a.scenes.flatMap(s =>
@@ -152,17 +152,16 @@ export function FrenchSceneDetail({
                   </dd>
                 </div>
               )}
-              {frenchScene.original_line_count != null && (
+              {frenchScene.original_line_count > 0 && (
                 <div>
                   <dt className="font-medium text-gray-700">Lines</dt>
                   <dd className="text-gray-600 mt-1">
-                    {frenchScene.new_line_count ?? frenchScene.original_line_count}
-                    {frenchScene.new_line_count != null &&
-                      frenchScene.new_line_count !== frenchScene.original_line_count && (
-                        <span className="text-gray-400 ml-1">
-                          (originally {frenchScene.original_line_count})
-                        </span>
-                      )}
+                    {frenchScene.new_line_count}
+                    {frenchScene.new_line_count !== frenchScene.original_line_count && (
+                      <span className="text-gray-400 ml-1">
+                        (originally {frenchScene.original_line_count})
+                      </span>
+                    )}
                   </dd>
                 </div>
               )}

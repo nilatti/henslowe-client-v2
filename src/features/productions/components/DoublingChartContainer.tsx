@@ -87,8 +87,7 @@ export function DoublingChartContainer({
                   (c) => c.user_id === actor.id,
                 );
                 const actorLineCount = actorCastings.reduce(
-                  (sum, c) =>
-                    sum + (c.character?.new_line_count ?? c.character?.original_line_count ?? 0),
+                  (sum, c) => sum + (c.character?.new_line_count ?? 0),
                   0,
                 );
                 return (
@@ -125,8 +124,7 @@ export function DoublingChartContainer({
                           casting.character_group?.name;
                         const charId = casting.character_id;
                         const groupId = casting.character_group_id;
-                        const lineCount =
-                          casting.character?.new_line_count ?? casting.character?.original_line_count;
+                        const lineCount = casting.character?.new_line_count;
                         return (
                           <li key={casting.id}>
                             {charId && playId ? (

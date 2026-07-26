@@ -44,7 +44,7 @@ export function PlayDetail({ playId }: PlayDetailProps) {
 
   const scenes = getScenes(play)
   const allCharacters = getAllCharacters(play)
-  const hasLines = play.characters.some(c => (c.original_line_count ?? 0) > 0)
+  const hasLines = play.characters.some(c => c.original_line_count > 0)
 
   const tabs = [
     { id: 'info', label: 'Info' },

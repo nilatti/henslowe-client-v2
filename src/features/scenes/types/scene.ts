@@ -6,8 +6,8 @@ export interface Scene {
   heading: string | null
   start_page: number | null
   end_page: number | null
-  original_line_count: number | null
-  new_line_count: number | null
+  original_line_count: number
+  new_line_count: number
   pretty_name: string
   created_at: string
   updated_at: string

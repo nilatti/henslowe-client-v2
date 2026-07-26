@@ -51,7 +51,7 @@ import { FrenchSceneDetail } from './FrenchSceneDetail'
 function makeFrenchSceneData(id: number, number: string, sceneId: number) {
   return {
     id, number, scene_id: sceneId, summary: null, start_page: null, end_page: null,
-    original_line_count: null, new_line_count: null, pretty_name: null,
+    original_line_count: 0, new_line_count: 0, pretty_name: null,
     created_at: '', updated_at: '', on_stages: [], entrance_exits: [], characters: [], songs: [],
   }
 }
