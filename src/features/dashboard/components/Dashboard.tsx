@@ -154,7 +154,7 @@ export function Dashboard() {
 
         <div>
           <h3 className="pt-4 text-xl font-semibold">Conflicts</h3>
-          <ConflictsManager userId={user!.id} canEdit={true} />
+          <ConflictsManager userId={user!.id} canEdit={true} futureOnly />
         </div>
       </div>
 

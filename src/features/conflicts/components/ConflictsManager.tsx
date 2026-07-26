@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { isAfter, parseISO } from "date-fns";
 import type { Conflict, ConflictPattern } from "../types/conflict";
 import {
   userConflictsQueryOptions,
@@ -17,12 +18,14 @@ interface ConflictsManagerProps {
   userId?: number;
   spaceId?: number;
   canEdit: boolean;
+  futureOnly?: boolean;
 }
 
 export function ConflictsManager({
   userId,
   spaceId,
   canEdit,
+  futureOnly = false,
 }: ConflictsManagerProps) {
   const conflictKey = userId
     ? ["conflicts", { userId }]
@@ -50,8 +53,12 @@ export function ConflictsManager({
   const [showConflictForm, setShowConflictForm] = useState(false);
   const [showPatternForm, setShowPatternForm] = useState(false);
 
-  const individualConflicts = conflicts.filter((c) => !c.regular);
-  const regularConflicts = conflicts.filter((c) => c.regular);
+  const scopedConflicts = futureOnly
+    ? conflicts.filter((c) => isAfter(parseISO(c.end_time), new Date()))
+    : conflicts;
+
+  const individualConflicts = scopedConflicts.filter((c) => !c.regular);
+  const regularConflicts = scopedConflicts.filter((c) => c.regular);
   const occurrencesByPattern = regularConflicts.reduce<Record<number, Conflict[]>>(
     (acc, c) => {
       if (c.conflict_pattern_id != null) {
