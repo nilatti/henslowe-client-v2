@@ -19,6 +19,8 @@ import {
   getActorsAndAuditioners,
   getAuditioners,
 } from "../utils/jobUtils";
+import { buildContactSheetRows } from "../utils/contactSheetUtils";
+import { downloadCsv, slugify } from "../../../utils/csvUtils";
 
 interface CastListProps {
   productionId: number;
@@ -59,8 +61,21 @@ export function ProductionJobs({
     a.name.localeCompare(b.name),
   );
 
+  function handleDownloadContactSheet() {
+    downloadCsv(
+      buildContactSheetRows(jobs),
+      `${slugify(playSkeleton.title)}-contact-sheet.csv`,
+    );
+  }
+
   return (
     <div className="space-y-8">
+      <div className="flex justify-end">
+        <Button variant="secondary" onClick={handleDownloadContactSheet}>
+          Download Contact Sheet
+        </Button>
+      </div>
+
       {/* Cast list */}
       <div>
         <div className="flex items-center justify-between mb-3">
