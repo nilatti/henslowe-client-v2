@@ -7,8 +7,12 @@ const { mockUseSuspenseQuery } = vi.hoisted(() => ({
 
 vi.mock('@tanstack/react-query', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@tanstack/react-query')>()
-  return { ...actual, useSuspenseQuery: mockUseSuspenseQuery }
+  return { ...actual, useSuspenseQuery: mockUseSuspenseQuery, useQuery: () => ({ data: undefined }) }
 })
+
+vi.mock('../../rehearsals/api/rehearsals', () => ({
+  playSceneOnStagesQueryOptions: (id: number) => ({ queryKey: ['playSceneOnStages', id] }),
+}))
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to, params, className }: any) => (
