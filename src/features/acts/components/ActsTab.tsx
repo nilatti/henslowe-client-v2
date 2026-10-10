@@ -1,17 +1,12 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
 import { useDeleteAct } from "../api/acts";
 import { ActForm } from "./ActForm";
 import type { PlaySkeleton } from "../../plays/types/play";
 import { useIsPlayAdmin } from "../../../hooks/useUserRole";
 import { Button, Card, ConfirmDialog } from "../../../components/ui";
-import {
-  playActOnStagesQueryOptions,
-  playSceneOnStagesQueryOptions,
-} from "../../rehearsals/api/rehearsals";
-import { rehearsalTimeLabel } from "../../rehearsals/utils/rehearsalMetrics";
+import { useRehearsalTimeLabels } from "../../rehearsals/hooks/useRehearsalTimeLabels";
 
 interface ActsTabProps {
   play: PlaySkeleton;
@@ -21,14 +16,8 @@ interface ActsTabProps {
 export function ActsTab({ play, playId }: ActsTabProps) {
   const deleteAct = useDeleteAct(playId);
   const isAdmin = useIsPlayAdmin(playId);
-  const { data: actOnStages } = useQuery(playActOnStagesQueryOptions(playId));
-  const { data: sceneOnStages } = useQuery(playSceneOnStagesQueryOptions(playId));
-  const actRehearsalTimeById = new Map(
-    (actOnStages ?? []).map((a) => [a.id, rehearsalTimeLabel(a)]),
-  );
-  const sceneRehearsalTimeById = new Map(
-    (sceneOnStages ?? []).map((s) => [s.id, rehearsalTimeLabel(s)]),
-  );
+  const { acts: actRehearsalTimeById, scenes: sceneRehearsalTimeById } =
+    useRehearsalTimeLabels(playId);
 
   const [showForm, setShowForm] = useState(false);
   const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete<number>();

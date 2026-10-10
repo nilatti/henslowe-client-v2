@@ -1,9 +1,11 @@
+import { useRef } from "react";
 import { useForm } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { addMinutes, format, isValid } from "date-fns";
 import { useCreateRehearsal, useUpdateRehearsal } from "../api/rehearsals";
 import type { RehearsalWithDetails } from "../types/rehearsal";
 import { theaterSkeletonQueryOptions } from "../../theaters/api/theaters";
+import { productionSkeletonQueryOptions } from "../../productions/api/productions";
 import { FormField, FormActions, inputClass } from "../../../components/ui";
 
 interface RehearsalFormProps {
@@ -18,7 +20,7 @@ interface RehearsalFormProps {
   onCancel: () => void;
 }
 
-function toLocalInput(iso: string) {
+function toLocalInput(iso: string | Date) {
   return format(new Date(iso), "yyyy-MM-dd'T'HH:mm");
 }
 
@@ -37,6 +39,9 @@ export function RehearsalForm({
   const update = useUpdateRehearsal(productionId, playId);
   const isEditing = !!rehearsal;
   const { data: theater } = useQuery(theaterSkeletonQueryOptions(theaterId));
+  const { data: production } = useQuery(productionSkeletonQueryOptions(productionId));
+  const blockLength = production?.default_rehearsal_block_length ?? 0;
+  const startTimeOnFocus = useRef<string | null>(null);
 
   const now = format(new Date(), "yyyy-MM-dd'T'HH:mm");
 
@@ -92,7 +97,21 @@ export function RehearsalForm({
                     form.setFieldValue("end_time", val);
                   }
                 }}
-                onBlur={field.handleBlur}
+                onFocus={() => {
+                  startTimeOnFocus.current = field.state.value;
+                }}
+                onBlur={() => {
+                  field.handleBlur();
+                  // Once a new start time is settled, the rehearsal runs for the
+                  // default block length. Breaks fall between rehearsals, so
+                  // they aren't added here.
+                  const val = field.state.value;
+                  const start = new Date(val);
+                  if (val !== startTimeOnFocus.current && blockLength > 0 && isValid(start)) {
+                    form.setFieldValue("end_time", toLocalInput(addMinutes(start, blockLength)));
+                  }
+                  startTimeOnFocus.current = null;
+                }}
                 className={inputClass}
               />
             </FormField>

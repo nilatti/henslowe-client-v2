@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { onStageUserIds, buildCallList, getCalledActors, markContentRecommended, withInheritedRehearsals } from './contentUtils'
+import { onStageUserIds, buildCallList, getCalledActors, markContentRecommended, withInheritedRehearsals, inheritedRehearsalTimeLabels } from './contentUtils'
+import { minutesPerPage, totalRehearsalMinutes } from './rehearsalMetrics'
 import type { TextUnitWithOnStages } from '../api/rehearsals'
 import type { RehearsalUser } from '../types/rehearsal'
 
@@ -79,10 +80,33 @@ describe('markContentRecommended with character groups', () => {
 })
 
 describe('withInheritedRehearsals', () => {
-  it('leaves french scenes unchanged, since they have no children', () => {
-    const frenchScenes = [{ ...makeContent(1, []), rehearsals: [makeRehearsal(0, 30)] }]
-    const result = withInheritedRehearsals(frenchScenes, 'french_scenes')
-    expect(result).toBe(frenchScenes)
+  function withPages<T extends TextUnitWithOnStages>(item: T, start_page: number, end_page: number): T {
+    return { ...item, start_page, end_page }
+  }
+
+  // A 15-page act of three scenes (10, 4 and 1 pages); scene 1 is two 5-page french scenes.
+  function buildPlay({ actMinutes = 0, scene1Minutes = 0 } = {}) {
+    const act = { ...withPages(makeContent(1, []), 1, 15), rehearsals: actMinutes ? [makeRehearsal(0, actMinutes)] : [] }
+    const scenes = [
+      { ...withPages(makeContent(10, []), 1, 10), act_id: 1, rehearsals: scene1Minutes ? [makeRehearsal(100, scene1Minutes)] : [] },
+      { ...withPages(makeContent(11, []), 11, 14), act_id: 1, rehearsals: [] },
+      { ...withPages(makeContent(12, []), 15, 15), act_id: 1, rehearsals: [] },
+    ]
+    const frenchScenes = [
+      { ...withPages(makeContent(20, []), 1, 5), scene_id: 10, rehearsals: [] },
+      { ...withPages(makeContent(21, []), 6, 10), scene_id: 10, rehearsals: [] },
+      { ...withPages(makeContent(22, []), 11, 14), scene_id: 11, rehearsals: [] },
+    ]
+    return { acts: [act], scenes, frenchScenes }
+  }
+
+  const minutesById = (items: TextUnitWithOnStages[]) =>
+    Object.fromEntries(items.map(item => [item.id, totalRehearsalMinutes(item.rehearsals ?? [])]))
+
+  it('leaves french scenes unchanged when no scenes or acts are provided', () => {
+    const frenchScenes = [{ ...makeContent(1, []), scene_id: 10, rehearsals: [makeRehearsal(0, 30)] }]
+    const [result] = withInheritedRehearsals(frenchScenes, 'french_scenes')
+    expect(result.rehearsals).toEqual(frenchScenes[0].rehearsals)
   })
 
   it('folds a scene\'s french scenes rehearsal time into the scene', () => {
@@ -92,7 +116,7 @@ describe('withInheritedRehearsals', () => {
       { ...makeContent(11, []), scene_id: 1, rehearsals: [makeRehearsal(200, 60)] },
       { ...makeContent(12, []), scene_id: 2, rehearsals: [makeRehearsal(300, 60)] }, // different scene
     ]
-    const [result] = withInheritedRehearsals([scene], 'scenes', [], frenchScenes)
+    const [result] = withInheritedRehearsals([scene], 'scenes', { frenchScenes })
     expect(result.rehearsals?.length).toBe(3)
     expect(result.rehearsals?.map(r => r.id).sort()).toEqual([0, 100, 200])
   })
@@ -107,7 +131,91 @@ describe('withInheritedRehearsals', () => {
       { ...makeContent(20, []), scene_id: 10, rehearsals: [makeRehearsal(300, 60)] },
       { ...makeContent(21, []), scene_id: 11, rehearsals: [makeRehearsal(400, 60)] }, // under other act's scene
     ]
-    const [result] = withInheritedRehearsals([act], 'acts', scenes, frenchScenes)
+    const [result] = withInheritedRehearsals([act], 'acts', { scenes, frenchScenes })
     expect(result.rehearsals?.map(r => r.id).sort((a, b) => a - b)).toEqual([0, 100, 300])
+  })
+
+  it('does not prorate child rehearsal time folded into an act', () => {
+    const { acts, scenes, frenchScenes } = buildPlay({ scene1Minutes: 60 })
+    expect(minutesById(withInheritedRehearsals(acts, 'acts', { acts, scenes, frenchScenes }))).toEqual({ 1: 60 })
+  })
+
+  it('credits each scene with its page share of act rehearsal time', () => {
+    const { acts, scenes, frenchScenes } = buildPlay({ actMinutes: 60 })
+    const result = withInheritedRehearsals(scenes, 'scenes', { acts, scenes, frenchScenes })
+    const minutes = minutesById(result)
+    expect(minutes[10]).toBeCloseTo(40) // 10 of 15 pages
+    expect(minutes[11]).toBeCloseTo(16) // 4 of 15 pages
+    expect(minutes[12]).toBeCloseTo(4) // 1 of 15 pages
+    // Every page of the act gets the same per-page credit
+    result.forEach(scene => expect(minutesPerPage(scene)).toBeCloseTo(4))
+  })
+
+  it('credits each french scene with its page share of act rehearsal time', () => {
+    const { acts, scenes, frenchScenes } = buildPlay({ actMinutes: 60 })
+    const minutes = minutesById(withInheritedRehearsals(frenchScenes, 'french_scenes', { acts, scenes, frenchScenes }))
+    expect(minutes[20]).toBeCloseTo(20) // 1/3 of the act
+    expect(minutes[21]).toBeCloseTo(20) // 1/3 of the act
+    expect(minutes[22]).toBeCloseTo(16) // all of scene 2's 4/15 share
+  })
+
+  it('credits each french scene with its page share of scene rehearsal time', () => {
+    const { acts, scenes, frenchScenes } = buildPlay({ scene1Minutes: 60 })
+    const minutes = minutesById(withInheritedRehearsals(frenchScenes, 'french_scenes', { acts, scenes, frenchScenes }))
+    expect(minutes[20]).toBeCloseTo(30)
+    expect(minutes[21]).toBeCloseTo(30)
+    expect(minutes[22]).toBe(0) // under a different scene
+  })
+
+  it('combines a scene\'s own, inherited and folded-in rehearsal time', () => {
+    const { acts, scenes, frenchScenes } = buildPlay({ actMinutes: 60, scene1Minutes: 30 })
+    frenchScenes[0] = { ...frenchScenes[0], rehearsals: [makeRehearsal(300, 15)] }
+    const minutes = minutesById(withInheritedRehearsals(scenes, 'scenes', { acts, scenes, frenchScenes }))
+    expect(minutes[10]).toBeCloseTo(30 + 40 + 15)
+  })
+
+  it('combines a french scene\'s own and inherited rehearsal time', () => {
+    const { acts, scenes, frenchScenes } = buildPlay({ actMinutes: 60, scene1Minutes: 30 })
+    frenchScenes[0] = { ...frenchScenes[0], rehearsals: [makeRehearsal(300, 15)] }
+    const minutes = minutesById(withInheritedRehearsals(frenchScenes, 'french_scenes', { acts, scenes, frenchScenes }))
+    expect(minutes[20]).toBeCloseTo(15 + 15 + 20) // own + half the scene + a third of the act
+    expect(minutes[21]).toBeCloseTo(15 + 20)
+  })
+
+  it('splits evenly among children when page numbers are missing', () => {
+    const acts = [{ ...makeContent(1, []), rehearsals: [makeRehearsal(0, 60)] }]
+    const scenes = [
+      { ...makeContent(10, []), act_id: 1, rehearsals: [] },
+      { ...makeContent(11, []), act_id: 1, rehearsals: [] },
+    ]
+    const minutes = minutesById(withInheritedRehearsals(scenes, 'scenes', { acts, scenes }))
+    expect(minutes).toEqual({ 10: 30, 11: 30 })
+  })
+})
+
+describe('inheritedRehearsalTimeLabels', () => {
+  it('labels every level of the play with inherited rehearsal time', () => {
+    // A 15-page act with an hour of act rehearsal: 4 min/page everywhere,
+    // plus 30 extra minutes on 10-page scene 1 (3 min/page for it and its french scenes)
+    const act = { ...makeContent(1, []), start_page: 1, end_page: 15, rehearsals: [makeRehearsal(0, 60)] }
+    const scenes = [
+      { ...makeContent(10, []), start_page: 1, end_page: 10, act_id: 1, rehearsals: [makeRehearsal(100, 30)] },
+      { ...makeContent(11, []), start_page: 11, end_page: 15, act_id: 1, rehearsals: [] },
+    ]
+    const frenchScenes = [
+      { ...makeContent(20, []), start_page: 1, end_page: 5, scene_id: 10, rehearsals: [] },
+      { ...makeContent(21, []), start_page: 6, end_page: 10, scene_id: 10, rehearsals: [] },
+    ]
+    const labels = inheritedRehearsalTimeLabels({ acts: [act], scenes, frenchScenes })
+    expect(labels.acts.get(1)).toBe('Rehearsal time: 6.0 minutes per page') // 90 min / 15 pages
+    expect(labels.scenes.get(10)).toBe('Rehearsal time: 7.0 minutes per page')
+    expect(labels.scenes.get(11)).toBe('Rehearsal time: 4.0 minutes per page')
+    expect(labels.frenchScenes.get(20)).toBe('Rehearsal time: 7.0 minutes per page')
+    expect(labels.frenchScenes.get(21)).toBe('Rehearsal time: 7.0 minutes per page')
+  })
+
+  it('returns empty maps while data is loading', () => {
+    const labels = inheritedRehearsalTimeLabels({})
+    expect(labels.acts.size + labels.scenes.size + labels.frenchScenes.size).toBe(0)
   })
 })

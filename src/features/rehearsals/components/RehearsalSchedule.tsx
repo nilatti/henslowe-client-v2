@@ -32,12 +32,13 @@ import { Button, Card, ConfirmDialog } from "../../../components/ui";
 import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
 import type { RehearsalUser, RehearsalWithDetails } from "../types/rehearsal";
 import { buildUserName, sortUsers } from "../../../utils/actorUtils";
+import { slugify } from "../../../utils/csvUtils";
 
 function tsvEscape(val: string): string {
   return val.replace(/\t/g, " ").replace(/\n/g, " ");
 }
 
-function downloadRehearsalTSV(rehearsals: RehearsalWithDetails[]) {
+function downloadRehearsalTSV(rehearsals: RehearsalWithDetails[], filename: string) {
   const headers = ["Date", "Start Time", "End Time", "Location", "Title", "Notes", "Content", "Call List"];
 
   const sorted = [...rehearsals].sort((a, b) => a.start_time.localeCompare(b.start_time));
@@ -73,7 +74,7 @@ function downloadRehearsalTSV(rehearsals: RehearsalWithDetails[]) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "rehearsal-schedule.tsv";
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -282,7 +283,12 @@ export function RehearsalSchedule({
         <div className="flex items-center gap-2">
           <Button
             variant="secondary"
-            onClick={() => downloadRehearsalTSV(rehearsals)}
+            onClick={() =>
+              downloadRehearsalTSV(
+                rehearsals,
+                `${slugify(productionSkeleton.play.title)}-${format(new Date(), "yyyyMMdd")}.tsv`,
+              )
+            }
           >
             Download TSV
           </Button>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { sceneQueryOptions, useDeleteScene } from "../api/scenes";
@@ -15,8 +15,7 @@ import {
   InfoCard,
   PageHeader,
 } from "../../../components/ui";
-import { playFrenchSceneOnStagesQueryOptions } from "../../rehearsals/api/rehearsals";
-import { rehearsalTimeLabel } from "../../rehearsals/utils/rehearsalMetrics";
+import { useRehearsalTimeLabels } from "../../rehearsals/hooks/useRehearsalTimeLabels";
 
 interface SceneDetailProps {
   playId: number;
@@ -28,10 +27,7 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
   const { data: scene } = useSuspenseQuery(sceneQueryOptions(sceneId));
   const { data: act } = useSuspenseQuery(actQueryOptions(actId));
   const { data: playSkeleton } = useSuspenseQuery(playSkeletonQueryOptions(playId));
-  const { data: frenchSceneOnStages } = useQuery(playFrenchSceneOnStagesQueryOptions(playId));
-  const frenchSceneRehearsalTimeById = new Map(
-    (frenchSceneOnStages ?? []).map((fs) => [fs.id, rehearsalTimeLabel(fs)]),
-  );
+  const { frenchScenes: frenchSceneRehearsalTimeById } = useRehearsalTimeLabels(playId);
   const deleteScene = useDeleteScene(playId, actId);
   const isAdmin = useIsPlayAdmin(playId);
   const navigate = useNavigate();
