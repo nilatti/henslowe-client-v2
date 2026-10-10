@@ -10,8 +10,8 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
   return { ...actual, useSuspenseQuery: mockUseSuspenseQuery, useQuery: () => ({ data: undefined }) }
 })
 
-vi.mock('../../rehearsals/api/rehearsals', () => ({
-  playFrenchSceneOnStagesQueryOptions: (id: number) => ({ queryKey: ['playFrenchSceneOnStages', id] }),
+vi.mock('../../rehearsals/hooks/useRehearsalTimeLabels', () => ({
+  useRehearsalTimeLabels: () => ({ acts: new Map(), scenes: new Map(), frenchScenes: new Map() }),
 }))
 
 vi.mock('@tanstack/react-router', () => ({

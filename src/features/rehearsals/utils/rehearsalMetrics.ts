@@ -1,18 +1,27 @@
+// `share` is the fraction of a rehearsal's duration credited to a text unit —
+// e.g. a scene inherits only its page share of a rehearsal scheduled on its act.
+// Omitted means the full duration counts.
+export interface RehearsalSpan {
+  start_time: string
+  end_time: string
+  share?: number
+}
+
 export interface TextUnitPageInfo {
   start_page?: number | null
   end_page?: number | null
-  rehearsals?: { start_time: string; end_time: string }[]
+  rehearsals?: RehearsalSpan[]
 }
 
-function pageCount(startPage: number | null | undefined, endPage: number | null | undefined): number {
+export function pageCount(startPage: number | null | undefined, endPage: number | null | undefined): number {
   if (startPage == null || endPage == null) return 1
   return Math.max(1, endPage - startPage + 1)
 }
 
-export function totalRehearsalMinutes(rehearsals: { start_time: string; end_time: string }[]): number {
+export function totalRehearsalMinutes(rehearsals: RehearsalSpan[]): number {
   return rehearsals.reduce((sum, r) => {
     const ms = new Date(r.end_time).getTime() - new Date(r.start_time).getTime()
-    return sum + ms / 60000
+    return sum + (ms / 60000) * (r.share ?? 1)
   }, 0)
 }
 

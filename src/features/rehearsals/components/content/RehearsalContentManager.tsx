@@ -71,16 +71,15 @@ export function RehearsalContentManager({
     return map;
   }, [jobs]);
 
-  // Scenes need french scene rehearsals to fold in, and acts need both scene
-  // and french scene rehearsals, so those collections are fetched even when
-  // not the one being displayed.
+  // Rehearsal time is inherited both up and down the act → scene → french
+  // scene tree, so all three collections are needed whichever one is displayed.
   const actsQuery = useQuery({
     ...playActOnStagesQueryOptions(playId),
-    enabled: rehearsal.text_unit === "acts",
+    enabled: rehearsal.text_unit != null,
   });
   const scenesQuery = useQuery({
     ...playSceneOnStagesQueryOptions(playId),
-    enabled: rehearsal.text_unit === "scenes" || rehearsal.text_unit === "acts",
+    enabled: rehearsal.text_unit != null,
   });
   const frenchScenesQuery = useQuery({
     ...playFrenchSceneOnStagesQueryOptions(playId),
@@ -95,11 +94,7 @@ export function RehearsalContentManager({
         : frenchScenesQuery.data;
 
   const isLoading =
-    rehearsal.text_unit === "acts"
-      ? actsQuery.isLoading || scenesQuery.isLoading || frenchScenesQuery.isLoading
-      : rehearsal.text_unit === "scenes"
-        ? scenesQuery.isLoading || frenchScenesQuery.isLoading
-        : frenchScenesQuery.isLoading;
+    actsQuery.isLoading || scenesQuery.isLoading || frenchScenesQuery.isLoading;
 
   const [selectedIds, setSelectedIds] = useState<number[]>(() => {
     const textUnit = (rehearsal.text_unit ??
@@ -132,8 +127,11 @@ export function RehearsalContentManager({
     let processed: TextUnitWithOnStages[] = withInheritedRehearsals(
       rawPlayContent,
       granularity,
-      scenesQuery.data,
-      frenchScenesQuery.data,
+      {
+        acts: actsQuery.data,
+        scenes: scenesQuery.data,
+        frenchScenes: frenchScenesQuery.data,
+      },
     );
     processed = markContentRecommended(processed, unavailableActors, characterToUserMap, characterGroupToUserIdsMap);
     processed = processed.map((item) => ({
@@ -146,6 +144,7 @@ export function RehearsalContentManager({
   }, [
     rawPlayContent,
     rehearsal.text_unit,
+    actsQuery.data,
     scenesQuery.data,
     frenchScenesQuery.data,
     unavailableActors,
