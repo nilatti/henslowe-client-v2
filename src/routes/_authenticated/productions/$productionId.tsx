@@ -49,7 +49,12 @@ export const Route = createFileRoute('/_authenticated/productions/$productionId'
   component: function ProductionDetailLayout() {
     const { productionId } = Route.useParams()
     const pid = Number(productionId)
-    const { data: production } = useSuspenseQuery(productionSkeletonQueryOptions(pid))
+    // A new production's play is copied by a background job, so the skeleton
+    // has no play for a while after creation; poll until it shows up.
+    const { data: production } = useSuspenseQuery({
+      ...productionSkeletonQueryOptions(pid),
+      refetchInterval: (query) => (query.state.data?.play ? false : 5000),
+    })
     const deleteProduction = useDeleteProduction()
     const isSuperAdmin = useIsSuperAdmin()
     const productionRole = useUserRoleForProduction(pid, production.theater?.id ?? 0)
@@ -117,6 +122,11 @@ export const Route = createFileRoute('/_authenticated/productions/$productionId'
               onSuccess={() => setIsEditing(false)}
               onCancel={() => setIsEditing(false)}
             />
+          </Card>
+        ) : !production.play ? (
+          <Card className="p-6 text-sm text-gray-600">
+            Copying the play for this production. This can take a few minutes for a
+            long play — this page will update when it's ready.
           </Card>
         ) : (
           <>

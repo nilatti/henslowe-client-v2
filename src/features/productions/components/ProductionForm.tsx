@@ -40,7 +40,7 @@ export function ProductionForm({ production, defaultTheaterId, onSuccess, onCanc
 
   const form = useForm({
     defaultValues: {
-      play_id: production?.play.id ? String(production.play.id) : '',
+      play_id: production?.play?.id ? String(production.play.id) : '',
       theater_id: production?.theater_id
         ? String(production.theater_id)
         : defaultTheaterId
