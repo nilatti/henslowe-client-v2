@@ -16,6 +16,7 @@ import {
   productionUserConflictsQueryOptions,
   productionSpaceConflictsQueryOptions,
   usePublishRehearsalCalendar,
+  useRescheduleRehearsals,
 } from "../api/rehearsals";
 import { productionJobsQueryOptions } from "../../jobs/api/jobs";
 import { productionSkeletonQueryOptions } from "../../productions/api/productions";
@@ -24,6 +25,7 @@ import { totalRehearsalMinutes, formatHoursAndMinutes } from "../utils/rehearsal
 import { RehearsalShow } from "./RehearsalShow";
 import { RehearsalForm } from "./RehearsalForm";
 import { RehearsalPatternCreator } from "./RehearsalPatternCreator";
+import { SortableRehearsalList } from "./SortableRehearsalList";
 import {
   useUserRoleForProduction,
   useIsSuperAdmin,
@@ -129,6 +131,7 @@ export function RehearsalSchedule({
   const [addFormDate, setAddFormDate] = useState<string | null>(null);
 
   const publishCalendar = usePublishRehearsalCalendar(productionId);
+  const rescheduleRehearsals = useRescheduleRehearsals(productionId, playId);
   const {
     target: confirmingPublish,
     open: requestPublish,
@@ -317,8 +320,12 @@ export function RehearsalSchedule({
                   </h3>
                 </div>
                 <div className="px-4 pb-2">
-                  {[...groupedRehearsals[date]].sort((a, b) => a.start_time.localeCompare(b.start_time)).map((rehearsal) => (
-                    <div key={rehearsal.id} id={`rehearsal-${rehearsal.id}`}>
+                  <SortableRehearsalList
+                    rehearsals={[...groupedRehearsals[date]].sort((a, b) => a.start_time.localeCompare(b.start_time))}
+                    breakMinutes={productionSkeleton?.default_rehearsal_break_length ?? 0}
+                    enabled={isAdmin}
+                    onReschedule={(times) => rescheduleRehearsals.mutate(times)}
+                    renderItem={(rehearsal) => (
                       <RehearsalShow
                         rehearsal={rehearsal}
                         productionId={productionId}
@@ -331,8 +338,8 @@ export function RehearsalSchedule({
                         productionSpaceConflicts={productionSpaceConflicts}
                         actorCharacterNames={actorCharacterNames}
                       />
-                    </div>
-                  ))}
+                    )}
+                  />
                   {isAdmin && addFormDate === date && (() => {
                     const sorted = [...groupedRehearsals[date]].sort((a, b) => a.start_time.localeCompare(b.start_time));
                     const last = sorted[sorted.length - 1];

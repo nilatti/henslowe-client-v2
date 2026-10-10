@@ -19,6 +19,7 @@ vi.mock('../api/rehearsals', () => ({
   productionUserConflictsQueryOptions: (id: number) => ({ queryKey: ['productions', id, 'user_conflicts'] }),
   productionSpaceConflictsQueryOptions: (id: number) => ({ queryKey: ['productions', id, 'space_conflicts'] }),
   usePublishRehearsalCalendar: () => ({ mutateAsync: mockPublishMutateAsync, isPending: false }),
+  useRescheduleRehearsals: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
 vi.mock('../../jobs/api/jobs', () => ({
@@ -233,6 +234,16 @@ describe('RehearsalSchedule — per-day add rehearsal', () => {
   it('shows the per-day "+ Add rehearsal" button for admins when rehearsals exist this week', () => {
     renderSchedule({ isAdmin: true, rehearsals: [makeWeekRehearsal(99)] })
     expect(screen.getByRole('button', { name: /\+ add rehearsal/i })).toBeInTheDocument()
+  })
+
+  it('shows a drag handle on each rehearsal for admins only', () => {
+    renderSchedule({ isAdmin: true, rehearsals: [makeWeekRehearsal(98), makeWeekRehearsal(99)] })
+    expect(screen.getAllByRole('button', { name: /drag to reorder rehearsal/i })).toHaveLength(2)
+  })
+
+  it('hides drag handles from non-admins', () => {
+    renderSchedule({ isAdmin: false, rehearsals: [makeWeekRehearsal(98), makeWeekRehearsal(99)] })
+    expect(screen.queryByRole('button', { name: /drag to reorder rehearsal/i })).not.toBeInTheDocument()
   })
 
   it('hides the per-day "+ Add rehearsal" button from non-admins', () => {
