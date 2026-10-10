@@ -73,7 +73,7 @@ function setupQueries(rehearsals: any[] = []) {
     if (queryKey[0] === 'jobs') return { data: [] }
     if (queryKey[0] === 'productions' && queryKey[2] === 'user_conflicts') return { data: [] }
     if (queryKey[0] === 'productions' && queryKey[2] === 'space_conflicts') return { data: [] }
-    if (queryKey[0] === 'productions' && queryKey[2] === 'skeleton') return { data: { default_space_id: null } }
+    if (queryKey[0] === 'productions' && queryKey[2] === 'skeleton') return { data: { default_space_id: null, play: { id: 10, title: 'Big Fish' } } }
     throw new Error(`Unexpected queryKey: ${JSON.stringify(queryKey)}`)
   })
 }
@@ -255,5 +255,27 @@ describe('RehearsalSchedule — per-day add rehearsal', () => {
     expect(screen.getByTestId('rehearsal-form')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /cancel form/i }))
     expect(screen.queryByTestId('rehearsal-form')).not.toBeInTheDocument()
+  })
+})
+
+describe('RehearsalSchedule — TSV download', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.restoreAllMocks()
+  })
+
+  it('names the file after the production\'s play and the download date', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true, toFake: ['Date'] })
+    vi.setSystemTime(new Date(2026, 9, 10, 12, 0))
+    URL.createObjectURL = vi.fn(() => 'blob:schedule')
+    URL.revokeObjectURL = vi.fn()
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {})
+    const user = userEvent.setup()
+    renderSchedule()
+
+    await user.click(screen.getByRole('button', { name: /download tsv/i }))
+
+    expect(click).toHaveBeenCalledOnce()
+    expect((click.mock.contexts[0] as HTMLAnchorElement).download).toBe('big-fish-20261010.tsv')
   })
 })

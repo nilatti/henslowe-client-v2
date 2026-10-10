@@ -67,6 +67,13 @@ describe('totalRehearsalMinutes', () => {
       { start_time: '2024-01-02T10:00:00Z', end_time: '2024-01-02T11:45:00Z' },
     ])).toBe(195)
   })
+
+  it('counts only the credited share of a rehearsal', () => {
+    expect(totalRehearsalMinutes([
+      { start_time: '2024-01-01T10:00:00Z', end_time: '2024-01-01T11:00:00Z', share: 2 / 3 },
+      { start_time: '2024-01-02T10:00:00Z', end_time: '2024-01-02T10:30:00Z' },
+    ])).toBeCloseTo(70)
+  })
 })
 
 describe('formatHoursAndMinutes', () => {

@@ -33,7 +33,7 @@ export interface TextUnitWithOnStages {
     character_id: number | null;
     character_group_id: number | null;
   }[];
-  rehearsals?: { id: number; start_time: string; end_time: string }[];
+  rehearsals?: { id: number; start_time: string; end_time: string; share?: number }[];
   isScheduled?: boolean;
   isRecommended?: boolean;
   reasonsForRecommendation?: {
