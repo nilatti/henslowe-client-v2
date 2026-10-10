@@ -7,6 +7,7 @@ import api from "../../../api/client";
 import { customQueryOptions } from "../../../api/queryFactory";
 import type { Rehearsal, RehearsalUser, RehearsalWithDetails } from "../types/rehearsal";
 import type { Conflict } from "../../conflicts/types/conflict";
+import type { RehearsalTimes } from "../utils/reorderUtils";
 
 export interface ProductionUserConflict {
   user: { id: number; first_name: string; last_name: string };
@@ -234,6 +235,40 @@ export function useDeleteRehearsal(productionId: number, playId: number) {
       return { previous };
     },
     onError: (_err, _id, ctx) => {
+      if (ctx?.previous !== undefined) {
+        qc.setQueryData(key, ctx.previous);
+      }
+    },
+    onSettled: () => {
+      invalidateRehearsalRelatedQueries(qc, productionId, playId);
+    },
+  });
+}
+
+export function useRescheduleRehearsals(productionId: number, playId: number) {
+  const qc = useQueryClient();
+  const key = ["rehearsals", { productionId }] as const;
+  return useMutation({
+    mutationFn: (times: RehearsalTimes[]) =>
+      api
+        .put(`/api/v1/productions/${productionId}/reschedule_rehearsals`, {
+          rehearsals: times,
+        })
+        .then((r) => r.data),
+    onMutate: async (times) => {
+      await qc.cancelQueries({ queryKey: key });
+      const previous = qc.getQueryData<RehearsalWithDetails[]>(key);
+      const byId = new Map(times.map((t) => [t.id, t]));
+      qc.setQueryData<RehearsalWithDetails[]>(
+        key,
+        previous?.map((r) => {
+          const t = byId.get(r.id);
+          return t ? { ...r, start_time: t.start_time, end_time: t.end_time } : r;
+        }) ?? [],
+      );
+      return { previous };
+    },
+    onError: (_err, _times, ctx) => {
       if (ctx?.previous !== undefined) {
         qc.setQueryData(key, ctx.previous);
       }
