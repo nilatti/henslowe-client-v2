@@ -8,6 +8,8 @@ export interface ScriptLine {
   character_group_id: number | null
   french_scene_id: number
   xml_id: string | null
+  // Order within the French scene; null until that French scene is reordered.
+  position?: number | null
   character?: { id: number; name: string } | null
   character_group?: { id: number; name: string } | null
 }
@@ -20,12 +22,15 @@ export interface ScriptStageDirection {
   new_content: string | null
   french_scene_id: number
   xml_id: string | null
+  position?: number | null
 }
 
 export interface ScriptSoundCue {
   id: number
   xml_id: string | null
-  number: string | null
+  number?: string | null
+  line_number?: string | null
+  position?: number | null
   kind: string | null
   original_content: string | null
   new_content: string | null
@@ -40,6 +45,7 @@ export type ScriptItem = (ScriptLine | ScriptStageDirection | ScriptSoundCue) & 
 export interface ScriptFrenchScene {
   id: number
   number: string
+  position?: number | null
   pretty_name: string
   lines: ScriptLine[]
   stage_directions: ScriptStageDirection[]

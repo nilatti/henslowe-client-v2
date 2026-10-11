@@ -1,11 +1,13 @@
 import _ from "lodash";
 import { syllable as Syllable } from "syllable";
+import { mergeInPlayOrder, sortByPlayOrder } from "./scriptOrder";
 
 interface Line {
   new_content?: string | null;
   original_content: string;
   count?: number;
   number?: string;
+  position?: number | null;
   character_id?: number | null;
   kind?: string | null;
 }
@@ -272,27 +274,12 @@ function lineToWords(line: string): string[] {
     .split(" ");
 }
 
+// Items come back stamped with `_order` (their play order), which sortLines
+// follows.
 function mergeTextFromFrenchScenes(
   frenchScenes: FrenchScene[],
 ): TextCollection {
-  const allText: TextCollection = {
-    lines: [],
-    sound_cues: [],
-    stage_directions: [],
-  };
-  frenchScenes.map((frenchScene) => {
-    const gatheredLines = frenchScene.lines;
-    const compactLines = _.compact(gatheredLines);
-    allText.lines = allText.lines.concat(compactLines);
-    const compactStageDirections = _.compact(frenchScene.stage_directions);
-    allText.stage_directions = allText.stage_directions.concat(
-      compactStageDirections,
-    );
-    const compactSoundCues = _.compact(frenchScene.sound_cues);
-    allText.sound_cues = allText.sound_cues.concat(compactSoundCues);
-  });
-
-  return allText;
+  return mergeInPlayOrder(frenchScenes) as unknown as TextCollection;
 }
 
 function returnWordsFromLines(lines: Line[]): {
@@ -327,7 +314,12 @@ function returnWordsFromLines(lines: Line[]): {
   };
 }
 
+// Play order when the lines came from mergeTextFromFrenchScenes, else number order.
 function sortLines(arrayOfLines: Line[]): Line[] {
+  return sortByPlayOrder(arrayOfLines, sortLinesByNumber);
+}
+
+function sortLinesByNumber(arrayOfLines: Line[]): Line[] {
   const brokenOut: SortWrapper[] = arrayOfLines.map((line) => {
     let line_number: number | undefined;
     let act_number: number | undefined;

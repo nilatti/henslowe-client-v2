@@ -7,6 +7,9 @@ import { actQueryOptions } from "../../acts/api/acts";
 import { playSkeletonQueryOptions } from "../../plays/api/plays";
 import { SceneForm } from "./SceneForm";
 import { FrenchSceneForm } from "../../french_scenes/components/FrenchSceneForm";
+import { useReorderFrenchScenes } from "../../french_scenes/api/frenchScenes";
+import { arrayMove } from "@dnd-kit/sortable";
+import { SortableList } from "../../../components/ui/SortableList";
 import { useIsPlayAdmin } from "../../../hooks/useUserRole";
 import {
   Button,
@@ -30,6 +33,9 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
   const { frenchScenes: frenchSceneRehearsalTimeById } = useRehearsalTimeLabels(playId);
   const deleteScene = useDeleteScene(playId, actId);
   const isAdmin = useIsPlayAdmin(playId);
+  const reorderFrenchScenes = useReorderFrenchScenes(playId, sceneId);
+  // Only a production's copy of a play can be reordered.
+  const canReorder = isAdmin && !playSkeleton.canonical;
   const navigate = useNavigate();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -49,9 +55,13 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
     ? `Scene ${prettyName}: ${scene.heading}`
     : `Scene ${prettyName}`;
 
-  const lastFrenchScene = scene.french_scenes[scene.french_scenes.length - 1];
-  const nextFrenchSceneNumber = lastFrenchScene
-    ? String.fromCharCode(lastFrenchScene.number.toString().charCodeAt(0) + 1)
+  // French scenes can be reordered, so the last one isn't necessarily the highest letter.
+  const highestLetterCode = Math.max(
+    0,
+    ...scene.french_scenes.map(fs => fs.number.toString().charCodeAt(0)),
+  );
+  const nextFrenchSceneNumber = highestLetterCode
+    ? String.fromCharCode(highestLetterCode + 1)
     : "a";
 
   return (
@@ -142,8 +152,19 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
               </p>
             ) : (
               <ul className="divide-y divide-gray-100">
-                {scene.french_scenes.map((fs) => (
-                  <li key={fs.id}>
+                <SortableList
+                  items={scene.french_scenes}
+                  getId={(fs) => fs.id}
+                  enabled={canReorder}
+                  as="li"
+                  rowClassName={canReorder ? "bg-white pl-2" : ""}
+                  handleLabel="Drag to reorder French scene"
+                  onMove={(from, to) =>
+                    reorderFrenchScenes.mutate(
+                      arrayMove(scene.french_scenes, from, to).map((fs) => fs.id),
+                    )
+                  }
+                  renderItem={(fs) => (
                     <Link
                       to="/plays/$playId/acts/$actId/scenes/$sceneId/french-scenes/$frenchSceneId"
                       params={{
@@ -178,8 +199,8 @@ export function SceneDetail({ playId, actId, sceneId }: SceneDetailProps) {
                         )}
                       </div>
                     </Link>
-                  </li>
-                ))}
+                  )}
+                />
               </ul>
             )}
           </Card>

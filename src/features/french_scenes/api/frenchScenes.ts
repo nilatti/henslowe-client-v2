@@ -1,6 +1,10 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '../../../api/client'
 import type { FrenchScene, FrenchSceneDetail, OnStage, Song } from '../types/frenchScene'
+import type { SceneWithFrenchScenes } from '../../scenes/types/scene'
+import type { PlaySkeleton } from '../../plays/types/play'
+import { reorderByIds } from '../../../utils/reorder'
+import { invalidatePlayOrder } from '../../plays/api/playOrder'
 
 export const frenchSceneQueryOptions = (id: number) =>
   queryOptions({
@@ -146,5 +150,44 @@ export function useDeleteSong(frenchSceneId: number, playId: number, sceneId: nu
       qc.invalidateQueries({ queryKey: ['scenes', sceneId] })
       qc.invalidateQueries({ queryKey: ['french_scenes', frenchSceneId] })
     },
+  })
+}
+
+// Drag-to-reorder on the scene page. ids is every French scene in the scene, in its new order.
+export function useReorderFrenchScenes(playId: number, sceneId: number) {
+  const qc = useQueryClient()
+  const sceneKey = ['scenes', sceneId]
+  const skeletonKey = ['plays', playId, 'skeleton']
+  return useMutation({
+    mutationFn: (ids: number[]) =>
+      api.put(`/api/v1/scenes/${sceneId}/reorder_french_scenes`, { ids }),
+    onMutate: async ids => {
+      await Promise.all([qc.cancelQueries({ queryKey: sceneKey }), qc.cancelQueries({ queryKey: skeletonKey })])
+      const previousScene = qc.getQueryData<SceneWithFrenchScenes>(sceneKey)
+      const previousSkeleton = qc.getQueryData<PlaySkeleton>(skeletonKey)
+      if (previousScene) {
+        qc.setQueryData<SceneWithFrenchScenes>(sceneKey, {
+          ...previousScene,
+          french_scenes: reorderByIds(previousScene.french_scenes, ids),
+        })
+      }
+      if (previousSkeleton) {
+        qc.setQueryData<PlaySkeleton>(skeletonKey, {
+          ...previousSkeleton,
+          acts: previousSkeleton.acts.map(a => ({
+            ...a,
+            scenes: a.scenes.map(s =>
+              s.id === sceneId ? { ...s, french_scenes: reorderByIds(s.french_scenes, ids) } : s,
+            ),
+          })),
+        })
+      }
+      return { previousScene, previousSkeleton }
+    },
+    onError: (_err, _ids, ctx) => {
+      if (ctx?.previousScene) qc.setQueryData(sceneKey, ctx.previousScene)
+      if (ctx?.previousSkeleton) qc.setQueryData(skeletonKey, ctx.previousSkeleton)
+    },
+    onSettled: () => invalidatePlayOrder(qc, playId),
   })
 }

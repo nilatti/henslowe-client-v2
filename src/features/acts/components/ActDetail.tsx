@@ -6,6 +6,8 @@ import { actQueryOptions, useDeleteAct } from "../api/acts";
 import { playSkeletonQueryOptions } from "../../plays/api/plays";
 import { ActForm } from "./ActForm";
 import { SceneForm } from "../../scenes/components/SceneForm";
+import { useReorderScenes } from "../../scenes/api/scenes";
+import { arrayMove } from "@dnd-kit/sortable";
 import { useIsPlayAdmin } from "../../../hooks/useUserRole";
 import {
   Button,
@@ -27,14 +29,17 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
   const { scenes: sceneRehearsalTimeById } = useRehearsalTimeLabels(playId);
   const deleteAct = useDeleteAct(playId);
   const isAdmin = useIsPlayAdmin(playId);
+  const reorderScenes = useReorderScenes(playId, actId);
+  // Only a production's copy of a play can be reordered.
+  const canReorder = isAdmin && !playSkeleton.canonical;
   const navigate = useNavigate();
 
   const [isEditing, setIsEditing] = useState(false);
   const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete();
   const [showForm, setShowForm] = useState(false);
 
-  const lastScene = act.scenes[act.scenes.length - 1];
-  const nextSceneNumber = lastScene ? Number(lastScene.number) + 1 : 1;
+  // Scenes can be reordered, so the last scene isn't necessarily the highest number.
+  const nextSceneNumber = Math.max(0, ...act.scenes.map(s => Number(s.number))) + 1;
 
   const actIndex = playSkeleton.acts.findIndex(a => a.id === actId);
   const prevAct = actIndex > 0 ? playSkeleton.acts[actIndex - 1] : null;
@@ -126,6 +131,13 @@ export function ActDetail({ playId, actId }: ActDetailProps) {
 
           <LinkedItemList
             emptyMessage="No scenes yet."
+            handleLabel="Drag to reorder scene"
+            onMove={
+              canReorder
+                ? (from, to) =>
+                    reorderScenes.mutate(arrayMove(act.scenes, from, to).map(s => s.id))
+                : undefined
+            }
             items={act.scenes.map(scene => {
               const songs = scene.french_scenes?.flatMap(fs => fs.songs) ?? []
               return {

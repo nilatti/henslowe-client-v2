@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
-const { mockUseSuspenseQuery } = vi.hoisted(() => ({
+const { mockUseSuspenseQuery, mockIsPlayAdmin } = vi.hoisted(() => ({
   mockUseSuspenseQuery: vi.fn(),
+  mockIsPlayAdmin: vi.fn(() => false),
 }))
 
 vi.mock('@tanstack/react-query', async (importOriginal) => {
@@ -28,12 +29,16 @@ vi.mock('../api/acts', () => ({
   useDeleteAct: () => ({ mutateAsync: vi.fn() }),
 }))
 
+vi.mock('../../scenes/api/scenes', () => ({
+  useReorderScenes: () => ({ mutate: vi.fn() }),
+}))
+
 vi.mock('../../plays/api/plays', () => ({
   playSkeletonQueryOptions: (id: number) => ({ queryKey: ['plays', id, 'skeleton'] }),
 }))
 
 vi.mock('../../../hooks/useUserRole', () => ({
-  useIsPlayAdmin: () => false,
+  useIsPlayAdmin: () => mockIsPlayAdmin(),
 }))
 
 vi.mock('./ActForm', () => ({ ActForm: () => null }))
@@ -47,29 +52,33 @@ function makeActData(id: number, number: number) {
   return {
     id, number, play_id: 1, summary: null, heading: null,
     start_page: null, end_page: null, original_line_count: 0,
-    new_line_count: 0, created_at: '', updated_at: '', scenes: [],
+    new_line_count: 0, created_at: '', updated_at: '',
+    scenes: [{ id: 100, number: 1, french_scenes: [] }, { id: 101, number: 2, french_scenes: [] }],
   }
 }
 
-function makeActSkeleton(acts: Array<{ id: number; number: number }>) {
+function makeActSkeleton(acts: Array<{ id: number; number: number }>, canonical = true) {
   return {
-    id: 1, title: 'Test Play', canonical: true, synopsis: null, text_notes: null,
+    id: 1, title: 'Test Play', canonical, synopsis: null, text_notes: null,
     production_id: null, author: { id: 1, first_name: 'A', last_name: 'B' },
     characters: [], character_groups: [],
     acts: acts.map(a => ({ ...a, summary: null, scenes: [] })),
   }
 }
 
-function setup(actId: number, acts: Array<{ id: number; number: number }>) {
+function setup(actId: number, acts: Array<{ id: number; number: number }>, canonical = true) {
   mockUseSuspenseQuery.mockImplementation(({ queryKey }: { queryKey: unknown[] }) => {
     if (queryKey[0] === 'acts') return { data: makeActData(actId, acts.find(a => a.id === actId)!.number) }
-    if (queryKey[0] === 'plays') return { data: makeActSkeleton(acts) }
+    if (queryKey[0] === 'plays') return { data: makeActSkeleton(acts, canonical) }
     throw new Error(`Unexpected queryKey: ${JSON.stringify(queryKey)}`)
   })
   render(<ActDetail playId={1} actId={actId} />)
 }
 
-beforeEach(() => { mockUseSuspenseQuery.mockReset() })
+beforeEach(() => {
+  mockUseSuspenseQuery.mockReset()
+  mockIsPlayAdmin.mockReturnValue(false)
+})
 
 // ── tests ─────────────────────────────────────────────────────────────────────
 
@@ -106,5 +115,26 @@ describe('ActDetail — prev/next navigation', () => {
     const nextLink = screen.getByText('Act 3 →').closest('a')!
     expect(JSON.parse(prevLink.dataset.params!)).toMatchObject({ actId: '1' })
     expect(JSON.parse(nextLink.dataset.params!)).toMatchObject({ actId: '3' })
+  })
+})
+
+describe('ActDetail — reordering scenes', () => {
+  const handles = () => screen.queryAllByRole('button', { name: /drag to reorder scene/i })
+
+  it("shows a drag handle on each scene for admins of a production copy", () => {
+    mockIsPlayAdmin.mockReturnValue(true)
+    setup(1, threeActs, false)
+    expect(handles()).toHaveLength(2)
+  })
+
+  it('hides drag handles on canonical plays, even for admins', () => {
+    mockIsPlayAdmin.mockReturnValue(true)
+    setup(1, threeActs, true)
+    expect(handles()).toHaveLength(0)
+  })
+
+  it('hides drag handles from non-admins', () => {
+    setup(1, threeActs, false)
+    expect(handles()).toHaveLength(0)
   })
 })

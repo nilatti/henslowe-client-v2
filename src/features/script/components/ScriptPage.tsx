@@ -16,7 +16,7 @@ import {
   getFrenchScenesFromAct,
   getFrenchScenesFromPlay,
 } from '../utils/scriptUtils'
-import type { MergedText, ScriptAct } from '../types/script'
+import type { MergedText, ScriptAct, ScriptFrenchScene } from '../types/script'
 
 interface ScriptPageProps {
   playId: number
@@ -41,25 +41,22 @@ export function ScriptPage({ playId }: ScriptPageProps) {
 
   const bulkUpdate = useBulkUpdateLines(playId)
 
-  const selectedText = useMemo((): MergedText | null => {
+  // The French scenes in the selected section, in play order.
+  const selectedFrenchScenes = useMemo((): ScriptFrenchScene[] | null => {
     if (!selectedKey) return null
 
-    if (selectedKey === 'play') {
-      return mergeTextFromFrenchScenes(getFrenchScenesFromPlay(script))
-    }
+    if (selectedKey === 'play') return getFrenchScenesFromPlay(script)
 
     if (selectedKey.startsWith('act-')) {
       const actId = Number(selectedKey.split('-')[1])
       const act = script.acts.find(a => a.id === actId)
-      if (!act) return null
-      return mergeTextFromFrenchScenes(getFrenchScenesFromAct(act))
+      return act ? getFrenchScenesFromAct(act) : null
     }
 
     if (selectedKey.startsWith('scene-')) {
       const [, , sceneId] = selectedKey.split('-').map(Number)
       const scene = script.acts.flatMap(a => a.scenes).find(s => s.id === sceneId)
-      if (!scene) return null
-      return mergeTextFromFrenchScenes(scene.french_scenes)
+      return scene ? scene.french_scenes : null
     }
 
     if (selectedKey.startsWith('fs-')) {
@@ -67,12 +64,21 @@ export function ScriptPage({ playId }: ScriptPageProps) {
       const fs = script.acts
         .flatMap(a => a.scenes.flatMap(s => s.french_scenes))
         .find(f => f.id === fsId)
-      if (!fs) return null
-      return mergeTextFromFrenchScenes([fs])
+      return fs ? [fs] : null
     }
 
     return null
   }, [selectedKey, script])
+
+  const allFrenchScenes = useMemo(() => getFrenchScenesFromPlay(script), [script])
+  // Dragging across the whole play is too slow; "Move…" covers it instead.
+  const canDrag = selectedKey !== 'play'
+
+  const selectedText = useMemo(
+    (): MergedText | null =>
+      selectedFrenchScenes ? mergeTextFromFrenchScenes(selectedFrenchScenes) : null,
+    [selectedFrenchScenes]
+  )
 
   const selectedAct = useMemo((): ScriptAct | null => {
     if (!selectedKey?.startsWith('act-')) return null
@@ -194,7 +200,9 @@ export function ScriptPage({ playId }: ScriptPageProps) {
         <div className="flex-1 min-w-0 border-l border-gray-200 pl-8">
           {isEditable && (
             <div className="text-xs text-blue-600 mb-2 italic">
-              Edit mode: double-click any line to edit, or use Cut / Restore
+              Edit mode: double-click any line to edit, use Cut / Restore, or reorder with{' '}
+              {canDrag ? 'drag ⋮⋮ or Move…' : 'Move… (load an act or smaller to drag)'}
+              {canDrag && !showCut && ' (show cut text to drag)'}
             </div>
           )}
           {isProductionCopy && !isEditable && (
@@ -217,6 +225,9 @@ export function ScriptPage({ playId }: ScriptPageProps) {
               {selectedText && (
                 <ScriptViewer
                   text={selectedText}
+                  frenchScenes={selectedFrenchScenes ?? []}
+                  allFrenchScenes={allFrenchScenes}
+                  canDrag={canDrag}
                   showCut={showCut}
                   linesPerMinute={linesPerMinute}
                   isEditable={isEditable}
