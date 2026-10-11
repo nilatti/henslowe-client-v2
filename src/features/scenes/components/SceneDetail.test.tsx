@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
-const { mockUseSuspenseQuery } = vi.hoisted(() => ({
+const { mockUseSuspenseQuery, mockIsPlayAdmin } = vi.hoisted(() => ({
   mockUseSuspenseQuery: vi.fn(),
+  mockIsPlayAdmin: vi.fn(() => false),
 }))
 
 vi.mock('@tanstack/react-query', async (importOriginal) => {
@@ -32,12 +33,16 @@ vi.mock('../../acts/api/acts', () => ({
   actQueryOptions: (id: number) => ({ queryKey: ['acts', id] }),
 }))
 
+vi.mock('../../french_scenes/api/frenchScenes', () => ({
+  useReorderFrenchScenes: () => ({ mutate: vi.fn() }),
+}))
+
 vi.mock('../../plays/api/plays', () => ({
   playSkeletonQueryOptions: (id: number) => ({ queryKey: ['plays', id, 'skeleton'] }),
 }))
 
 vi.mock('../../../hooks/useUserRole', () => ({
-  useIsPlayAdmin: () => false,
+  useIsPlayAdmin: () => mockIsPlayAdmin(),
 }))
 
 vi.mock('./SceneForm', () => ({ SceneForm: () => null }))
@@ -48,11 +53,15 @@ import { SceneDetail } from './SceneDetail'
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 function makeSceneData(id: number, number: number, actId: number) {
+  const frenchScene = (fsId: number, letter: string) => ({
+    id: fsId, number: letter, scene_id: id, summary: null, start_page: null, end_page: null,
+    on_stages: [], songs: [],
+  })
   return {
     id, number, act_id: actId, summary: null, heading: null,
     start_page: null, end_page: null, original_line_count: 0,
     new_line_count: 0, pretty_name: `${Math.ceil(actId / 10)}.${number}`,
-    created_at: '', updated_at: '', french_scenes: [],
+    created_at: '', updated_at: '', french_scenes: [frenchScene(1000, 'a'), frenchScene(1001, 'b')],
   }
 }
 
@@ -66,9 +75,9 @@ function makeActData(id: number, number: number) {
 
 type SkeletonAct = { id: number; number: number; scenes: Array<{ id: number; number: number; prettyName: string }> }
 
-function makeSkeleton(acts: SkeletonAct[]) {
+function makeSkeleton(acts: SkeletonAct[], canonical = true) {
   return {
-    id: 1, title: 'Test Play', canonical: true, synopsis: null, text_notes: null,
+    id: 1, title: 'Test Play', canonical, synopsis: null, text_notes: null,
     production_id: null, author: { id: 1, first_name: 'A', last_name: 'B' },
     characters: [], character_groups: [],
     acts: acts.map(a => ({
@@ -99,18 +108,21 @@ const twoActSkeleton: SkeletonAct[] = [
   },
 ]
 
-function setup(sceneId: number, actId: number, sceneNumber: number) {
+function setup(sceneId: number, actId: number, sceneNumber: number, canonical = true) {
   const actNumber = twoActSkeleton.find(a => a.id === actId)!.number
   mockUseSuspenseQuery.mockImplementation(({ queryKey }: { queryKey: unknown[] }) => {
     if (queryKey[0] === 'scenes') return { data: makeSceneData(sceneId, sceneNumber, actId) }
     if (queryKey[0] === 'acts') return { data: makeActData(actId, actNumber) }
-    if (queryKey[0] === 'plays') return { data: makeSkeleton(twoActSkeleton) }
+    if (queryKey[0] === 'plays') return { data: makeSkeleton(twoActSkeleton, canonical) }
     throw new Error(`Unexpected queryKey: ${JSON.stringify(queryKey)}`)
   })
   render(<SceneDetail playId={1} actId={actId} sceneId={sceneId} />)
 }
 
-beforeEach(() => { mockUseSuspenseQuery.mockReset() })
+beforeEach(() => {
+  mockUseSuspenseQuery.mockReset()
+  mockIsPlayAdmin.mockReturnValue(false)
+})
 
 // ── tests ─────────────────────────────────────────────────────────────────────
 
@@ -145,5 +157,21 @@ describe('SceneDetail — prev/next navigation', () => {
     setup(20, 2, 1) // Scene 2.1 — first of act 2
     const prevLink = screen.getByText('← Scene 1.2').closest('a')!
     expect(JSON.parse(prevLink.dataset.params!)).toMatchObject({ sceneId: '11', actId: '1' })
+  })
+})
+
+describe('SceneDetail — reordering French scenes', () => {
+  const handles = () => screen.queryAllByRole('button', { name: /drag to reorder french scene/i })
+
+  it('shows a drag handle on each French scene for admins of a production copy', () => {
+    mockIsPlayAdmin.mockReturnValue(true)
+    setup(10, 1, 1, false)
+    expect(handles()).toHaveLength(2)
+  })
+
+  it('hides drag handles on canonical plays', () => {
+    mockIsPlayAdmin.mockReturnValue(true)
+    setup(10, 1, 1, true)
+    expect(handles()).toHaveLength(0)
   })
 })

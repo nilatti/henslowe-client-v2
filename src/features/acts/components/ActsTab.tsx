@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useConfirmDelete } from "../../../hooks/useConfirmDelete";
-import { useDeleteAct } from "../api/acts";
+import { useDeleteAct, useReorderActs } from "../api/acts";
+import { arrayMove } from "@dnd-kit/sortable";
+import { SortableList } from "../../../components/ui/SortableList";
 import { ActForm } from "./ActForm";
 import type { PlaySkeleton } from "../../plays/types/play";
 import { useIsPlayAdmin } from "../../../hooks/useUserRole";
@@ -15,94 +17,108 @@ interface ActsTabProps {
 
 export function ActsTab({ play, playId }: ActsTabProps) {
   const deleteAct = useDeleteAct(playId);
+  const reorderActs = useReorderActs(playId);
   const isAdmin = useIsPlayAdmin(playId);
+  // Only a production's copy of a play can be reordered.
+  const canReorder = isAdmin && !play.canonical;
   const { acts: actRehearsalTimeById, scenes: sceneRehearsalTimeById } =
     useRehearsalTimeLabels(playId);
 
   const [showForm, setShowForm] = useState(false);
   const { target: confirmDelete, open: requestDelete, close: clearDelete } = useConfirmDelete<number>();
 
-  const nextActNumber = (play.acts[play.acts.length - 1]?.number ?? 0) + 1;
+  // Acts can be reordered, so the last act isn't necessarily the highest number.
+  const nextActNumber = Math.max(0, ...play.acts.map((a) => a.number)) + 1;
 
   return (
     <div className="space-y-4">
-      {play.acts.map((act) => (
-        <Card key={act.id}>
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-            <div>
-              <Link
-                to="/plays/$playId/acts/$actId"
-                params={{ playId: String(playId), actId: String(act.id) }}
-                className="text-sm font-semibold text-gray-900 hover:text-blue-600"
-              >
-                Act {act.number}
-              </Link>
-              {act.summary && (
-                <p className="text-xs text-gray-500 mt-0.5">{act.summary}</p>
-              )}
-              {actRehearsalTimeById.get(act.id) && (
-                <p className="text-xs text-gray-400 mt-0.5">
-                  {actRehearsalTimeById.get(act.id)}
-                </p>
+      <SortableList
+        items={play.acts}
+        getId={(act) => act.id}
+        enabled={canReorder}
+        handleLabel="Drag to reorder act"
+        rowClassName=""
+        onMove={(from, to) =>
+          reorderActs.mutate(arrayMove(play.acts, from, to).map((a) => a.id))
+        }
+        renderItem={(act) => (
+          <Card>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+              <div>
+                <Link
+                  to="/plays/$playId/acts/$actId"
+                  params={{ playId: String(playId), actId: String(act.id) }}
+                  className="text-sm font-semibold text-gray-900 hover:text-blue-600"
+                >
+                  Act {act.number}
+                </Link>
+                {act.summary && (
+                  <p className="text-xs text-gray-500 mt-0.5">{act.summary}</p>
+                )}
+                {actRehearsalTimeById.get(act.id) && (
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {actRehearsalTimeById.get(act.id)}
+                  </p>
+                )}
+              </div>
+              {isAdmin && (
+                <Button variant="danger" onClick={() => requestDelete(act.id)}>
+                  Delete
+                </Button>
               )}
             </div>
-            {isAdmin && (
-              <Button variant="danger" onClick={() => requestDelete(act.id)}>
-                Delete
-              </Button>
-            )}
-          </div>
-          <ul className="divide-y divide-gray-100">
-            {act.scenes.map((scene) => (
-              <li key={scene.id}>
-                <Link
-                  to="/plays/$playId/acts/$actId/scenes/$sceneId"
-                  params={{
-                    playId: String(playId),
-                    actId: String(act.id),
-                    sceneId: String(scene.id),
-                  }}
-                  className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
-                >
-                  <div>
-                    <span className="text-gray-700">
-                      Scene {scene.pretty_name}{scene.heading ? `: ${scene.heading}` : ''}
-                    </span>
-                    {scene.summary && (
-                      <p className="text-xs text-gray-500 mt-0.5">{scene.summary}</p>
+            <ul className="divide-y divide-gray-100">
+              {act.scenes.map((scene) => (
+                <li key={scene.id}>
+                  <Link
+                    to="/plays/$playId/acts/$actId/scenes/$sceneId"
+                    params={{
+                      playId: String(playId),
+                      actId: String(act.id),
+                      sceneId: String(scene.id),
+                    }}
+                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-sm"
+                  >
+                    <div>
+                      <span className="text-gray-700">
+                        Scene {scene.pretty_name}{scene.heading ? `: ${scene.heading}` : ''}
+                      </span>
+                      {scene.summary && (
+                        <p className="text-xs text-gray-500 mt-0.5">{scene.summary}</p>
+                      )}
+                      {(scene.start_page != null || scene.end_page != null) && (
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {scene.start_page != null && scene.end_page != null
+                            ? `pp. ${scene.start_page}–${scene.end_page}`
+                            : scene.start_page != null
+                            ? `p. ${scene.start_page}`
+                            : `p. ${scene.end_page}`}
+                        </p>
+                      )}
+                      {(() => {
+                        const songs = scene.french_scenes?.flatMap(fs => fs.songs) ?? []
+                        return songs.length > 0 ? (
+                          <p className="text-xs text-gray-400 mt-0.5">{songs.map(s => s.title).join(' · ')}</p>
+                        ) : null
+                      })()}
+                    </div>
+                    {sceneRehearsalTimeById.get(scene.id) && (
+                      <span className="text-gray-400 text-xs shrink-0 ml-4">
+                        {sceneRehearsalTimeById.get(scene.id)}
+                      </span>
                     )}
-                    {(scene.start_page != null || scene.end_page != null) && (
-                      <p className="text-xs text-gray-400 mt-0.5">
-                        {scene.start_page != null && scene.end_page != null
-                          ? `pp. ${scene.start_page}–${scene.end_page}`
-                          : scene.start_page != null
-                          ? `p. ${scene.start_page}`
-                          : `p. ${scene.end_page}`}
-                      </p>
-                    )}
-                    {(() => {
-                      const songs = scene.french_scenes?.flatMap(fs => fs.songs) ?? []
-                      return songs.length > 0 ? (
-                        <p className="text-xs text-gray-400 mt-0.5">{songs.map(s => s.title).join(' · ')}</p>
-                      ) : null
-                    })()}
-                  </div>
-                  {sceneRehearsalTimeById.get(scene.id) && (
-                    <span className="text-gray-400 text-xs shrink-0 ml-4">
-                      {sceneRehearsalTimeById.get(scene.id)}
-                    </span>
-                  )}
-                </Link>
-              </li>
-            ))}
-            {act.scenes.length === 0 && (
-              <li className="px-4 py-3 text-sm text-gray-400 italic">
-                No scenes yet.
-              </li>
-            )}
-          </ul>
-        </Card>
-      ))}
+                  </Link>
+                </li>
+              ))}
+              {act.scenes.length === 0 && (
+                <li className="px-4 py-3 text-sm text-gray-400 italic">
+                  No scenes yet.
+                </li>
+              )}
+            </ul>
+          </Card>
+        )}
+      />
       {isAdmin && !showForm && (
         <Button onClick={() => setShowForm(true)}>Add Act</Button>
       )}

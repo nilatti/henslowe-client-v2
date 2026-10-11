@@ -26,14 +26,13 @@ function collectItems(act: ScriptAct): {
 }[] {
   return act.scenes.map(scene => {
     const allItems: ItemWithType[] = []
-    for (const fs of scene.french_scenes) {
-      const merged = mergeTextFromFrenchScenes([fs])
-      for (const l of merged.lines) allItems.push({ ...l, _type: 'line' })
-      for (const sd of merged.stage_directions)
-        allItems.push({ ...sd, _type: 'stage_direction' })
-      for (const sc of merged.sound_cues) {
-        if (sc.original_content?.trim()) allItems.push({ ...sc, _type: 'sound_cue' })
-      }
+    // Merge the whole scene at once so play order runs across its French scenes.
+    const merged = mergeTextFromFrenchScenes(scene.french_scenes)
+    for (const l of merged.lines) allItems.push({ ...l, _type: 'line' })
+    for (const sd of merged.stage_directions)
+      allItems.push({ ...sd, _type: 'stage_direction' })
+    for (const sc of merged.sound_cues) {
+      if (sc.original_content?.trim()) allItems.push({ ...sc, _type: 'sound_cue' })
     }
     const filtered = allItems.filter(item => item.original_content?.trim())
     return {

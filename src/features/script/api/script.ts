@@ -6,6 +6,8 @@ import type {
   ScriptStageDirection,
   ScriptSoundCue,
 } from '../types/script'
+import { applyScriptReorder, type FrenchSceneOrder } from '../utils/scriptReorder'
+import { invalidatePlayOrder } from '../../plays/api/playOrder'
 
 export const playScriptQueryOptions = (playId: number) =>
   queryOptions({
@@ -198,5 +200,28 @@ export function useUpdateSoundCue(playId: number) {
     onSettled: () => {
       qc.invalidateQueries({ queryKey: ['plays', playId, 'script'] })
     },
+  })
+}
+
+// Drag-to-reorder in script edit mode. orders lists, for each French scene the
+// moved item left or joined, every item in its new order.
+export function useReorderScriptItems(playId: number) {
+  const qc = useQueryClient()
+  const key = ['plays', playId, 'script']
+  return useMutation({
+    mutationFn: (orders: FrenchSceneOrder[]) =>
+      api.put(`/api/v1/plays/${playId}/reorder_script_items`, { french_scenes: orders }),
+    onMutate: async orders => {
+      await qc.cancelQueries({ queryKey: key })
+      const previous = qc.getQueryData<PlayScript>(key)
+      if (previous) qc.setQueryData<PlayScript>(key, applyScriptReorder(previous, orders))
+      return { previous }
+    },
+    onError: (_err, _orders, ctx) => {
+      if (ctx?.previous) qc.setQueryData(key, ctx.previous)
+    },
+    // A moved line can add its speaker to a French scene's on-stage list, so
+    // refresh more than the script.
+    onSettled: () => invalidatePlayOrder(qc, playId),
   })
 }

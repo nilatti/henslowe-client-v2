@@ -1,4 +1,10 @@
 import * as DiffLib from 'diff'
+import {
+  compareByNumber,
+  mergeInPlayOrder,
+  sortByPlayOrder,
+  type OrderableItem,
+} from '../../../utils/scriptOrder'
 import type {
   ScriptFrenchScene,
   ScriptAct,
@@ -6,14 +12,12 @@ import type {
   PlayScript,
 } from '../types/script'
 
+// Items come back stamped with `_order` (their play order), which
+// sortScriptItems follows.
 export function mergeTextFromFrenchScenes(
   frenchScenes: ScriptFrenchScene[]
 ): MergedText {
-  return {
-    lines: frenchScenes.flatMap(fs => fs.lines),
-    stage_directions: frenchScenes.flatMap(fs => fs.stage_directions),
-    sound_cues: frenchScenes.flatMap(fs => fs.sound_cues),
-  }
+  return mergeInPlayOrder(frenchScenes)
 }
 
 export function getFrenchScenesFromAct(act: ScriptAct): ScriptFrenchScene[] {
@@ -24,26 +28,9 @@ export function getFrenchScenesFromPlay(play: PlayScript): ScriptFrenchScene[] {
   return play.acts.flatMap(act => act.scenes.flatMap(s => s.french_scenes))
 }
 
-export function sortScriptItems<
-  T extends { number: string | null | undefined },
->(items: T[]): T[] {
-  return [...items].sort((a, b) => {
-    const aSegs = parseLineNumber(a.number ?? '')
-    const bSegs = parseLineNumber(b.number ?? '')
-    const len = Math.max(aSegs.length, bSegs.length)
-    for (let i = 0; i < len; i++) {
-      // Missing trailing segments sort before 0, placing e.g. "4.1.16"
-      // before "SD 4.1.16.0" (which is a sub-position of that line).
-      const diff = (i < aSegs.length ? aSegs[i] : -1) - (i < bSegs.length ? bSegs[i] : -1)
-      if (diff !== 0) return diff
-    }
-    return 0
-  })
-}
-
-function parseLineNumber(num: string): number[] {
-  const stripped = num.replace(/^(SD|SC)\s*/, '')
-  return stripped.split('.').map(n => parseInt(n, 10) || 0)
+// Play order when the items came from mergeTextFromFrenchScenes, else number order.
+export function sortScriptItems<T extends OrderableItem>(items: T[]): T[] {
+  return sortByPlayOrder(items, all => [...all].sort(compareByNumber))
 }
 
 export function buildDiff(
