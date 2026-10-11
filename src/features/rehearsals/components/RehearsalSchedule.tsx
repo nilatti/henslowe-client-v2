@@ -289,7 +289,7 @@ export function RehearsalSchedule({
             onClick={() =>
               downloadRehearsalTSV(
                 rehearsals,
-                `${slugify(productionSkeleton.play.title)}-${format(new Date(), "yyyyMMdd")}.tsv`,
+                `${slugify(productionSkeleton.play?.title ?? "rehearsals")}-${format(new Date(), "yyyyMMdd")}.tsv`,
               )
             }
           >

@@ -21,6 +21,7 @@ export const Route = createFileRoute('/_authenticated/productions/$productionId/
     const { data: production } = useSuspenseQuery(
       productionSkeletonQueryOptions(pid)
     )
+    if (!production.play) return null
     return (
       <RehearsalSchedule
         productionId={pid}

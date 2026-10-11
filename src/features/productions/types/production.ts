@@ -34,7 +34,8 @@ export interface Production {
   audition_information: string | null
   created_at: string
   updated_at: string
-  play: { id: number; title: string; has_lines: boolean; new_line_count: number }
+  // Null until PlayCopyWorker finishes copying the play for a new production.
+  play: { id: number; title: string; has_lines: boolean; new_line_count: number } | null
   theater: { id: number; name: string; fake?: boolean }
   default_space_id: number | null
   default_space: { id: number; name: string } | null

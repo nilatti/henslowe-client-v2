@@ -48,7 +48,7 @@ export function DoublingChartContainer({
   );
 
   const chartPlay: ChartPlay | null =
-    script && script.acts.length > 0
+    production.play && script && script.acts.length > 0
       ? {
           id: production.play.id,
           title: production.play.title,

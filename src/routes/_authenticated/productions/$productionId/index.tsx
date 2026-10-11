@@ -59,7 +59,8 @@ export const Route = createFileRoute('/_authenticated/productions/$productionId/
               <dd className="text-gray-600 mt-1">{production.lines_per_minute}</dd>
             </div>
           )}
-          {production.lines_per_minute != null &&
+          {production.play &&
+            production.lines_per_minute != null &&
             production.lines_per_minute !== 0 &&
             production.play.new_line_count > 0 && (
               <div>
